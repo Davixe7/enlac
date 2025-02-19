@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('dose');
             $table->string('frequency');
             $table->string('duration');
+            $table->string('observations')->nullable();
             $table->timestamps();
         });
     }

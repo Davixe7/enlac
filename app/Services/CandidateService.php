@@ -37,4 +37,28 @@ class CandidateService
             return $candidate;
         });
     }
+
+    public function updateCandidate(Candidate $candidate, Request $request)
+    {
+        return DB::transaction(function () use ($candidate, $request) {
+            $candidateData = $request->candidate;
+            unset($candidateData['id']);
+
+            $candidate->update($candidateData);
+            $contact = Contact::updateOrCreate(['id' => $request->contact['id']], $request->contact);
+            $address = Address::updateOrCreate(['id' => $request->address], $request->address);
+
+            foreach ($request->medications as $medicationData) {
+                Medication::updateOrCreate(
+                    [
+                        'id' => isset($medicationData['id']) ? $medicationData['id'] : null,
+                        'candidate_id' => $candidate->id
+                    ],
+                    $medicationData
+                );
+            }
+
+            return $candidate;
+        });
+    }
 }

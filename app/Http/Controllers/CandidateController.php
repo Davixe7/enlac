@@ -40,9 +40,9 @@ class CandidateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCandidateRequest $request, Candidate $candidate)
+    public function update(CreateCandidateRequest $request, Candidate $candidate)
     {
-        $candidate = $candidate->update($request->validated());
+        $candidate = $this->candidateService->updateCandidate($candidate, $request);
         return new CandidateResource($candidate);
     }
 

@@ -25,7 +25,7 @@ class CandidateResource extends JsonResource
             'diagnosis' => $this->diagnosis,
             'photo' => $this->photo,
             'contact' => $this->contacts->load('addresses')->first(),
-            'medications' => $this->load('medications'),
+            'medications' => $this->medications,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
