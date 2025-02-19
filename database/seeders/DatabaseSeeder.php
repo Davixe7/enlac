@@ -28,5 +28,8 @@ class DatabaseSeeder extends Seeder
         $this->call(BrainLevelSeeder::class);
         $this->call(BrainFunctionSeeder::class);
         $this->call(BrainFunctionRankSeeder::class);
+        $this->call(ProgramSeeder::class);
+        $this->call(InterviewSeeder::class);
+        $this->call(InterviewQuestionSeeder::class);
     }
 }
