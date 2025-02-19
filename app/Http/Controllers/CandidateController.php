@@ -4,17 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\Candidate;
 use App\Http\Resources\CandidateResource;
+use App\Services\CandidateService;
 use App\Http\Requests\StoreCandidateRequest;
 use App\Http\Requests\UpdateCandidateRequest;
+use App\Http\Requests\CreateCandidateRequest;
+use Illuminate\Http\Request;
 
 class CandidateController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $candidateService;
+
+    public function __construct(CandidateService $candidateService)
+    {
+        $this->candidateService = $candidateService;
+    }
+
     public function index()
     {
         return CandidateResource::collection(Candidate::all());
+    }
+
+    public function createCandidate(CreateCandidateRequest $request)
+    {
+        $candidate = $this->candidateService->createCandidate($request);
+        $candidate->createCandidate();
+        return new CandidateResource($candidate);
     }
 
     /**
