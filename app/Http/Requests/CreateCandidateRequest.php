@@ -31,7 +31,6 @@ class CreateCandidateRequest extends FormRequest
             'candidate.diagnosis' => 'nullable|string',
             'candidate.photo' => 'nullable|string',
 
-            'contact.candidate_id' => 'required|exists:candidates,id',
             'contact.first_name' => 'required|string|max:255',
             'contact.middle_name' => 'nullable|string|max:255',
             'contact.last_name' => 'required|string|max:255',
@@ -42,7 +41,6 @@ class CreateCandidateRequest extends FormRequest
             'contact.whatsapp' => 'nullable|string|max:255',
             'contact.home_phone' => 'nullable|string|max:255',
 
-            'address.contact_id' => 'required|exists:contacts,id',
             'address.street' => 'required|string|max:255',
             'address.neighborhood' => 'required|string|max:255',
             'address.state' => 'required|string|max:255',

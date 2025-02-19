@@ -24,7 +24,8 @@ class CandidateResource extends JsonResource
             'chronological_age' => $this->chronological_age,
             'diagnosis' => $this->diagnosis,
             'photo' => $this->photo,
-            'contacts' => $this->whenLoaded('contacts'),
+            'contact' => $this->contacts->load('addresses')->first(),
+            'medications' => $this->load('medications'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

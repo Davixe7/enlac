@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Candidate;
 use App\Http\Resources\CandidateResource;
 use App\Services\CandidateService;
-use App\Http\Requests\StoreCandidateRequest;
 use App\Http\Requests\UpdateCandidateRequest;
 use App\Http\Requests\CreateCandidateRequest;
 use Illuminate\Http\Request;
@@ -24,19 +23,9 @@ class CandidateController extends Controller
         return CandidateResource::collection(Candidate::all());
     }
 
-    public function createCandidate(CreateCandidateRequest $request)
+    public function store(CreateCandidateRequest $request)
     {
         $candidate = $this->candidateService->createCandidate($request);
-        $candidate->createCandidate();
-        return new CandidateResource($candidate);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCandidateRequest $request)
-    {
-        $candidate = Candidate::create($request->validated());
         return new CandidateResource($candidate);
     }
 
@@ -45,7 +34,7 @@ class CandidateController extends Controller
      */
     public function show(Candidate $candidate)
     {
-        return new CandidateResource($candidate);
+        return new CandidateResource($candidate->load('contacts.addresses'));
     }
 
     /**

@@ -26,7 +26,10 @@ class Candidate extends Model
 
     public function programs()
     {
-        return $this->belongsToMany(Program::class)
-            ->withTimestamps();
+        return $this->belongsToMany(Program::class)->withTimestamps();
+    }
+
+    public function medications(){
+        return $this->hasMany(Medication::class);
     }
 }
