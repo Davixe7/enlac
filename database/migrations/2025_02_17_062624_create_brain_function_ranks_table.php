@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('laterality_impact', ['l', 'r']);
             $table->foreignId('brain_level_id')->constrained();
             $table->foreignId('brain_function_id')->constrained();
-            $table->foreignId('candidate_id')->constrained();
+            $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

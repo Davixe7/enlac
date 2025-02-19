@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('123456')
         ]);
 
-        $this->call(CandidateSeeder::class);
+        /* $this->call(CandidateSeeder::class);
         $this->call(MedicationSeeder::class);
         $this->call(ContactSeeder::class);
         $this->call(AddressSeeder::class);
@@ -30,6 +30,6 @@ class DatabaseSeeder extends Seeder
         $this->call(BrainFunctionRankSeeder::class);
         $this->call(ProgramSeeder::class);
         $this->call(InterviewSeeder::class);
-        $this->call(InterviewQuestionSeeder::class);
+        $this->call(InterviewQuestionSeeder::class); */
     }
 }

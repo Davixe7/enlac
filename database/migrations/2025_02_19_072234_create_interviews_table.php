@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('parent_name');
             $table->integer('apgar_rank');
-            $table->foreignId('candidate_id')->constrained('candidates');
+            $table->foreignId('candidate_id')->constrained('candidates')->onDelete('cascade');
             $table->boolean('sphincter');
             $table->date('signed_at')->nullable();
             $table->text('observation')->nullable();
