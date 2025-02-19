@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Program extends Model
 {
-    use HasFactory;
+    use HasFactory ;
     protected $guarded = [];
+
+    public function cadidates()
+    {
+        return $this->belongsToMany(Candidate::class)
+            ->withTimestamps();
+    }
 }

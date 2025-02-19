@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('chronological_age');
             $table->text('diagnosis');
             $table->string('photo')->nullable();
+            $table->string('acceptance_status')->default(null)->nullable();
             $table->timestamps();
         });
     }

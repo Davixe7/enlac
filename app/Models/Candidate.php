@@ -23,4 +23,10 @@ class Candidate extends Model
     public function brainFunctionRanks() {
         return $this->hasMany(BrainFunctionRank::class);
     }
+
+    public function programs()
+    {
+        return $this->belongsToMany(Program::class)
+            ->withTimestamps();
+    }
 }
