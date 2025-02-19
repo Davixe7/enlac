@@ -13,35 +13,41 @@ class InterviewQuestionSeeder extends Seeder
      */
     public function run(): void
     {
-        InterviewQuestion::create(['question_text' => '¿Cuál es tu mayor fortaleza?']);
-        InterviewQuestion::create(['question_text' => '¿Cuál es tu mayor debilidad?']);
-        InterviewQuestion::create(['question_text' => '¿Por qué quieres trabajar en esta empresa?']);
-        InterviewQuestion::create(['question_text' => '¿Qué experiencia tienes en este campo?']);
-        InterviewQuestion::create(['question_text' => '¿Cuáles son tus objetivos profesionales?']);
-        InterviewQuestion::create(['question_text' => '¿Cómo manejas la presión?']);
-        InterviewQuestion::create(['question_text' => '¿Qué te motiva?']);
-        InterviewQuestion::create(['question_text' => '¿Cómo trabajas en equipo?']);
-        InterviewQuestion::create(['question_text' => '¿Qué esperas de este puesto?']);
-        InterviewQuestion::create(['question_text' => '¿Por qué deberíamos contratarte?']);
-        InterviewQuestion::create(['question_text' => '¿Cuál es tu disponibilidad?']);
-        InterviewQuestion::create(['question_text' => '¿Tienes alguna pregunta para nosotros?']);
-        InterviewQuestion::create(['question_text' => 'Describe un momento en el que superaste un desafío.']);
-        InterviewQuestion::create(['question_text' => '¿Cómo te mantienes actualizado en tu campo?']);
-        InterviewQuestion::create(['question_text' => '¿Qué habilidades te hacen destacar?']);
-        InterviewQuestion::create(['question_text' => '¿Qué te gusta hacer en tu tiempo libre?']);
-        InterviewQuestion::create(['question_text' => '¿Cómo te describirías en tres palabras?']);
-        InterviewQuestion::create(['question_text' => '¿Qué salario esperas?']);
-        InterviewQuestion::create(['question_text' => '¿Estás dispuesto a reubicarte?']);
-        InterviewQuestion::create(['question_text' => '¿Cómo manejas el conflicto?']);
-        InterviewQuestion::create(['question_text' => '¿Qué te inspiró a seguir esta carrera?']);
-        InterviewQuestion::create(['question_text' => '¿Qué te atrae de nuestra cultura empresarial?']);
-        InterviewQuestion::create(['question_text' => '¿Cómo contribuyes al éxito de un equipo?']);
-        InterviewQuestion::create(['question_text' => '¿Qué rol sueles desempeñar en un equipo?']);
-        InterviewQuestion::create(['question_text' => '¿Cómo te adaptas a los cambios?']);
-        InterviewQuestion::create(['question_text' => '¿Qué te gustaría lograr en los próximos cinco años?']);
-        InterviewQuestion::create(['question_text' => '¿Qué te diferencia de otros candidatos?']);
-        InterviewQuestion::create(['question_text' => '¿Por qué dejaste tu último trabajo?']);
-        InterviewQuestion::create(['question_text' => '¿Qué has aprendido de tus errores?']);
-        InterviewQuestion::create(['question_text' => '¿Qué te gustaría saber sobre nosotros?']);
+        $preguntas = [
+            "¿Consultó con algún médico especialista?",
+            "¿El embarazo de su hija fue un embarazo planeado?",
+            "¿Cuántos embarazos ha tenido?",
+            "¿Tuvo su hijo alguna complicación durante el embarazo?",
+            "¿Cómo fue el embarazo y qué edad tenía la madre cuando nació su hijo/a?",
+            "¿Qué número de hijo(a) es?",
+            "¿Tuvo algún problema durante el embarazo?",
+            "¿A las cuántas semanas nació?",
+            "¿Usó fórceps o hubo necesidad de utilizar la aspiradora?",
+            "Descríbame, ¿cómo fue el nacimiento de su bebé?",
+            "¿Su hijo(a) lloró al nacer?",
+            "Actualmente, ¿viven juntos los padres, quiénes viven en casa?",
+            "En caso de haberse separado, ¿cuál fue el motivo de la separación?",
+            "¿Le dio permiso si la respuesta es sí. ¿Cuánto tiempo? Si la respuesta es no. ¿Por qué motivo?",
+            "¿El niño se encuentra a su edad, y por cuánto tiempo?",
+            "¿Gatea? ¿A qué edad?",
+            "¿A qué edad caminó?",
+            "¿El niño balbucea y a qué edad?",
+            "¿En algún momento notó algún retraso en su desarrollo?",
+            "¿El niño(a) acudió a la guardería, kinder o algún otro centro educativo? ¿Cómo fue?",
+            "Actualmente, ¿qué alimentos consume (describa el plato de comida de un día del menú del niño(a))?",
+            "En el día a día, ¿cómo es la rutina del niño(a) desde que se despierta hasta que se duerme?",
+            "¿Qué le llama la atención cuando lo observan jugar?",
+            "¿Cómo es el ciclo de sueño de su niño(a) (cuántas siestas, a qué hora se acuesta y se levanta)?",
+            "¿El niño rechina los dientes (durante el día, durante la noche o ambos)?",
+            "¿Es de mayor de 9 años y ya tuvo su período? ¿Qué edad tenía cuando inició su período? ¿Toma alguna medicación o tratamiento hormonal?",
+            "¿Ha tenido algún evento emocional fuerte (pérdida de algún familiar, separación, violencia, etc.)?",
+            "¿Hay algo más que desea agregar?"
+        ];
+
+        foreach ($preguntas as $pregunta) {
+            InterviewQuestion::create([
+                'question_text' => $pregunta
+            ]);
+        }
     }
 }
