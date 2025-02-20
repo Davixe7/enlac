@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer('age');
             $table->integer('chronological_age');
             $table->text('diagnosis');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->date('evaluation_date');
             $table->string('photo')->nullable();
             $table->string('acceptance_status')->default(null)->nullable();
             $table->timestamps();

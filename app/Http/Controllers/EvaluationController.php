@@ -8,10 +8,11 @@ use App\Models\Evaluation;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreEvaluationRequest;
 use App\Http\Requests\UpdateEvaluationRequest;
+use App\Models\User;
 
 class EvaluationController extends Controller
 {
-    public function store(StoreEvaluationRequest $request)
+    public function store(StoreEvaluationRequest $request, User $user)
     {
         $candidate = Candidate::where('id', $request->validated()->candidate_id);
         $evaluation = $candidate->evaluation()->create($request->validated());
