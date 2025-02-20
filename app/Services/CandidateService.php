@@ -18,6 +18,10 @@ class CandidateService
             // 1. Crear Candidato
             $candidate = Candidate::create($request->candidate);
 
+            if ($request->hasFile('picture')) {
+                $candidate->addMediaFromRequest('picture')->toMediaCollection('profile_picture');
+            }
+
             // 2. Crear Contacto
             $contact = new Contact($request->contact);
             $contact->candidate_id = $candidate->id;
@@ -45,6 +49,11 @@ class CandidateService
             unset($candidateData['id']);
 
             $candidate->update($candidateData);
+
+            if ($request->hasFile('picture')) {
+                $candidate->addMediaFromRequest('picture')->toMediaCollection('profile_picture');
+            }
+
             $contact = Contact::updateOrCreate(['id' => $request->contact['id']], $request->contact);
             $address = Address::updateOrCreate(['id' => $request->address], $request->address);
 
