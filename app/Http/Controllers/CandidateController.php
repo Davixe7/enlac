@@ -23,10 +23,10 @@ class CandidateController extends Controller
         return CandidateResource::collection(Candidate::all());
     }
 
-    public function store(CreateCandidateRequest $request)
+    public function store(Request $request)
     {
         $candidate = $this->candidateService->createCandidate($request);
-        return new CandidateResource($candidate);
+        return new CandidateResource($candidate->load('evaluation_schedules.evaluator'));
     }
 
     /**
@@ -34,7 +34,7 @@ class CandidateController extends Controller
      */
     public function show(Candidate $candidate)
     {
-        return new CandidateResource($candidate->load('contacts.addresses'));
+        return new CandidateResource($candidate->load(['contacts.addresses', 'evaluation_schedules.evaluator']));
     }
 
     /**

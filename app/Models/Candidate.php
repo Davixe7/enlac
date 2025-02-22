@@ -36,15 +36,34 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(Medication::class);
     }
 
+    public function registerMediaConversions(?Media $media = null): void
+    {
+            $this->addMediaConversion('thumb')
+                ->width(300)
+                ->height(300);
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('profile_picture')
             ->singleFile()
-            ->useDisk('public')
-            ->registerConversions(function (Media $media) {
-                $this->addMediaConversion('thumb')
-                    ->width(300)
-                    ->height(300);
-            });
+            ->useDisk('public');
+    }
+
+    public function evaluation_schedules(){
+        return $this->hasMany(EvaluationSchedule::class);
+    }
+
+    public function getEvaluationScheduleAttribute(){
+        return $this->evaluation_schedules()
+        ->orderBy('created_at', 'desc')
+        ->where('status', '!=', 'canceled')
+        ->with('evaluator')
+        ->first();
+    }
+
+    public function getFullNameAttribute(){
+        $fullNameArray = array_filter([$this->first_name, $this->middle_name, $this->last_name]);
+        return join(" ", $fullNameArray);
     }
 }

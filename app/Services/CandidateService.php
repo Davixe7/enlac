@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\Candidate;
 use App\Models\Contact;
 use App\Models\Address;
+use App\Models\EvaluationSchedule;
 use App\Models\Medication;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -33,10 +36,15 @@ class CandidateService
             $address->save();
 
             // 4. Crear Medicamentos
-            foreach ($request->medicamentos as $medicationData) {
-                $medication = new Medication($medicationData);
-                $medication->save();
+            foreach ($request->medications as $medicationData) {
+                $candidate->medications()->create($medicationData);
             }
+
+            // 5. Crear agendamiento de Evaluacion
+            $evaluation_schedule = EvaluationSchedule::create(array_merge(
+                $request->evaluation_schedule,
+                ['candidate_id' => $candidate->id]
+            ));
 
             return $candidate;
         });
@@ -65,6 +73,20 @@ class CandidateService
                     ],
                     $medicationData
                 );
+            }
+
+            /*
+            Si cambian evaluador o fecha de cita
+            cacelar cita actual, generar nueva cita. */
+            $evaluator_changed = $candidate->evaluation_schedule['evaluator_id'] != $request->evaluation_schedule['evaluator_id'];
+            $date_changed      = $candidate->evaluation_schedule['date'] != $request->evaluation_schedule['date'];
+            if ($evaluator_changed || $date_changed) {
+                $candidate->evaluation_schedule->update(['status' => 'canceled']);
+                $evaluation_schedule = EvaluationSchedule::create([
+                    "candidate_id" => $request->evaluation_schedule['candidate_id'],
+                    "evaluator_id" => $request->evaluation_schedule['evaluator_id'],
+                    "date" => $request->evaluation_schedule['date'],
+                ]);
             }
 
             return $candidate;
