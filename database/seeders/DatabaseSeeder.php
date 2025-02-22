@@ -30,11 +30,12 @@ class DatabaseSeeder extends Seeder
         $this->call(ContactSeeder::class);
         $this->call(AddressSeeder::class);t
         $this->call(EvaluationSeeder::class);
-        $this->call(BrainLevelSeeder::class);
-        $this->call(BrainFunctionSeeder::class);
         $this->call(BrainFunctionRankSeeder::class);
         $this->call(ProgramSeeder::class);
         $this->call(InterviewSeeder::class);
         $this->call(InterviewQuestionSeeder::class); */
+
+        $this->call(BrainLevelSeeder::class);
+        $this->call(BrainFunctionSeeder::class);
     }
 }

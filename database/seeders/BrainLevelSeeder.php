@@ -15,6 +15,7 @@ class BrainLevelSeeder extends Seeder
     {
         BrainLevel::create([
             'name' => 'Médula y Cordón espinal',
+            'color' => '#EE8B0080',
             'grade' => 'I',
             'S' => 5,
             'P' => 1,
@@ -23,6 +24,7 @@ class BrainLevelSeeder extends Seeder
 
         BrainLevel::create([
             'name' => 'Protuberancia anualar',
+            'color' => '#DD004A80',
             'grade' => 'II',
             'S' => 1,
             'P' => 2.5,
@@ -31,6 +33,7 @@ class BrainLevelSeeder extends Seeder
 
         BrainLevel::create([
             'name' => 'Cerebro medio',
+            'color' => '#8DAF1280',
             'grade' => 'III',
             'S' => 3.5,
             'P' => 7,
@@ -39,6 +42,7 @@ class BrainLevelSeeder extends Seeder
 
         BrainLevel::create([
             'name' => 'Corteza inicial',
+            'color' => '#00659180',
             'grade' => 'IV',
             'S' => 6,
             'P' => 12,
@@ -47,6 +51,7 @@ class BrainLevelSeeder extends Seeder
 
         BrainLevel::create([
             'name' => 'Corteza temprana',
+            'color' => '#98007780',
             'grade' => 'V',
             'S' => 9,
             'P' => 18,
@@ -55,6 +60,7 @@ class BrainLevelSeeder extends Seeder
 
         BrainLevel::create([
             'name' => 'Corteza primitiva',
+            'color' => '#D4242980',
             'grade' => 'VI',
             'S' => 18,
             'P' => 36,
@@ -63,6 +69,7 @@ class BrainLevelSeeder extends Seeder
 
         BrainLevel::create([
             'name' => 'Corteza sofisticada',
+            'color' => '#36087680',
             'grade' => 'VII',
             'S' => 36,
             'P' => 72,
