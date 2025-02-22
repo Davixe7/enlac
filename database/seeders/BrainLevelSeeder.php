@@ -14,35 +14,59 @@ class BrainLevelSeeder extends Seeder
     public function run(): void
     {
         BrainLevel::create([
-            'name' => 'Cortex Early',
-            'grade' => 'A',
+            'name' => 'Médula y Cordón espinal',
+            'grade' => 'I',
+            'S' => 5,
+            'P' => 1,
+            'L' => 2,
+        ]);
+
+        BrainLevel::create([
+            'name' => 'Protuberancia anualar',
+            'grade' => 'II',
             'S' => 1,
-            'P' => 2,
-            'L' => 3,
-        ]);
-
-        BrainLevel::create([
-            'name' => 'Cortex Initial',
-            'grade' => 'B',
-            'S' => 2,
-            'P' => 3,
-            'L' => 4,
-        ]);
-
-        BrainLevel::create([
-            'name' => 'Cortex Primitive',
-            'grade' => 'C',
-            'S' => 3,
-            'P' => 4,
+            'P' => 2.5,
             'L' => 5,
         ]);
 
         BrainLevel::create([
-            'name' => 'Cortex Sophisticated',
-            'grade' => 'D',
-            'S' => 4,
-            'P' => 5,
-            'L' => 6,
+            'name' => 'Cerebro medio',
+            'grade' => 'III',
+            'S' => 3.5,
+            'P' => 7,
+            'L' => 14,
+        ]);
+
+        BrainLevel::create([
+            'name' => 'Corteza inicial',
+            'grade' => 'IV',
+            'S' => 6,
+            'P' => 12,
+            'L' => 24,
+        ]);
+
+        BrainLevel::create([
+            'name' => 'Corteza temprana',
+            'grade' => 'V',
+            'S' => 9,
+            'P' => 18,
+            'L' => 36,
+        ]);
+
+        BrainLevel::create([
+            'name' => 'Corteza primitiva',
+            'grade' => 'VI',
+            'S' => 18,
+            'P' => 36,
+            'L' => 72,
+        ]);
+
+        BrainLevel::create([
+            'name' => 'Corteza sofisticada',
+            'grade' => 'VII',
+            'S' => 36,
+            'P' => 72,
+            'L' => 144,
         ]);
     }
 }
