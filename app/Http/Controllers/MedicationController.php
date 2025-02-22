@@ -27,7 +27,7 @@ class MedicationController extends Controller
 
     public function update(UpdateMedicationRequest $request, Medication $medication)
     {
-        $medication = $medication->update($request->validated());
+        $medication->update($request->validated());
         return new MedicationResource($medication);
     }
 

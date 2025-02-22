@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('diagnosis');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('evaluation_date');
-            //$table->string('photo')->nullable();
+            $table->unsignedBigInteger('sheet')->autoIncrement();
             $table->string('acceptance_status')->default(null)->nullable();
             $table->timestamps();
         });

@@ -53,6 +53,9 @@ class CreateCandidateRequest extends FormRequest
             'medications.*.dose' => 'required|string|max:255',
             'medications.*.frequency' => 'required|string|max:255',
             'medications.*.duration' => 'required|string|max:255',
+
+            'evaluation_schedule.evaluator_id' => 'required',
+            'evaluation_schedule.date' => 'required',
         ];
     }
 
