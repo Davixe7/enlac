@@ -25,15 +25,6 @@ class DatabaseSeeder extends Seeder
 
         $user->assignRole('evaluator');
 
-        /* $this->call(CandidateSeeder::class);
-        $this->call(MedicationSeeder::class);
-        $this->call(ContactSeeder::class);
-        $this->call(AddressSeeder::class);t
-        $this->call(EvaluationSeeder::class);
-        $this->call(BrainFunctionRankSeeder::class);
-        $this->call(InterviewSeeder::class);
-        $this->call(InterviewQuestionSeeder::class); */
-
         $this->call(ProgramSeeder::class);
         $this->call(BrainLevelSeeder::class);
         $this->call(BrainFunctionSeeder::class);

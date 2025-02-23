@@ -20,9 +20,7 @@ return new class extends Migration
             $table->integer('age');
             $table->integer('chronological_age');
             $table->text('diagnosis');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->date('evaluation_date');
-            $table->unsignedBigInteger('sheet')->autoIncrement();
+            $table->unsignedBigInteger('sheet');
             $table->string('acceptance_status')->default(null)->nullable();
             $table->string('rejection_comment')->default(null)->nullable();
             $table->timestamps();
