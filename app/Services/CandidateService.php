@@ -92,4 +92,20 @@ class CandidateService
             return $candidate;
         });
     }
+
+    public function admission(Request $request, Candidate $candidate){
+        return DB::transaction(function () use ($request, $candidate) {
+
+            $candidate->update([
+                'acceptance_status' => $request->acceptance_status,
+                'rejection_comment' => $request->rejection_comment
+            ]);
+
+            if($request->filled('programs')){
+                $candidate->programs()->sync($programs);
+            }
+
+            return $candidate;
+        });
+    }
 }

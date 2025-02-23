@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('evaluation_date');
             $table->unsignedBigInteger('sheet')->autoIncrement();
             $table->string('acceptance_status')->default(null)->nullable();
+            $table->string('rejection_comment')->default(null)->nullable();
             $table->timestamps();
         });
     }

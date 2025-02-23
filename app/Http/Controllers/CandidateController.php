@@ -42,7 +42,12 @@ class CandidateController extends Controller
      */
     public function update(CreateCandidateRequest $request, Candidate $candidate)
     {
-        $candidate = $this->candidateService->updateCandidate($candidate, $request);
+        $this->candidateService->updateCandidate($candidate, $request);
+        return new CandidateResource($candidate);
+    }
+
+    public function admission(Request $request, Candidate $candidate){
+        $candidate = $this->candidateService->admission($request, $candidate);
         return new CandidateResource($candidate);
     }
 
@@ -51,7 +56,7 @@ class CandidateController extends Controller
      */
     public function destroy(Candidate $candidate)
     {
-        $candidate = $candidate->delete();
+        $candidate->delete();
         return response()->json(['data' => $candidate]);
     }
 }
