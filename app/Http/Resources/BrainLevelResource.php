@@ -14,15 +14,6 @@ class BrainLevelResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'grade' => $this->grade,
-            'S' => $this->S,
-            'P' => $this->P,
-            'L' => $this->L,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
+        return parent::toArray($request);
     }
 }

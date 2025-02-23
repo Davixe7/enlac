@@ -7,8 +7,10 @@ use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BrainFunctionController;
+use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
 use App\Http\Controllers\InterviewController;
+use App\Http\Resources\EvaluationFields;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +30,12 @@ Route::middleware('auth:sanctum')->group(function(){
         'interviews'  => InterviewController::class,
         'brain_levels'  => BrainLevelController::class,
         'brain_functions'  => BrainFunctionController::class,
+        'brain_function_ranks'  => BrainFunctionRankController::class,
     ]);
+
+    Route::get('evaluation_fields', function(Request $request){
+        return new EvaluationFields($request);
+    });
 
     Route::get('evaluators', function(){
         return response()->json(['data'=>User::role('evaluator')->get()]);
