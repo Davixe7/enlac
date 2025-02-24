@@ -41,7 +41,9 @@ class InterviewQuestionSeeder extends Seeder
             "¿El niño rechina los dientes (durante el día, durante la noche o ambos)?",
             "¿Es de mayor de 9 años y ya tuvo su período? ¿Qué edad tenía cuando inició su período? ¿Toma alguna medicación o tratamiento hormonal?",
             "¿Ha tenido algún evento emocional fuerte (pérdida de algún familiar, separación, violencia, etc.)?",
-            "¿Hay algo más que desea agregar?"
+            "¿Hay algo más que desea agregar?",
+            "¿Qué calificación APGAR tuvo al nacer?. Seleccione una opción?",
+            "¿Controla esfínteres?"
         ];
 
         foreach ($preguntas as $pregunta) {
