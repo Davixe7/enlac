@@ -22,10 +22,7 @@ class StoreInterviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'parent_name' => 'required|string|max:255',
-            'apgar_rank' => 'required|integer|min:1|max:10',
             'candidate_id' => 'required|exists:candidates,id',
-            'sphincter' => 'required|boolean',
             'signed_at' => 'nullable|date',
             'observation' => 'nullable|string',
         ];

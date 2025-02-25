@@ -29,7 +29,7 @@ class Candidate extends Model implements HasMedia
 
     public function programs()
     {
-        return $this->belongsToMany(Program::class)->withTimestamps();
+        return $this->belongsToMany(Program::class);
     }
 
     public function medications(){

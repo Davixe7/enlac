@@ -102,7 +102,7 @@ class CandidateService
             ]);
 
             if($request->filled('programs')){
-                $candidate->programs()->sync($programs);
+                $candidate->programs()->sync($request->programs);
             }
 
             return $candidate;

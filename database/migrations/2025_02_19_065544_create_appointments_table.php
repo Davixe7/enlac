@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
+            $table->foreignId('evaluator_id')->constrained('users')->onDelete('cascade');
+            $table->enum('type_id', [1,2,3]);
+            $table->text('comments')->nullable();
+            $table->dateTime('date');
             $table->timestamps();
         });
     }
