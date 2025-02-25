@@ -36,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
         'interview_questions'   => InterviewQuestionController::class
     ]);
 
+    Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
+
     Route::get('evaluation_fields', function (Request $request) {
         return new EvaluationFields($request);
     });

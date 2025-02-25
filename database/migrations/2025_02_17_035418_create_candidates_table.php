@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('chronological_age');
             $table->text('diagnosis');
             $table->unsignedBigInteger('sheet');
-            $table->string('acceptance_status')->default(null)->nullable();
+            $table->boolean('acceptance_status')->default(null)->nullable();
             $table->string('rejection_comment')->default(null)->nullable();
             $table->timestamps();
         });
