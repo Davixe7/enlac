@@ -13,6 +13,11 @@ class Candidate extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
     protected $guarded = [];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function contacts()
     {
         return $this->hasMany(Contact::class);
@@ -25,11 +30,6 @@ class Candidate extends Model implements HasMedia
 
     public function brainFunctionRanks() {
         return $this->hasMany(BrainFunctionRank::class);
-    }
-
-    public function programs()
-    {
-        return $this->belongsToMany(Program::class);
     }
 
     public function medications(){
@@ -54,6 +54,11 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(EvaluationSchedule::class);
     }
 
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
+    }
+
     public function getEvaluationScheduleAttribute(){
         return $this->evaluation_schedules()
         ->orderBy('created_at', 'desc')
@@ -65,5 +70,15 @@ class Candidate extends Model implements HasMedia
     public function getFullNameAttribute(){
         $fullNameArray = array_filter([$this->first_name, $this->middle_name, $this->last_name]);
         return join(" ", $fullNameArray);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($candidate) {
+            $maxSheet = static::max('sheet');
+            $candidate->sheet = $maxSheet ? $maxSheet + 1 : 1;
+        });
     }
 }

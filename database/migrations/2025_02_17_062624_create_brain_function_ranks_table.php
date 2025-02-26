@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('brain_function_ranks', function (Blueprint $table) {
             $table->id();
-            $table->enum('caracteristic', ['0', 'F', 'P']);
+            $table->enum('rating', ['0', 'F', 'P']);
             $table->text('comments')->nullable();
             $table->enum('laterality_impact', ['l', 'r']);
             $table->foreignId('brain_level_id')->constrained();

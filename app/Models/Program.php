@@ -10,9 +10,8 @@ class Program extends Model
     use HasFactory ;
     protected $guarded = [];
 
-    public function cadidates()
+    public function candidates()
     {
-        return $this->belongsToMany(Candidate::class)
-            ->withTimestamps();
+        return $this->hasMany(Candidate::class);
     }
 }

@@ -19,10 +19,12 @@ return new class extends Migration
             $table->date('birth_date');
             $table->integer('age');
             $table->integer('chronological_age');
-            $table->text('diagnosis');
-            $table->unsignedBigInteger('sheet');
+            $table->text('diagnosis')->nullable();
+            $table->integer('sheet')->nullable();
+            $table->date('entered_at')->nullable();
             $table->boolean('acceptance_status')->default(null)->nullable();
             $table->string('rejection_comment')->default(null)->nullable();
+            $table->foreignId('program_id')->constrained()->onDelete('cascade')->default(null)->nullable();
             $table->timestamps();
         });
     }

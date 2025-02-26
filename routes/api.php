@@ -11,6 +11,7 @@ use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Resources\EvaluationFields;
+use App\Http\Middleware\CandidateEvaluator;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,6 @@ Route::get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResources([
-        'candidates' => CandidateController::class,
         'medications' => MedicationController::class,
         'contacts' => ContactController::class,
         'addresses' => AddressController::class,
@@ -35,6 +35,8 @@ Route::middleware('auth:sanctum')->group(function () {
         'brain_function_ranks'  => BrainFunctionRankController::class,
         'interview_questions'   => InterviewQuestionController::class
     ]);
+
+    Route::resource('candidates', CandidateController::class)->middleware(CandidateEvaluator::class);
 
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
 
