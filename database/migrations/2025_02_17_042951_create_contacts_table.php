@@ -23,6 +23,14 @@ return new class extends Migration
             $table->string('email');
             $table->string('whatsapp');
             $table->string('home_phone');
+
+            $table->string('street');
+            $table->string('neighborhood');
+            $table->string('state');
+            $table->string('postal_code');
+            $table->string('exterior_number');
+            $table->string('city');
+            $table->string('country');
             $table->timestamps();
         });
     }
