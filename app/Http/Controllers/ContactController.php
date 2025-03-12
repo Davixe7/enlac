@@ -7,12 +7,14 @@ use App\Models\Candidate;
 use App\Models\Contact;
 use App\Http\Requests\StoreContactRequest;
 use App\Http\Requests\UpdateContactRequest;
+use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return ContactResource::collection(Contact::all());
+        $contacts = Contact::whereCandidateId($request->candidate_id)->get();
+        return ContactResource::collection($contacts);
     }
 
     public function store(StoreContactRequest $request)
