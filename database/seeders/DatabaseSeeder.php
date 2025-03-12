@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(BrainLevelSeeder::class);
         $this->call(BrainFunctionSeeder::class);
-        $this->call(InterviewQuestion::class);
+        $this->call(InterviewQuestionSeeder::class);
         $this->call(ProgramSeeder::class);
     }
 }
