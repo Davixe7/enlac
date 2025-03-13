@@ -98,12 +98,9 @@ class CandidateService
 
             $candidate->update([
                 'acceptance_status' => $request->acceptance_status,
-                'rejection_comment' => $request->rejection_comment
+                'rejection_comment' => $request->rejection_comment,
+                'program_id'        => $request->program_id
             ]);
-
-            if($request->filled('programs')){
-                $candidate->programs()->sync($request->programs);
-            }
 
             return $candidate;
         });

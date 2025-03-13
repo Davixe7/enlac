@@ -27,9 +27,9 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(BrainFunctionRank::class);
     }
 
-    public function programs()
+    public function program()
     {
-        return $this->belongsToMany(Program::class);
+        return $this->belongsTo(Program::class);
     }
 
     public function medications(){
