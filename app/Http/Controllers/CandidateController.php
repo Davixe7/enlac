@@ -47,7 +47,12 @@ class CandidateController extends Controller
     }
 
     public function admission(Request $request, Candidate $candidate){
-        $candidate = $this->candidateService->admission($request, $candidate);
+        $candidate->update([
+            'acceptance_status' => $request->acceptance_status,
+            'rejection_comment' => $request->rejection_comment,
+            'program_id'        => $request->program_id
+        ]);
+
         return new CandidateResource($candidate);
     }
 
