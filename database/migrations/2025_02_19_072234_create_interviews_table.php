@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('candidate_id')->constrained('candidates')->onDelete('cascade');
             $table->date('signed_at')->nullable();
+            $table->string('interviewee_name');
+            $table->string('interviewee_relationship');
+            $table->text('content');
             $table->text('observation')->nullable();
             $table->timestamps();
         });
