@@ -26,8 +26,6 @@ class UpdateCandidateRequest extends FormRequest
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'string|max:255', // No es requerido en la actualización
             'birth_date' => 'date', // No es requerido en la actualización
-            'age' => 'integer|min:0', // No es requerido en la actualización
-            'chronological_age' => 'integer|min:0', // No es requerido en la actualización
             'diagnosis' => 'nullable|string',
             'photo' => 'nullable|string',
         ];

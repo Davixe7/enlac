@@ -56,8 +56,13 @@ class CandidateService
                 $candidate->addMediaFromRequest('picture')->toMediaCollection('profile_picture');
             }
 
-            $contact = Contact::updateOrCreate(['id' => $request->contact['id']], $request->contact);
-            $address = Address::updateOrCreate(['id' => $request->address], $request->address);
+            // 2. Contactos
+            if($request->filled('contacts')){
+                foreach( $request->contacts as $contactData ){
+                    $id = array_key_exists('id', $contactData) ? $contactData['id'] : null;
+                    Contact::updateOrCreate(['id' => $id, 'candidate_id' => $candidate->id], $contactData);
+                }
+            }
 
             foreach ($request->medications as $medicationData) {
                 Medication::updateOrCreate(
@@ -76,10 +81,9 @@ class CandidateService
             $date_changed      = $candidate->evaluation_schedule['date'] != $request->evaluation_schedule['date'];
             if ($evaluator_changed || $date_changed) {
                 $candidate->evaluation_schedule->update(['status' => 'canceled']);
-                $evaluation_schedule = EvaluationSchedule::create([
-                    "candidate_id" => $request->evaluation_schedule['candidate_id'],
-                    "evaluator_id" => $request->evaluation_schedule['evaluator_id'],
-                    "date" => $request->evaluation_schedule['date'],
+                $candidate->evaluation_schedules()->create([
+                    'evaluator_id' => $request->evaluation_schedule['evaluator_id'],
+                    'date' => $request->evaluation_schedule['date'],
                 ]);
             }
 

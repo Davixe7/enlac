@@ -27,7 +27,7 @@ class CandidateResource extends JsonResource
             'evaluation_schedules' => $this->whenLoaded('evaluation_schedules'),
             'evaluation_schedule' => $this->evaluation_schedule,
             'brain_function_ranks' => $ranks,
-            'programs' => $this->programs->pluck('id'),
+            'program' => $this->whenLoaded('program'),
         ]);
     }
 }
