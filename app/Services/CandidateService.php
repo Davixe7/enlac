@@ -25,26 +25,20 @@ class CandidateService
                 $candidate->addMediaFromRequest('picture')->toMediaCollection('profile_picture');
             }
 
-            // 2. Crear Contacto
-            $contact = new Contact($request->contact);
-            $contact->candidate_id = $candidate->id;
-            $contact->save();
+            // 2. Contactos
+            foreach( $request->contacts as $contactData ){
+                $candidate->contacts()->create($contactData);
+            }
 
-            // 3. Crear Domicilio
-            $address = new Address($request->address);
-            $address->contact_id = $contact->id;
-            $address->save();
-
-            // 4. Crear Medicamentos
+            // 3. Crear Medicamentos
             foreach ($request->medications as $medicationData) {
                 $candidate->medications()->create($medicationData);
             }
 
-            // 5. Crear agendamiento de Evaluacion
-            $evaluation_schedule = EvaluationSchedule::create(array_merge(
-                $request->evaluation_schedule,
-                ['candidate_id' => $candidate->id]
-            ));
+            // 4. Crear agendamiento de Evaluacion
+            if( $request->filled('evaluation_schedule') ){
+                $candidate->evaluation_schedules()->create($request->evaluation_schedule);
+            }
 
             return $candidate;
         });
