@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('interview_id')->constrained()->onDelete('cascade');
             $table->foreignId('interview_question_id')->constrained()->onDelete('cascade');
-            $table->text('content')->nullable();
+            $table->boolean('checked')->nullable();
             $table->timestamps();
         });
     }
