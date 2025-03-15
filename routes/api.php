@@ -15,6 +15,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InterviewQuestionController;
+use App\Http\Resources\CandidateResource;
+use App\Models\Candidate;
 use Illuminate\Support\Facades\DB;
 
 Route::get('/user', function (Request $request) {
@@ -35,6 +37,40 @@ Route::middleware('auth:sanctum')->group(function () {
         'brain_function_ranks'  => BrainFunctionRankController::class,
         'interview_questions'   => InterviewQuestionController::class
     ]);
+
+    Route::get('candidates/reports_by_name', function (Request $request){
+        $candidates = Candidate::whereName($request->name)->get();
+        return CandidateResource::collection($candidates);
+    });
+
+    Route::get('candidates/reports_by_birthdate', function (Request $request) {
+        $candidates = Candidate::whereBirthDate($request->birthDate)->get();
+        return CandidateResource::collection($candidates);
+    });
+
+    Route::get('candidates/reports_by_evaluation_date', function(Request $request){
+        $candidatesWithRecentSchedule = Candidate::whereEvaluationBetween($request->startDate, $request->endDate)
+        ->get()
+        ->groupBy(function ($candidate) {
+            if ($candidate->evaluation_status === 'done') {
+                return $candidate->onboard_at ? 'done_onboarded' : 'done_not_onboarded';
+            }
+            return $candidate->evaluation_status;
+        });
+
+        $counts = $candidatesWithRecentSchedule->map(function ($group) {
+            return $group->count();
+        });
+
+        $dataWithCount = $candidatesWithRecentSchedule->map(function ($group) {
+            return CandidateResource::collection($group);
+        });
+
+        return response()->json([
+            'counts' => $counts,
+            'data' => $dataWithCount,
+        ]);
+    });
 
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
 

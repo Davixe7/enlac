@@ -47,7 +47,8 @@ class CandidateFactory extends Factory
             return [
                 'acceptance_status' => true,
                 'rejection_comment' => null,
-                'onboard_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+                'onboard_at' => $this->faker->randomElement([$this->faker->dateTimeBetween('-1 year', 'now'), null]),
+                //'onboard_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
             ];
         });
     }
