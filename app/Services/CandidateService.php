@@ -7,10 +7,12 @@ use App\Models\Contact;
 use App\Models\Address;
 use App\Models\EvaluationSchedule;
 use App\Models\Medication;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CandidateService
 {
@@ -64,27 +66,32 @@ class CandidateService
                 }
             }
 
-            foreach ($request->medications as $medicationData) {
-                Medication::updateOrCreate(
-                    [
-                        'id' => isset($medicationData['id']) ? $medicationData['id'] : null,
-                        'candidate_id' => $candidate->id
-                    ],
-                    $medicationData
-                );
+            if($request->filled('medications')){
+                foreach ($request->medications as $medicationData) {
+                    Medication::updateOrCreate(
+                        [
+                            'id' => isset($medicationData['id']) ? $medicationData['id'] : null,
+                            'candidate_id' => $candidate->id
+                        ],
+                        $medicationData
+                    );
+                }
             }
 
             /*
             Si cambian evaluador o fecha de cita
             cacelar cita actual, generar nueva cita. */
-            $evaluator_changed = $candidate->evaluation_schedule['evaluator_id'] != $request->evaluation_schedule['evaluator_id'];
-            $date_changed      = $candidate->evaluation_schedule['date'] != $request->evaluation_schedule['date'];
-            if ($evaluator_changed || $date_changed) {
-                $candidate->evaluation_schedule->update(['status' => 'canceled']);
-                $candidate->evaluation_schedules()->create([
-                    'evaluator_id' => $request->evaluation_schedule['evaluator_id'],
-                    'date' => $request->evaluation_schedule['date'],
-                ]);
+            if($request->filled('evaluation_schedule')){
+                Storage::append('schedules.log', json_encode($request->evaluation_schedule));
+                $evaluator_changed = $candidate->evaluation_schedule->evaluator_id != $request->evaluation_schedule['evaluator_id'];
+                $date_changed      = $candidate->evaluation_schedule->date != $request->evaluation_schedule['date'];
+                if ($evaluator_changed || $date_changed) {
+                    $candidate->evaluation_schedule->update(['status' => 'canceled']);
+                    $candidate->evaluation_schedules()->create([
+                        'evaluator_id' => $request->evaluation_schedule['evaluator_id'],
+                        'date' => $request->evaluation_schedule['date'],
+                    ]);
+                }
             }
 
             return $candidate;

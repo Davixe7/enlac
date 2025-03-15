@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('interviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('candidate_id')->constrained('candidates')->onDelete('cascade');
-            $table->date('signed_at')->nullable();
             $table->string('interviewee_name');
             $table->string('interviewee_relationship');
             $table->text('content');
+            $table->unsignedTinyInteger('apgar_rank');
+            $table->boolean('sphincters_control');
             $table->text('observation')->nullable();
+            $table->date('signed_at')->nullable();
             $table->timestamps();
         });
     }

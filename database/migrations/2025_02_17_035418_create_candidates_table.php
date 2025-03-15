@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('middle_name');
             $table->string('last_name');
             $table->date('birth_date');
-            $table->integer('age');
-            $table->integer('chronological_age');
             $table->text('diagnosis');
             $table->unsignedBigInteger('sheet');
 

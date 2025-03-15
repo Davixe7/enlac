@@ -22,27 +22,12 @@ class UpdateInterviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'parent_name' => 'nullable|string|max:255',
-            'apgar_rank' => 'nullable|integer|min:1|max:10',
             'candidate_id' => 'nullable|exists:candidates,id',
-            'sphincter' => 'nullable|boolean',
-            'signed_at' => 'nullable|date',
+            'content' => 'required|string',
+            'apgar_rank' => 'nullable|integer|min:1|max:10',
+            'sphincters_control' => 'nullable|boolean',
             'observation' => 'nullable|string',
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'parent_name.string' => 'El nombre del padre/madre debe ser una cadena de texto.',
-            'parent_name.max' => 'El nombre del padre/madre no debe exceder los 255 caracteres.',
-            'apgar_rank.integer' => 'El rango de Apgar debe ser un número entero.',
-            'apgar_rank.min' => 'El rango de Apgar debe ser como mínimo 1.',
-            'apgar_rank.max' => 'El rango de Apgar debe ser como máximo 10.',
-            'candidate_id.exists' => 'El candidato seleccionado no existe.',
-            'sphincter.boolean' => 'El campo esfínter debe ser un valor booleano.',
-            'signed_at.date' => 'La fecha de firma debe ser un formato válido.',
-            'observation.string' => 'La observación debe ser una cadena de texto.',
+            'signed_at' => 'nullable|date',
         ];
     }
 }

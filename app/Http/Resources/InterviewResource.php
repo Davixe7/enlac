@@ -14,6 +14,9 @@ class InterviewResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        $data = parent::toArray($request);
+        return array_merge($data, [
+            'answers' => $this->interview_questions()->pluck('interview_question_id')
+        ]);
     }
 }
