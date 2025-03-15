@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('info_channel');
             $table->boolean('acceptance_status')->default(null)->nullable();
             $table->string('rejection_comment')->default(null)->nullable();
+            $table->date('onboard_at')->default(null)->nullable();
             $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
