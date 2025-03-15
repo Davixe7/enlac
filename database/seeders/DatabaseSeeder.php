@@ -31,5 +31,6 @@ class DatabaseSeeder extends Seeder
         $this->call(BrainFunctionSeeder::class);
         $this->call(InterviewQuestionSeeder::class);
         $this->call(ProgramSeeder::class);
+        $this->call(CandidateSeeder::class);
     }
 }
