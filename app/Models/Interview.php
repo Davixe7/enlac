@@ -15,10 +15,8 @@ class Interview extends Model
         return $this->belongsTo(Candidate::class);
     }
 
-    public function answers()
+    public function interview_questions()
     {
-        return $this->belongsToMany(InterviewQuestion::class)
-            ->withPivot('content')
-            ->withTimestamps();
+        return $this->belongsToMany(InterviewQuestion::class);
     }
 }

@@ -34,11 +34,13 @@ class EvaluationFields extends JsonResource
                     'brain_function_ranks.caracteristic as caracteristic',
                 )
                 ->get();
+
             $level->ranks = $level->ranks->map(function ($rank) use ($request, $level) {
                 $rank->candidate_id = intval($request->candidate_id);
                 $rank->brain_level_id = $level->id;
                 return $rank;
             });
+
             $level->ranks = $level->ranks->keyBy('brain_function_id');
             return $level;
         });

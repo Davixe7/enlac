@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,12 +23,13 @@ class CandidateResource extends JsonResource
         return array_merge($data, [
             'full_name' => $this->full_name,
             'picture' => $this->getFirstMediaUrl('profile_picture'),
-            'contact' => $this->contacts->load('addresses')->first(),
+            'contacts' => $this->contacts,
             'medications' => $this->medications,
             'evaluation_schedules' => $this->whenLoaded('evaluation_schedules'),
             'evaluation_schedule' => $this->evaluation_schedule,
             'brain_function_ranks' => $ranks,
             'program' => $this->whenLoaded('program'),
+            'chronological_age' => number_format( Carbon::parse($this->birth_date)->diffInMonths(now()), 2 )
         ]);
     }
 }

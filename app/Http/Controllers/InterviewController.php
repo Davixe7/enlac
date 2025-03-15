@@ -6,9 +6,6 @@ use App\Models\Interview;
 use App\Http\Resources\InterviewResource;
 use App\Http\Requests\StoreInterviewRequest;
 use App\Http\Requests\UpdateInterviewRequest;
-use App\Models\InterviewInterviewQuestion;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class InterviewController extends Controller
 {
@@ -25,17 +22,13 @@ class InterviewController extends Controller
     public function store(StoreInterviewRequest $request)
     {
         $data = $request->validated();
-        $data['signed_at'] = $request->sign ? now() : null;
-
+        unset($data['answers']);
         $interview = Interview::create($data);
 
         if( $request->filled('answers') ){
-            $answers = collect( $request->answers )
-                        ->map(fn($answer)=>collect($answer)->only(['interview_question_id', 'content']))
-                        ->keyBy('interview_question_id');
-
-            $interview->answers()->syncWithoutDetaching($answers->toArray());
+            $interview->interview_questions()->sync($request->answers);
         }
+
         return new InterviewResource($interview);
     }
 
@@ -47,16 +40,13 @@ class InterviewController extends Controller
     public function update(UpdateInterviewRequest $request, Interview $interview)
     {
         $data = $request->validated();
-        $data['signed_at'] = !$interview->signed_at && $request->sign ? now() : null;
+        unset($data['answers']);
+        $data['signed_at'] = !$interview->signed_at && $request->signed_at ? now() : null;
 
         $interview->update($data);
 
         if( $request->filled('answers') ){
-            $answers = collect( $request->answers )
-                        ->map(fn($answer)=>collect($answer)->only(['interview_question_id', 'content']))
-                        ->keyBy('interview_question_id');
-
-            $interview->answers()->syncWithoutDetaching($answers->toArray());
+            $interview->interview_questions()->sync($request->answers);
         }
         return new InterviewResource($interview);
     }
