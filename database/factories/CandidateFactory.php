@@ -65,6 +65,7 @@ class CandidateFactory extends Factory
                 'acceptance_status' => false,
                 'rejection_comment' => $this->faker->sentence(),
                 'onboard_at' => null,
+                'program_id' => null,
             ];
         });
     }

@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -38,33 +40,36 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(Medication::class);
     }
 
-    public function scopeWhereBirthDate(Builder $query, string $birthDate): Builder
+    public function scopeBirthDate(Builder $query, $birthDate): Builder
     {
-        return $query->where('birth_date', $birthDate);
+        return $birthDate ? $query->where('birth_date', $birthDate) : $query;
     }
 
-    public function scopeWhereName(Builder $query, string $name): Builder
+    public function scopeName(Builder $query, $name): Builder
     {
-        return $query->where(function (Builder $q) use ($name) {
+        return $name ?
+            $query->where(function (Builder $q) use ($name) {
             $q->where('first_name', 'like', '%' . $name . '%')
               ->orWhere('middle_name', 'like', '%' . $name . '%')
-              ->orWhere('last_name', 'like', '%' . $name . '%');
-        });
+              ->orWhere('last_name', 'like', '%' . $name . '%');})
+            : $query;
     }
 
-    public function scopeWhereEvaluationBetween(Builder $query, string $startDate, string $endDate): Builder
+    public function scopeEvaluationBetween(Builder $query, $startDate, $endDate): Builder
     {
+        if( !$startDate || !$endDate ){
+            return $query;
+        }
         // Subquery to find the most recent evaluation schedule ID for each candidate within the date range
+
         $mostRecentScheduleIds = EvaluationSchedule::query()
             ->whereBetween('date', [$startDate, $endDate])
             ->select('candidate_id', DB::raw('MAX(id) as most_recent_id'))
             ->groupBy('candidate_id');
 
-        return $query->leftJoinSub($mostRecentScheduleIds, 'most_recent_schedules', function ($join) {
+        return $query->joinSub($mostRecentScheduleIds, 'most_recent_schedules', function ($join) {
                 $join->on('candidates.id', '=', 'most_recent_schedules.candidate_id');
-            })
-            ->leftJoin('evaluation_schedules', 'evaluation_schedules.id', '=', 'most_recent_schedules.most_recent_id')
-            ->select('candidates.*', 'evaluation_schedules.status as evaluation_status', 'evaluation_schedules.date as evaluation_date');
+            });
     }
 
     public function registerMediaConversions(?Media $media = null): void
