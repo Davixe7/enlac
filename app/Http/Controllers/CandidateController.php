@@ -7,6 +7,7 @@ use App\Http\Resources\CandidateResource;
 use App\Services\CandidateService;
 use App\Http\Requests\UpdateCandidateRequest;
 use App\Http\Requests\CreateCandidateRequest;
+use App\Http\Requests\StoreCandidateRequest;
 use App\Http\Resources\CandidateResults;
 use App\Http\Resources\CandidateResultsResource;
 use Illuminate\Http\Request;
@@ -50,7 +51,7 @@ class CandidateController extends Controller
         return CandidateResource::collection($candidates)->additional(['counts' => $counts]);
     }
 
-    public function store(Request $request)
+    public function store(StoreCandidateRequest $request)
     {
         $candidate = $this->candidateService->createCandidate($request);
         return new CandidateResource($candidate->load('evaluation_schedules.evaluator'));
