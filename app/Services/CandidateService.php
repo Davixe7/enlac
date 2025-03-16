@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\StoreCandidateRequest;
 use App\Models\Candidate;
 use App\Models\Contact;
 use App\Models\Address;
@@ -16,12 +17,12 @@ use Illuminate\Support\Facades\Storage;
 
 class CandidateService
 {
-    public function createCandidate(Request $request)
+    public function createCandidate(StoreCandidateRequest $request)
     {
         // Iniciar transacción para asegurar la integridad de los datos
         return DB::transaction(function () use ($request) {
             // 1. Crear Candidato
-            $candidate = Candidate::create($request->candidate);
+            $candidate = Candidate::create($request->validated()['candidate']);
 
             if ($request->hasFile('picture')) {
                 $candidate->addMediaFromRequest('picture')->toMediaCollection('profile_picture');

@@ -22,14 +22,19 @@ class StoreCandidateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'birth_date' => 'required|date',
-            'age' => 'required|integer|min:1',
-            'chronological_age' => 'required|integer|min:1',
-            'diagnosis' => 'nullable|string',
-            'photo' => 'nullable|string',
+            'candidate.first_name' => 'required|string|max:255',
+            'candidate.middle_name' => 'nullable|string|max:255',
+            'candidate.last_name' => 'required|string|max:255',
+            'candidate.birth_date' => 'required|date',
+            'candidate.diagnosis' => 'nullable|string',
+            'candidate.photo' => 'nullable|string',
+            'candidate.sheet' => 'nullable',
+            'candidate.info_channel' => 'required',
+
+            'contacts' => 'required|array',
+            'contacts.*.first_name' => 'required|string|max:255',
+            'contacts.*.middle_name' => 'nullable|string|max:255',
+            'contacts.*.last_name' => 'required|string|max:255',
         ];
     }
 
