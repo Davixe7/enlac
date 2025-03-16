@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('interviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('candidate_id')->constrained('candidates')->onDelete('cascade');
-            $table->string('interviewee_name');
-            $table->string('interviewee_relationship');
+            $table->foreignId('interviewee_id')->constrained('interviewees')->onDelete('cascade');
             $table->text('content');
             $table->unsignedTinyInteger('apgar_rank');
             $table->boolean('sphincters_control');
