@@ -22,31 +22,19 @@ class UpdateCandidateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'string|max:255', // No es requerido en la actualización
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'string|max:255', // No es requerido en la actualización
-            'birth_date' => 'date', // No es requerido en la actualización
-            'diagnosis' => 'nullable|string',
-            'photo' => 'nullable|string',
-        ];
-    }
+            'candidate.first_name' => 'nullable|string|max:255',
+            'candidate.middle_name' => 'nullable|string|max:255',
+            'candidate.last_name' => 'nullable|string|max:255',
+            'candidate.birth_date' => 'nullable|date',
+            'candidate.diagnosis' => 'nullable|string',
+            'candidate.photo' => 'nullable|string',
+            'candidate.sheet' => 'nullable',
+            'candidate.info_channel' => 'nullable',
 
-    public function messages(): array
-    {
-        return [
-            'first_name.string' => 'El nombre debe ser una cadena de texto.',
-            'first_name.max' => 'El nombre no debe exceder los 255 caracteres.',
-            'middle_name.string' => 'El segundo nombre debe ser una cadena de texto.',
-            'middle_name.max' => 'El segundo nombre no debe exceder los 255 caracteres.',
-            'last_name.string' => 'El apellido debe ser una cadena de texto.',
-            'last_name.max' => 'El apellido no debe exceder los 255 caracteres.',
-            'birth_date.date' => 'La fecha de nacimiento debe ser una fecha válida.',
-            'age.integer' => 'La edad debe ser un número entero.',
-            'age.min' => 'La edad no debe ser menor que 0.',
-            'chronological_age.integer' => 'La edad cronológica debe ser un número entero.',
-            'chronological_age.min' => 'La edad cronológica no debe ser menor que 0.',
-            'diagnosis.string' => 'El diagnóstico debe ser una cadena de texto.',
-            'photo.string' => 'La foto debe ser una cadena de texto.',
+            'contacts' => 'nullable|array',
+            'contacts.*.first_name' => 'nullable|string|max:255',
+            'contacts.*.middle_name' => 'nullable|string|max:255',
+            'contacts.*.last_name' => 'nullable|string|max:255',
         ];
     }
 }
