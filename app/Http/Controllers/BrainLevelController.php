@@ -11,7 +11,7 @@ class BrainLevelController extends Controller
 {
     public function index()
     {
-        return BrainLevelResource::collection(BrainLevel::orderBy('id')->get());
+        return BrainLevelResource::collection(BrainLevel::orderBy('id', 'desc')->get());
     }
 
     public function store(StoreBrainLevelRequest $request)
