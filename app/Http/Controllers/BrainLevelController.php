@@ -11,7 +11,23 @@ class BrainLevelController extends Controller
 {
     public function index()
     {
-        return BrainLevelResource::collection(BrainLevel::orderBy('id')->get());
+        $braindlevels = BrainLevel::query()
+            ->orderByRaw(
+                'CASE grade
+                    WHEN ? THEN ?
+                    WHEN ? THEN ?
+                    WHEN ? THEN ?
+                    WHEN ? THEN ?
+                    WHEN ? THEN ?
+                    WHEN ? THEN ?
+                    WHEN ? THEN ?
+                    ELSE ?
+                END DESC',
+                ['VII', 7, 'VI', 6, 'V', 5, 'IV', 4, 'III', 3, 'II', 2, 'I', 1, 0]
+            )
+            ->get();
+
+        return BrainLevelResource::collection($braindlevels);
     }
 
     public function store(StoreBrainLevelRequest $request)
