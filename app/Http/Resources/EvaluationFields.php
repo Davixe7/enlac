@@ -16,7 +16,7 @@ class EvaluationFields extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $brainLevels = BrainLevel::all();
+        $brainLevels = BrainLevel::orderBy('id', 'DESC')->get();
         $brainLevels = $brainLevels->map(function ($level) use ($request) {
             $level->ranks = DB::table('brain_functions')
                 ->leftJoin('brain_function_ranks', function ($join) use ($request, $level) {

@@ -17,6 +17,12 @@ class Candidate extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
     protected $guarded = [];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:d/m/Y',
+        // ... otros casts
+    ];
+
     public function contacts()
     {
         return $this->hasMany(Contact::class);

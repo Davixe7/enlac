@@ -23,13 +23,13 @@ class StoreCandidateRequest extends FormRequest
     {
         return [
             'candidate.first_name' => 'required|string|max:255',
-            'candidate.middle_name' => 'nullable|string|max:255',
+            'candidate.middle_name' => 'required|string|max:255',
             'candidate.last_name' => 'required|string|max:255',
             'candidate.birth_date' => 'required|date',
-            'candidate.diagnosis' => 'nullable|string',
+            'candidate.diagnosis' => 'required|string',
             'candidate.photo' => 'nullable|string',
-            'candidate.sheet' => 'nullable',
             'candidate.info_channel' => 'required',
+            'candidate.sheet' => 'nullable',
 
             'contacts' => 'required|array',
             'contacts.*.first_name' => 'required|string|max:255',

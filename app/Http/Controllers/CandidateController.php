@@ -5,13 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Candidate;
 use App\Http\Resources\CandidateResource;
 use App\Services\CandidateService;
-use App\Http\Requests\UpdateCandidateRequest;
 use App\Http\Requests\CreateCandidateRequest;
 use App\Http\Requests\StoreCandidateRequest;
-use App\Http\Resources\CandidateResults;
-use App\Http\Resources\CandidateResultsResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class CandidateController extends Controller
 {
@@ -75,6 +71,10 @@ class CandidateController extends Controller
     }
 
     public function admission(Request $request, Candidate $candidate){
+        $request->validate([
+            'rejection_comment' => 'required_if:acceptance_status,0,null,false'
+        ]);
+
         $candidate->update([
             'acceptance_status' => $request->acceptance_status,
             'rejection_comment' => $request->rejection_comment,

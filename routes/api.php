@@ -38,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
         'interview_questions'   => InterviewQuestionController::class
     ]);
 
+    Route::post('contacts/validate', [ContactController::class, 'validate']);
+
     Route::get('candidates/reports_by_name', function (Request $request){
         $candidates = Candidate::whereName($request->name)->get();
         return CandidateResource::collection($candidates);

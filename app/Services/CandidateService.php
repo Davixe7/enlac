@@ -34,8 +34,10 @@ class CandidateService
             }
 
             // 3. Crear Medicamentos
-            foreach ($request->medications as $medicationData) {
-                $candidate->medications()->create($medicationData);
+            if( $request->filled('medications') ){
+                foreach ($request->medications as $medicationData) {
+                    $candidate->medications()->create($medicationData);
+                }
             }
 
             // 4. Crear agendamiento de Evaluacion

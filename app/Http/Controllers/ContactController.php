@@ -40,4 +40,12 @@ class ContactController extends Controller
         $contact = $contact->delete();
         return response()->json(['data' => $contact]);
     }
+
+    public function validate(Request $request){
+        $request->validate([
+            'first_name' => 'required|string',
+            'relationship' => 'required|string',
+        ]);
+        return response()->json([], 200);
+    }
 }
