@@ -22,16 +22,15 @@ class StoreInterviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'interview.candidate_id'       => 'required|exists:candidates,id',
-            'interview.content'            => 'required|string',
-            'interview.observation'        => 'nullable|string',
-            'interview.apgar_rank'         => 'required|numeric',
-            'interview.sphincters_control' => 'required',
-            'interview.signed_at'          => 'nullable|date',
-            'interview.answers'            => 'nullable|array',
+            'candidate_id'       => 'required|exists:candidates,id',
+            'content'            => 'required|string',
+            'observation'        => 'nullable|string',
+            'apgar_rank'         => 'required|numeric',
+            'sphincters_control' => 'required',
+            'signed_at'          => 'nullable|date',
+            'answers'            => 'nullable|array',
 
             'interviewee.name'               => 'required',
-            'interviewee.candidate_id'       => 'required|exists:candidates,id',
             'interviewee.relationship'       => 'required',
             'interviewee.legal_relationship' => 'required',
         ];

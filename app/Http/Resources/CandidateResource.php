@@ -30,7 +30,8 @@ class CandidateResource extends JsonResource
             'evaluation_schedule' => $this->evaluation_schedule,
             'brain_function_ranks' => $ranks,
             'program' => $this->program,
-            'chronological_age' => number_format( Carbon::parse($this->birth_date)->diffInMonths(now()), 2 )
+            'chronological_age' => number_format( Carbon::parse($this->birth_date)->diffInMonths(now()), 2 ),
+            'interviewee' => $this->whenLoaded('interviewee')
         ]);
     }
 }

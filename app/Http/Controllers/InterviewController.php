@@ -28,7 +28,7 @@ class InterviewController extends Controller
         return InterviewResource::collection($interviews);
     }
 
-    public function store(Request $request)
+    public function store(StoreInterviewRequest $request)
     {
         $interview = $this->interviewService->createInterview($request);
         return new InterviewResource($interview);

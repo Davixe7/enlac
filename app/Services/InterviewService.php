@@ -16,21 +16,22 @@ class InterviewService
     {
         // Iniciar transacción para asegurar la integridad de los datos
         return DB::transaction(function () use ($request) {
-            // 1. Crear Interview
+            // 1. Crear Entrevistado
+            if( $request->filled('interviewee') ){
+                $interviewee = Interviewee::updateOrCreate(['candidate_id' => $request->candidate_id], $request->interviewee);
+            }
+
+            // 2. Crear Entrevista
             $data = $request->validated();
+            $data['interviewee_id'] = $interviewee->id;
             unset($data['answers']);
             unset($data['interviewee']);
 
             $interview = Interview::create($data);
 
-            // 2. Crear Interview Questions
+            // 3. Asociar Respuestas
             if( $request->filled('answers') ){
                 $interview->interview_questions()->sync($request->answers);
-            }
-
-            // 3. Crear Interviewee
-            if( $request->filled('interviewee') ){
-                Interviewee::create($request->interviewee);
             }
 
             return $interview;
@@ -40,20 +41,21 @@ class InterviewService
     public function updateInterview(UpdateInterviewRequest $request, Interview $interview)
     {
         return DB::transaction(function () use ($interview, $request) {
-            $interviewData = $request->validated();
-            unset($interviewData['answers']);
-            unset($interviewData['interviewee']);
-            unset($interviewData['id']);
+
+            if( $request->filled('interviewee') ){
+                Interviewee::updateOrCreate(['candidate_id' => $interview->candidate_id],$request->interviewee);
+            }
+
+            $data = $request->validated();
+            unset($data['answers']);
+            unset($data['interviewee']);
+            unset($data['id']);
 
             $data['signed_at'] = !$interview->signed_at && $request->signed_at ? now() : null;
-            $interview->update($interviewData);
+            $interview->update($data);
 
             if( $request->filled('answers') ){
                 $interview->interview_questions()->sync($request->answers);
-            }
-
-            if( $request->filled('interviewee') ){
-                Interviewee::update($request->interviewee);
             }
 
             return $interview;

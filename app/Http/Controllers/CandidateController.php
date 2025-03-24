@@ -58,7 +58,9 @@ class CandidateController extends Controller
      */
     public function show(Candidate $candidate)
     {
-        return new CandidateResource($candidate->load(['contacts.addresses', 'evaluation_schedules.evaluator']));
+        return new CandidateResource($candidate->load([
+            'contacts.addresses', 'evaluation_schedules.evaluator', 'interviewee'
+        ]));
     }
 
     /**

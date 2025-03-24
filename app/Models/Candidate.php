@@ -42,6 +42,11 @@ class Candidate extends Model implements HasMedia
         return $this->belongsTo(Program::class);
     }
 
+    public function interviewee()
+    {
+        return $this->hasOne(Interviewee::class)->withDefault(fn()=>['name'=>'', 'relationship'=> '', 'legal_relationship'=> '']);
+    }
+
     public function medications(){
         return $this->hasMany(Medication::class);
     }
