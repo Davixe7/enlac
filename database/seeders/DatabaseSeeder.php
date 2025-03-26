@@ -24,8 +24,21 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'password' => bcrypt('123456'),
         ]);
-
         $user->assignRole('evaluator');
+
+        $user2 = User::factory()->create([
+            'name' => 'Pamela',
+            'email' => 'pamela@sistemaenlac.com',
+            'password' => bcrypt('123456'),
+        ]);
+        $user2->assignRole('evaluator');
+
+        $user3 = User::factory()->create([
+            'name' => 'Mario',
+            'email' => 'mario@sistemaenlac.com',
+            'password' => bcrypt('123456'),
+        ]);
+        $user3->assignRole('evaluator');
 
         $this->call(BrainLevelSeeder::class);
         $this->call(BrainFunctionSeeder::class);
