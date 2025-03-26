@@ -35,6 +35,13 @@ class StoreCandidateRequest extends FormRequest
             'contacts.*.first_name' => 'required|string|max:255',
             'contacts.*.middle_name' => 'nullable|string|max:255',
             'contacts.*.last_name' => 'required|string|max:255',
+            'contacts.*.relationship' => 'required|string|max:255',
+
+            'medications.*.name' => 'required',
+            'medications.*.dose' => 'required',
+            'medications.*.frequency' => 'required',
+            'medications.*.duration' => 'required',
+            'medications.*.observations' => 'nullable|string|max:255',
         ];
     }
 }
