@@ -15,15 +15,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InterviewQuestionController;
-use App\Http\Resources\CandidateResource;
-use App\Models\Candidate;
-use Illuminate\Support\Facades\DB;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::get('/user', fn (Request $request) => $request->user())->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('candidates/dashboard', [CandidateController::class, 'dashboard']);
+
     Route::apiResources([
         'candidates' => CandidateController::class,
         'medications' => MedicationController::class,
@@ -38,72 +36,11 @@ Route::middleware('auth:sanctum')->group(function () {
         'interview_questions'   => InterviewQuestionController::class
     ]);
 
-    Route::post('contacts/validate', [ContactController::class, 'validate']);
-
-    Route::get('candidates/reports_by_name', function (Request $request){
-        $candidates = Candidate::whereName($request->name)->get();
-        return CandidateResource::collection($candidates);
-    });
-
-    Route::get('candidates/reports_by_birthdate', function (Request $request) {
-        $candidates = Candidate::whereBirthDate($request->birthDate)->get();
-        return CandidateResource::collection($candidates);
-    });
-
-    Route::get('candidates/reports_by_evaluation_date', function(Request $request){
-        $candidatesWithRecentSchedule = Candidate::whereEvaluationBetween($request->startDate, $request->endDate)
-        ->get()
-        ->groupBy(function ($candidate) {
-            if ($candidate->evaluation_status === 'done') {
-                return $candidate->onboard_at ? 'done_onboarded' : 'done_not_onboarded';
-            }
-            return $candidate->evaluation_status;
-        });
-
-        $counts = $candidatesWithRecentSchedule->map(function ($group) {
-            return $group->count();
-        });
-
-        $dataWithCount = $candidatesWithRecentSchedule->map(function ($group) {
-            return CandidateResource::collection($group);
-        });
-
-        return response()->json([
-            'counts' => $counts,
-            'data' => $dataWithCount,
-        ]);
-    });
-
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
 
-    Route::get('evaluation_fields', function (Request $request) {
-        return new EvaluationFields($request);
-    });
+    Route::post('contacts/validate', [ContactController::class, 'validate']);
 
-    Route::get('interview_answers', function (Request $request) {
-        $results = DB::table('interview_questions')
-            ->leftJoin('interview_interview_question', function ($join) use ($request) {
-                $join
-                    ->on('interview_question_id', '=', 'interview_questions.id')
-                    ->where('interview_interview_question.interview_id', $request->interview_id);
-            })
-            ->select(
-                'interview_questions.question_text as question_text',
-                'interview_questions.id as interview_question_id',
-                'interview_questions.id as interview_question_id',
-                'interview_interview_question.content as content',
-            )
-            ->get();
-
-        $results = $results->map(function ($result) use ($request) {
-            $result->interview_id = $request->interview_id;
-            $result->content = strval($result->content);
-            $result->checked = $result->content ? 1 : 0;
-            return $result;
-        });
-
-        return response()->json(['data'=>$results]);
-    });
+    Route::get('evaluation_fields', fn (Request $request) => new EvaluationFields($request));
 
     Route::get('evaluators', function () {
         return response()->json(['data' => User::role('evaluator')->get()]);

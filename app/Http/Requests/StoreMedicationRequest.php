@@ -30,21 +30,14 @@ class StoreMedicationRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
+    public function attributes(): array
     {
         return [
-            'name.required' => 'El nombre del medicamento es requerido.',
-            'name.string' => 'El nombre del medicamento debe ser una cadena de texto.',
-            'name.max' => 'El nombre del medicamento no debe exceder los 255 caracteres.',
-            'dose.required' => 'La dosis es requerida.',
-            'dose.string' => 'La dosis debe ser una cadena de texto.',
-            'dose.max' => 'La dosis no debe exceder los 255 caracteres.',
-            'frequency.required' => 'La frecuencia es requerida.',
-            'frequency.string' => 'La frecuencia debe ser una cadena de texto.',
-            'frequency.max' => 'La frecuencia no debe exceder los 255 caracteres.',
-            'duration.required' => 'La duración es requerida.',
-            'duration.string' => 'La duración debe ser una cadena de texto.',
-            'duration.max' => 'La duración no debe exceder los 255 caracteres.',
+            'name'         => 'nombre',
+            'dose'         => 'dosis',
+            'frequency'    => 'frecuencia',
+            'duration'     => 'duracion',
+            'observations' => 'observaciones',
         ];
     }
 }

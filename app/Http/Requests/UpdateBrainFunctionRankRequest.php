@@ -31,15 +31,11 @@ class UpdateBrainFunctionRankRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
+    public function attributes() {
         return [
-            'caracteristic.in' => 'La característica debe ser 0, F o P.',
-            'comments.string' => 'Los comentarios deben ser una cadena de texto.',
-            'laterality_impact.in' => 'El impacto de la lateralidad debe ser l o r.',
-            'brain_level_id.exists' => 'El nivel cerebral seleccionado no existe.',
-            'brain_function_id.exists' => 'La función cerebral seleccionada no existe.',
-            'candidate_id.exists' => 'El candidato seleccionado no existe.',
+            'caracteristic'     => 'nivel de impacto',
+            'comments'          => 'comentario',
+            'laterality_impact' => 'lateralidad',
         ];
     }
 }

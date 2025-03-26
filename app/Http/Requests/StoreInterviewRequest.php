@@ -35,4 +35,12 @@ class StoreInterviewRequest extends FormRequest
             'interviewee.legal_relationship' => 'required',
         ];
     }
+
+    public function attributes() {
+        return [
+            'interviewee.name'               => 'nombre',
+            'interviewee.relationship'       => 'parentesco',
+            'interviewee.legal_relationship' => 'es hijo biologico',
+        ];
+    }
 }

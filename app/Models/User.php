@@ -31,4 +31,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function candidates() {
+        return $this->hasManyThrough(Candidate::class, EvaluationSchedule::class);
+    }
 }

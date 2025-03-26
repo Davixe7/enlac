@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Models\Appointment;
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAppointmentRequest extends FormRequest
@@ -31,12 +30,12 @@ class UpdateAppointmentRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    public function attributes()
     {
         return [
-            'appointment_type.in' => 'El tipo de cita seleccionado no es válido.',
-            'date.date' => 'La fecha debe ser un formato válido.',
-            'observation.string' => 'La observación debe ser una cadena de texto.',
+            'appointment_type' => 'tipo de cita',
+            'date' => 'fecha',
+            'observation' => 'observación',
         ];
     }
 }

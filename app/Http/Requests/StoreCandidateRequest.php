@@ -22,26 +22,53 @@ class StoreCandidateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'candidate.first_name' => 'required|string|max:255',
-            'candidate.middle_name' => 'required|string|max:255',
-            'candidate.last_name' => 'required|string|max:255',
-            'candidate.birth_date' => 'required|date',
-            'candidate.diagnosis' => 'required|string',
-            'candidate.photo' => 'nullable|string',
+            'candidate.first_name'   => 'required|string|max:255',
+            'candidate.middle_name'  => 'required|string|max:255',
+            'candidate.last_name'    => 'required|string|max:255',
+            'candidate.birth_date'   => 'required|date',
+            'candidate.diagnosis'    => 'required|string',
+            'candidate.photo'        => 'nullable|string',
             'candidate.info_channel' => 'required',
-            'candidate.sheet' => 'nullable',
+            'candidate.sheet'        => 'nullable',
 
-            'contacts' => 'required|array',
-            'contacts.*.first_name' => 'required|string|max:255',
-            'contacts.*.middle_name' => 'nullable|string|max:255',
-            'contacts.*.last_name' => 'required|string|max:255',
+            'contacts'                => 'required|array',
+            'contacts.*.first_name'   => 'required|string|max:255',
+            'contacts.*.middle_name'  => 'nullable|string|max:255',
+            'contacts.*.last_name'    => 'required|string|max:255',
             'contacts.*.relationship' => 'required|string|max:255',
 
-            'medications.*.name' => 'required',
-            'medications.*.dose' => 'required',
-            'medications.*.frequency' => 'required',
-            'medications.*.duration' => 'required',
+            'medications.*.name'         => 'required',
+            'medications.*.dose'         => 'required',
+            'medications.*.frequency'    => 'required',
+            'medications.*.duration'     => 'required',
             'medications.*.observations' => 'nullable|string|max:255',
+
+            'evaluation_schedule.evaluator_id' => 'required',
+            'evaluation_schedule.date'         => 'required',
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'candidate.first_name'   => 'nombre',
+            'candidate.middle_name'  => 'apellido materno',
+            'candidate.last_name'    => 'apellido paterno',
+            'candidate.birth_date'   => 'fecha de nacimiento',
+            'candidate.diagnosis'    => 'diagnostico',
+            'candidate.photo'        => 'foto',
+            'candidate.sheet'        => 'folio',
+
+            'contacts.*.first_name'   => 'primer nombre',
+            'contacts.*.middle_name'  => 'apellido materno',
+            'contacts.*.last_name'    => 'apellido paterno',
+            'contacts.*.relationship' => 'parentesco',
+
+            'medications.*.name'         => 'nombre',
+            'medications.*.dose'         => 'dosis',
+            'medications.*.frequency'    => 'frecuencia',
+            'medications.*.duration'     => 'duracion',
+            'medications.*.observations' => 'observaciones',
         ];
     }
 }

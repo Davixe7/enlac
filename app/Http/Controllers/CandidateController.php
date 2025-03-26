@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Candidate;
 use App\Http\Resources\CandidateResource;
 use App\Services\CandidateService;
-use App\Http\Requests\CreateCandidateRequest;
 use App\Http\Requests\StoreCandidateRequest;
 use Illuminate\Http\Request;
 
@@ -16,6 +15,14 @@ class CandidateController extends Controller
     public function __construct(CandidateService $candidateService)
     {
         $this->candidateService = $candidateService;
+    }
+
+    public function dashboard() {
+        $candidates = Candidate::whereHas('evaluation_schedules', function($query){
+            $query->whereEvaluatorId( auth()->id() );
+        })->get();
+
+        return CandidateResource::collection($candidates);
     }
 
     public function index(Request $request)
@@ -66,7 +73,7 @@ class CandidateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CreateCandidateRequest $request, Candidate $candidate)
+    public function update(StoreCandidateRequest $request, Candidate $candidate)
     {
         $this->candidateService->updateCandidate($candidate, $request);
         return new CandidateResource($candidate);

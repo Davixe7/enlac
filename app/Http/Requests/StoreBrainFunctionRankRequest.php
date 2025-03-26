@@ -31,21 +31,11 @@ class StoreBrainFunctionRankRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
+    public function attributes() {
         return [
-            'caracteristic.required' => 'Este campo es requerido.',
-            'caracteristic.in' => 'Debes seleccionar 0, F o P.',
-            'comments.string' => 'El comentario debe ser una cadena de texto.',
-            'comments.required_if' => 'El comentario es obligatorio.',
-            'laterality_impact.required_if' => 'Este campo es requerido.',
-            'laterality_impact.in' => 'Debe seleccionar el Hemisferio del impacto.',
-            'brain_level_id.required' => 'El nivel cerebral es requerido.',
-            'brain_level_id.exists' => 'El nivel cerebral seleccionado no existe.',
-            'brain_function_id.required' => 'La función cerebral es requerida.',
-            'brain_function_id.exists' => 'La función cerebral seleccionada no existe.',
-            'candidate_id.required' => 'El candidato es requerido.',
-            'candidate_id.exists' => 'El candidato seleccionado no existe.',
+            'caracteristic'     => 'nivel de impacto',
+            'comments'          => 'comentario',
+            'laterality_impact' => 'lateralidad',
         ];
     }
 }

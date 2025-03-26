@@ -35,4 +35,12 @@ class UpdateInterviewRequest extends FormRequest
             'interviewee.legal_relationship' => 'nullable',
         ];
     }
+
+    public function attributes(): array {
+        return [
+            'interviewee.name'               => 'nombre',
+            'interviewee.relationship'       => 'parentesco',
+            'interviewee.legal_relationship' => 'es hijo biologico',
+        ];
+    }
 }

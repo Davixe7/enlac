@@ -26,20 +26,18 @@ class UpdateMedicationRequest extends FormRequest
             'dose' => 'string|max:255',
             'frequency' => 'string|max:255',
             'duration' => 'string|max:255',
+            'observations' => 'string|max:255',
         ];
     }
 
-    public function messages(): array
+    public function attributes(): array
     {
         return [
-            'name.string' => 'El nombre del medicamento debe ser una cadena de texto.',
-            'name.max' => 'El nombre del medicamento no debe exceder los 255 caracteres.',
-            'dose.string' => 'La dosis debe ser una cadena de texto.',
-            'dose.max' => 'La dosis no debe exceder los 255 caracteres.',
-            'frequency.string' => 'La frecuencia debe ser una cadena de texto.',
-            'frequency.max' => 'La frecuencia no debe exceder los 255 caracteres.',
-            'duration.string' => 'La duración debe ser una cadena de texto.',
-            'duration.max' => 'La duración no debe exceder los 255 caracteres.',
+            'name'         => 'nombre',
+            'dose'         => 'dosis',
+            'frequency'    => 'frecuencia',
+            'duration'     => 'duracion',
+            'observations' => 'observaciones',
         ];
     }
 }
