@@ -41,11 +41,7 @@ class ContactController extends Controller
         return response()->json(['data' => $contact]);
     }
 
-    public function validate(Request $request){
-        $request->validate([
-            'first_name' => 'required|string',
-            'relationship' => 'required|string',
-        ]);
+    public function validate(StoreContactRequest $request){
         return response()->json([], 200);
     }
 }

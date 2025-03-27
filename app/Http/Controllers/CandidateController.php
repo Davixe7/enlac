@@ -20,7 +20,9 @@ class CandidateController extends Controller
     public function dashboard() {
         $candidates = Candidate::whereHas('evaluation_schedules', function($query){
             $query->whereEvaluatorId( auth()->id() );
-        })->get();
+        })
+        ->orderBy('first_name', 'ASC')
+        ->get();
 
         return CandidateResource::collection($candidates);
     }
@@ -29,18 +31,16 @@ class CandidateController extends Controller
     {
         $candidates = Candidate::name($request->name)
         ->birthDate($request->birth_date)
-        ->evaluationBetween($request->date_from, $request->date_to)->get();
+        ->evaluationBetween($request->date_from, $request->date_to)
+        ->orderBy('first_name', 'ASC')
+        ->get();
 
-        $counts = $candidates->countBy(function ($candidate) {
-            if ($candidate->acceptance_status === null) {
-                return 'en_proceso';
-            } elseif ($candidate->acceptance_status === 0) {
-                return 'rechazados';
-            } elseif ($candidate->acceptance_status === 1 && $candidate->onboard_at == null) {
-                return 'aceptados_no_ingresados';
-            } elseif ($candidate->acceptance_status === 1 && $candidate->onboard_at != null) {
-                return 'aceptados_ingresados';
-            }
+        $counts = $candidates->countBy(function ($u) {
+            $status = $u->acceptance_status;
+            if ($status === null)                        return 'en_proceso';
+            if ($status === 0)                           return 'rechazados';
+            if ($status === 1 && $u->onboard_at == null) return 'aceptados_no_ingresados';
+            if ($status === 1 && $u->onboard_at != null) return 'aceptados_ingresados';
         });
 
         $counts = [

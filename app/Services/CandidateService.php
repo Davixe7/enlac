@@ -83,7 +83,7 @@ class CandidateService
 
             /*
             Si cambian evaluador o fecha de cita
-            cacelar cita actual, generar nueva cita. */
+            cancelar cita actual, generar nueva cita. */
             if($request->filled('evaluation_schedule')){
                 Storage::append('schedules.log', json_encode($request->evaluation_schedule));
                 $evaluator_changed = $candidate->evaluation_schedule->evaluator_id != $request->evaluation_schedule['evaluator_id'];

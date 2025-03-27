@@ -110,7 +110,7 @@ class Candidate extends Model implements HasMedia
     }
 
     public function getFullNameAttribute(){
-        $fullNameArray = array_filter([$this->first_name, $this->middle_name, $this->last_name]);
+        $fullNameArray = array_filter([$this->first_name, $this->last_name, $this->middle_name]);
         return join(" ", $fullNameArray);
     }
 }

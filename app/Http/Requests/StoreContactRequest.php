@@ -22,14 +22,13 @@ class StoreContactRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'candidate_id' => 'required|exists:candidates,id',
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
             'relationship' => 'required|string|max:255',
-            'enlac_responsible' => 'required|boolean',
-            'legal_guardian' => 'required|boolean',
-            'email' => 'required|email|max:255',
+            'enlac_responsible' => 'nullable|boolean',
+            'legal_guardian' => 'nullable|boolean',
+            'email' => 'nullable|email|max:255',
             'whatsapp' => 'nullable|string|max:255',
             'home_phone' => 'nullable|string|max:255',
         ];
