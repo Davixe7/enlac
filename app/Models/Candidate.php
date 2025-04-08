@@ -71,6 +71,8 @@ class Candidate extends Model implements HasMedia
         if( !$startDate || !$endDate ){
             return $query;
         }
+
+        $endDate = Carbon::parse($endDate)->endOfDay();
         // Subquery to find the most recent evaluation schedule ID for each candidate within the date range
 
         $mostRecentScheduleIds = EvaluationSchedule::query()

@@ -14,7 +14,7 @@ class BrainLevelSeeder extends Seeder
     public function run(): void
     {
         BrainLevel::create([
-            'name' => 'Médula y Cordón espinal',
+            'name' => 'Médula y cordón espinal',
             'color' => '#EE8B0080',
             'grade' => 'I',
             'S' => 5,
@@ -23,7 +23,7 @@ class BrainLevelSeeder extends Seeder
         ]);
 
         BrainLevel::create([
-            'name' => 'Protuberancia anualar',
+            'name' => 'Protuberancia anular',
             'color' => '#DD004A80',
             'grade' => 'II',
             'S' => 1,

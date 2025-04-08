@@ -1,6 +1,8 @@
 <?php
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 Route::get('migrate', function(){
     $exitCode = Artisan::call('migrate:fresh --seed');

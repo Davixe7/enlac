@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
             $table->foreignId('evaluator_id')->constrained('users')->onDelete('cascade');
-            $table->enum('type_id', [1,2,3]);
+            $table->unsignedInteger('type_id');
             $table->text('comments')->nullable();
             $table->dateTime('date');
             $table->timestamps();

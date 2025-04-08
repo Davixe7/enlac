@@ -22,7 +22,7 @@ class BrainFunctionseeder extends Seeder
         ]);
 
         BrainFunction::create([
-            'name' => 'Capacidad Tactil',
+            'name' => 'Capacidad Táctil',
         ]);
 
         BrainFunction::create([

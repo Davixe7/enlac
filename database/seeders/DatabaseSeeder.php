@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\InterviewQuestion;
+use Illuminate\Support\Str;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,23 +16,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         $role = Role::create(['name' => 'evaluator']);
-
         $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('123456'),
         ]);
-        $user->assignRole('evaluator');
+        $user->assignRole($role);
 
         $user2 = User::factory()->create([
             'name' => 'Pamela',
             'email' => 'pamela@sistemaenlac.com',
             'password' => bcrypt('123456'),
         ]);
-        $user2->assignRole('evaluator');
+        $user2->assignRole($role);
 
         $user3 = User::factory()->create([
             'name' => 'Mario',
@@ -39,6 +37,17 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('123456'),
         ]);
         $user3->assignRole('evaluator');
+
+        $areas = ['Medico', 'Nutrición', 'Psicología', 'Comunicación', 'Programa escucha'];
+        foreach( $areas as $area ){
+            Role::create(['name' => $area]);
+            $user = User::factory()->create([
+                'name' => $area,
+                'email' => Str::slug($area) . '@example.com',
+                'password' => bcrypt('123456'),
+            ]);
+            $user->assignRole($area);
+        }
 
         $this->call(BrainLevelSeeder::class);
         $this->call(BrainFunctionSeeder::class);

@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InterviewQuestionController;
+use Spatie\Permission\Models\Role;
 
 Route::get('/user', fn (Request $request) => $request->user())->middleware('auth:sanctum');
 
@@ -42,7 +43,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('evaluation_fields', fn (Request $request) => new EvaluationFields($request));
 
-    Route::get('evaluators', function () {
+    Route::get('evaluators', function (Request $request) {
         return response()->json(['data' => User::role('evaluator')->get()]);
+    });
+
+    Route::get('roles', function(){
+        return response()->json(['data' => Role::whereNotIn('id', [1])->get(['id', 'name'])]);
+    });
+
+    Route::get('personal', function(Request $request){
+        $request->validate(['area'=>'required']);
+        $users = User::whereHas('roles', function($query) use ($request) {
+            $query->where('id', $request->area);
+        })->get();
+        return response()->json(['data' => $users]);
     });
 });
