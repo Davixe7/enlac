@@ -15,11 +15,20 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InterviewQuestionController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Resources\UserResource;
 use Spatie\Permission\Models\Role;
 
-Route::get('/user', fn (Request $request) => $request->user())->middleware('auth:sanctum');
+Route::get('/user', function (Request $request) {
+    $user = $request->user();
+    $user->load('notifications');
+    return new UserResource($user);
+})->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 
     Route::get('candidates/dashboard', [CandidateController::class, 'dashboard']);
 

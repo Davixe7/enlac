@@ -25,7 +25,7 @@ class StoreAppointmentRequest extends FormRequest
     {
         return [
             'candidate_id' => 'required|exists:candidates,id',
-            'type_id' => ['required', Rule::in(Appointment::APPOINTMENT_TYPES)],
+            'type_id' => ['required'],
             'evaluator_id' => 'required|exists:users,id',
             'date' => 'required|date',
             'comments' => 'nullable|string',

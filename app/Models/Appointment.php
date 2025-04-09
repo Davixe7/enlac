@@ -20,6 +20,11 @@ class Appointment extends Model
         return $this->belongsTo(Candidate::class);
     }
 
+    public function evaluator()
+    {
+        return $this->belongsTo(User::class, 'evaluator_id', 'id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

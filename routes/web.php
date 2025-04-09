@@ -1,8 +1,15 @@
 <?php
+
+use App\Notifications\EvaluationScheduled;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
+
+Route::get('test', function(){
+    $schedule = App\Models\EvaluationSchedule::first();
+    return (new EvaluationScheduled($schedule))->toMail($schedule->evaluator);
+});
 
 Route::get('migrate', function(){
     $exitCode = Artisan::call('migrate:fresh --seed');

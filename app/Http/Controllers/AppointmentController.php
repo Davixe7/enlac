@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Http\Resources\AppointmentResource;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
+use App\Notifications\AppointmentScheduled;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -18,7 +19,10 @@ class AppointmentController extends Controller
 
     public function store(StoreAppointmentRequest $request)
     {
-        $appointment = Appointment::create($request->validated());
+        $data = $request->validated();
+        $data['type_id'] = 1;
+        $appointment = Appointment::create($data);
+        $appointment->evaluator->notify(new AppointmentScheduled($appointment));
         return new AppointmentResource($appointment);
     }
 

@@ -8,6 +8,8 @@ use App\Models\Contact;
 use App\Models\Address;
 use App\Models\EvaluationSchedule;
 use App\Models\Medication;
+use App\Models\User;
+use App\Notifications\EvaluationScheduled;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -42,7 +44,8 @@ class CandidateService
 
             // 4. Crear agendamiento de Evaluacion
             if( $request->filled('evaluation_schedule') ){
-                $candidate->evaluation_schedules()->create($request->evaluation_schedule);
+                $schedule = $candidate->evaluation_schedules()->create($request->evaluation_schedule);
+                $schedule->evaluator->notify( new EvaluationScheduled( $schedule ) );
             }
 
             return $candidate;
@@ -88,13 +91,15 @@ class CandidateService
                 Storage::append('schedules.log', json_encode($request->evaluation_schedule));
                 $evaluator_changed = $candidate->evaluation_schedule->evaluator_id != $request->evaluation_schedule['evaluator_id'];
                 $date_changed      = $candidate->evaluation_schedule->date != $request->evaluation_schedule['date'];
-                if ($evaluator_changed || $date_changed) {
-                    $candidate->evaluation_schedule->update(['status' => 'canceled']);
-                    $candidate->evaluation_schedules()->create([
-                        'evaluator_id' => $request->evaluation_schedule['evaluator_id'],
-                        'date' => $request->evaluation_schedule['date'],
-                    ]);
-                }
+
+                if (!$evaluator_changed && !$date_changed) { return; }
+
+                $candidate->evaluation_schedule->update(['status' => 'canceled']);
+                $schedule = $candidate->evaluation_schedules()->create([
+                    'evaluator_id' => $request->evaluation_schedule['evaluator_id'],
+                    'date' => $request->evaluation_schedule['date'],
+                ]);
+                $schedule->evaluator->notify( new EvaluationScheduled( $schedule ) );
             }
 
             return $candidate;
