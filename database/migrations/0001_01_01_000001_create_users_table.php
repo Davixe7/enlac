@@ -14,6 +14,13 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('last_name');
+            $table->string('second_last_name');
+            $table->foreignId('work_area_id')->onDelete('SET NULL');
+            $table->foreignId('leader_id')->nullable()->references('id')->on('users')->onDelete('SET NULL');
+            $table->string('phone')->nullable();
+            $table->date('entry_date')->nullable();
+            $table->boolean('status')->default(true)->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

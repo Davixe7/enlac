@@ -15,11 +15,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = [];
 
     protected $hidden = [
         'password',
@@ -41,5 +37,18 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify((new ResetPasswordNotification($token))->locale('es'));
+    }
+
+    public function getFullNameAttribute(){
+        $fullNameArray = array_filter([$this->name, $this->last_name, $this->second_last_name]);
+        return join(" ", $fullNameArray);
+    }
+
+    public function work_area(){
+        return $this->belongsTo(WorkArea::class);
+    }
+
+    public function leader(){
+        return $this->belongsTo(User::class, 'leader_id');
     }
 }
