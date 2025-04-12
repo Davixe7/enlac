@@ -11,4 +11,8 @@ class Sponsor extends Model
     public function candidates(){
         $this->belongsToMany(Candidate::class, 'payment_configs', 'candidate_id', 'sponsor_id');
     }
+
+    public function payments(){
+        $this->hasMany(Payment::class);
+    }
 }

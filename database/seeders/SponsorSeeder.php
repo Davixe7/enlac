@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PaymentConfig;
 use App\Models\Sponsor;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -24,5 +25,14 @@ class SponsorSeeder extends Seeder
         ]);
 
         $sponsor->candidates->attach([1]);
+
+        $paymentConfig = PaymentConfig::create([
+            'sponsor_id' => $sponsor->id,
+            'candidate_id' => 1,
+            'amount' => 6000,
+            'frequency' => 4
+        ]);
+
+        Payment::create();
     }
 }
