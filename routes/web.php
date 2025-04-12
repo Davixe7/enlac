@@ -1,14 +1,38 @@
 <?php
 
+use App\Models\Candidate;
 use App\Notifications\EvaluationScheduled;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
 
 Route::get('test', function(){
-    $schedule = App\Models\EvaluationSchedule::first();
-    return (new EvaluationScheduled($schedule))->toMail($schedule->evaluator);
+    $candidate = Candidate::first();
+    $sponsors = $candidate->sponsors;
+    $wallets = [];
+
+    $sponsors->each(function($sponsor) use($candidate) {
+        $paymentConfig = $sponsor->payment_configs()->where('candidate_id', $candidate->id)->first();
+        $payments = $sponsor->payments()
+                    ->whereBetween('date', [now()->startOfYear(), now()->endOfYear()]);
+
+        for ($i=1; $i < 13; $i += $paymentConfig->frequency) {
+            $start = $i;
+            $end = $i + $paymentConfig->frequency - 1;
+
+            $startDate = Carbon::create(now()->year, $start);
+            $endDate = Carbon::create(now()->year, $end)->endOfMonth();
+
+            $payments = $sponsor->payments()
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->where('candidate_id', $candidate->id)
+                    ->get();
+
+            return $payments;
+        }
+    });
 });
 
 Route::get('migrate', function(){

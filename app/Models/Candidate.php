@@ -51,6 +51,10 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(Medication::class);
     }
 
+    public function sponsors(){
+        return $this->belongsToMany(Sponsor::class, 'payment_configs');
+    }
+
     public function scopeBirthDate(Builder $query, $birthDate): Builder
     {
         return $birthDate ? $query->where('birth_date', $birthDate) : $query;

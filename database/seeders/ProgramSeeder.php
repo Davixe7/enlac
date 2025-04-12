@@ -13,14 +13,14 @@ class ProgramSeeder extends Seeder
      */
     public function run(): void
     {
-        Program::create(['name' => 'Programa escolarizado matutino']);
-        Program::create(['name' => 'Programa escolarizado vespertino']);
-        Program::create(['name' => 'Programa asistido con sombra']);
-        Program::create(['name' => 'Programa asistido con padres']);
-        Program::create(['name' => 'Sabor alegría']);
-        Program::create(['name' => 'Estimulación temprana']);
-        Program::create(['name' => 'Programa intensivo de 6 meses']);
-        Program::create(['name' => 'Programa en casa a distancia']);
-        Program::create(['name' => 'Programa comunidad infantil']);
+        Program::create(['price'=>12000,'name' => 'Programa escolarizado matutino']);
+        Program::create(['price'=>12000,'name' => 'Programa escolarizado vespertino']);
+        Program::create(['price'=>12000,'name' => 'Programa asistido con sombra']);
+        Program::create(['price'=>12000,'name' => 'Programa asistido con padres']);
+        Program::create(['price'=>12000,'name' => 'Sabor alegría']);
+        Program::create(['price'=>12000,'name' => 'Estimulación temprana']);
+        Program::create(['price'=>12000,'name' => 'Programa intensivo de 6 meses']);
+        Program::create(['price'=>12000,'name' => 'Programa en casa a distancia']);
+        Program::create(['price'=>12000,'name' => 'Programa comunidad infantil']);
     }
 }
