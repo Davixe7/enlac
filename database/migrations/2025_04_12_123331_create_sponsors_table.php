@@ -16,9 +16,9 @@ return new class extends Migration
             $table->timestamps();
             $table->string('name', 191);
             $table->string('last_name', 191);
-            $table->string('second_last_name', 191)->nullable();
+            $table->string('second_last_name', 191);
+            $table->string('company_name')->nullable();
             $table->date('birthdate');
-            $table->string('razon_social')->nullable();
             $table->string('marital_status')->nullable();
         });
     }

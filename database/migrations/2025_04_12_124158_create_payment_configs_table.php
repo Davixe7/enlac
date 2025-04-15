@@ -16,8 +16,13 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
             $table->foreignId('sponsor_id')->constrained()->onDelete('cascade');
-            $table->unsignedTinyInteger('frequency');
             $table->decimal('amount');
+            $table->unsignedTinyInteger('frequency');
+            $table->unsignedTinyInteger('month_payday');
+            $table->enum('address_type', ['home', 'office']);
+            $table->boolean('wants_pickup')->default(false);
+            $table->boolean('wants_reminder')->default(false);
+            $table->boolean('wants_deductible_receipt')->default(false);
         });
     }
 
