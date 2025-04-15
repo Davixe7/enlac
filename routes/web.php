@@ -1,12 +1,9 @@
 <?php
 
 use App\Models\Candidate;
-use App\Notifications\EvaluationScheduled;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Str;
 
 Route::get('test', function(){
     $candidate = Candidate::first();

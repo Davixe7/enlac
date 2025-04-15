@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'work_areas'   => WorkAreaController::class,
         'roles'   => RoleController::class,
         'users'   => UserController::class,
+        'sponsors'   => SponsorController::class,
     ]);
 
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
