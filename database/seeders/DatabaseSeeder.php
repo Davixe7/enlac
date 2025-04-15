@@ -19,12 +19,12 @@ class DatabaseSeeder extends Seeder
     {
         /* $this->call(RoleSeeder::class);
         $this->call(WorkAreaSeeder::class); */
-        $this->call(UserSeeder::class);
+        /* $this->call(UserSeeder::class);
         $this->call(BrainLevelSeeder::class);
         $this->call(BrainFunctionSeeder::class);
         $this->call(InterviewQuestionSeeder::class);
         $this->call(ProgramSeeder::class);
-        $this->call(CandidateSeeder::class);
+        $this->call(CandidateSeeder::class); */
         $this->call(SponsorSeeder::class);
     }
 }

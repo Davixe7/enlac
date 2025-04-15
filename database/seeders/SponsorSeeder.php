@@ -16,16 +16,18 @@ class SponsorSeeder extends Seeder
      */
     public function run(): void
     {
-        $sponsor = Sponsor::create([
+        /* $sponsor = Sponsor::create([
             'name' => 'Padrino',
             'last_name' => 'Apellido',
             'second_last_name' => 'Dos',
             'birthdate' => Carbon::now()->subYears(20),
             'marital_status' => 'Casado(a)',
             'razon_social' => 'Padrinos C.A',
-        ]);
+        ]); */
 
-        $sponsor->candidates->attach([1]);
+        $sponsor = Sponsor::find(1);
+
+        //$sponsor->candidates()->attach([1]);
 
         $paymentConfig = PaymentConfig::create([
             'sponsor_id' => $sponsor->id,

@@ -9,10 +9,14 @@ class Sponsor extends Model
     protected $guarded = [];
 
     public function candidates(){
-        $this->belongsToMany(Candidate::class, 'payment_configs', 'candidate_id', 'sponsor_id');
+        return $this->belongsToMany(Candidate::class, 'payment_configs', 'candidate_id', 'sponsor_id');
     }
 
     public function payments(){
-        $this->hasMany(Payment::class);
+        return $this->hasMany(Payment::class);
+    }
+
+    public function payment_configs(){
+        return $this->hasMany(PaymentConfig::class);
     }
 }

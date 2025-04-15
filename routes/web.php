@@ -13,10 +13,8 @@ Route::get('test', function(){
     $sponsors = $candidate->sponsors;
     $wallets = [];
 
-    $sponsors->each(function($sponsor) use($candidate) {
+    $sponsors->each(function($sponsor) use($candidate, &$wallets) {
         $paymentConfig = $sponsor->payment_configs()->where('candidate_id', $candidate->id)->first();
-        $payments = $sponsor->payments()
-                    ->whereBetween('date', [now()->startOfYear(), now()->endOfYear()]);
 
         for ($i=1; $i < 13; $i += $paymentConfig->frequency) {
             $start = $i;
@@ -30,9 +28,41 @@ Route::get('test', function(){
                     ->where('candidate_id', $candidate->id)
                     ->get();
 
-            return $payments;
+            $balance = $payments->reduce(function($carry, $payment) use($paymentConfig) {
+                return $payment->amount + $carry;
+            },0);
+
+            $carry = $balance;
+
+            foreach(range($start, $end) as $month){
+                //echo $paymentConfig->id . ' ' . $month . "<br/>";
+                $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
+
+                $nombreMes = (Carbon::create(now()->year, $month))->format('F');
+                $status = null;
+
+                if( $abono == $paymentConfig->monthly_amount ){
+                    $status = 'green';
+                }
+                elseif ( now()->month > $end ) {
+                    //echo now()->month . ' > ' . $end . "<br/>";
+                    $status = 'red';
+                }
+                else {
+                    $status = 'yellow';
+                }
+
+                $wallets[$sponsor->id][] = [
+                    'month' => $nombreMes,
+                    'abono' => $abono,
+                    'status' => $status
+                ];
+                $carry = $carry - $abono;
+            }
         }
     });
+
+    return $wallets;
 });
 
 Route::get('migrate', function(){
