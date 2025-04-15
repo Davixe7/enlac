@@ -9,11 +9,11 @@ class PaymentConfig extends Model
     protected $guarded = [];
 
     public function candidate(){
-        $this->belongsToMany(Candidate::class);
+        return $this->belongsTo(Candidate::class);
     }
 
     public function sponsor(){
-        $this->belongsToMany(Sponsor::class);
+        return  $this->belongsToMany(Sponsor::class);
     }
 
     public function getMonthlyAmountAttribute(){
@@ -22,5 +22,13 @@ class PaymentConfig extends Model
 
     public function getYearlyPaymentsCountAttribute(){
         return 12 / $this->frequency;
+    }
+
+    public function scopeBySponsor($query, $sponsor_id){
+        if( !$sponsor_id ){
+            return $query;
+        }
+
+        return $query->whereSponsorId( $sponsor_id );
     }
 }
