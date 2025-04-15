@@ -21,11 +21,8 @@ class SponsorController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string',
-            'last_name' => 'required|string',
-            'second_last_name' => 'nullable|string',
-        ]);
+        $sponsor = Sponsor::create($request->all());
+        return response()->json(['data' => $sponsor]);
     }
 
     /**
@@ -41,7 +38,8 @@ class SponsorController extends Controller
      */
     public function update(Request $request, Sponsor $sponsor)
     {
-        //
+        $sponsor->update($request->all());
+        return response()->json(['data' => $sponsor]);
     }
 
     /**

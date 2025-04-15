@@ -25,6 +25,8 @@ class Sponsor extends Model
             return $query;
         }
 
-        return $query->whereCandidateId( $query->candidate_id );
+        return $query->whereHas(['payment_configs' => function($query){
+            $query->whereCandidateId( $query->candidate_id );
+        }]);
     }
 }

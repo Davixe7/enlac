@@ -14,6 +14,7 @@ use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
