@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PaymentConfig;
+use App\Http\Requests\StoreSponsorRequest;
+use App\Http\Requests\UpdateSponsorRequest;
+use App\Http\Resources\SponsorResource;
 use App\Models\Sponsor;
 use Illuminate\Http\Request;
 
@@ -14,31 +16,15 @@ class SponsorController extends Controller
     public function index(Request $request)
     {
         $sponsors = Sponsor::byCandidate( $request->candidate_id )->get();
-        return response()->json(['data'=>$sponsors]);
+        return SponsorResource::collection( $sponsors );
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSponsorRequest $request)
     {
-        $data = $request->validated();
-        unset($data['candidate_id']);
-        $candidate_id = $request->candidate_id;
-
-        $sponsor = Sponsor::create($request->all());
-
-        if($request->filled('candidate_id')){
-            PaymentConfig::create([
-                'sponsor_id'   => $sponsor->id,
-                'candidate_id' => $candidate_id,
-                'amount'       => 0,
-                'month_payday' => 1,
-                'address_type' => 'home',
-                'frequency'    => 1,
-            ]);
-        }
-
+        $sponsor = Sponsor::create($request->validated());
         return response()->json(['data' => $sponsor]);
     }
 
@@ -47,15 +33,15 @@ class SponsorController extends Controller
      */
     public function show(Sponsor $sponsor)
     {
-        //
+        return new SponsorResource( $sponsor );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Sponsor $sponsor)
+    public function update(UpdateSponsorRequest $request, Sponsor $sponsor)
     {
-        $sponsor->update($request->all());
+        $sponsor->update($request->validated());
         return response()->json(['data' => $sponsor]);
     }
 

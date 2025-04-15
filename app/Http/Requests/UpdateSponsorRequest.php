@@ -22,12 +22,12 @@ class UpdateSponsorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'             => 'nullable|string|max:191',
-            'last_name'        => 'nullable|string|max:191',
-            'second_last_name' => 'nullable|string|max:191',
+            'name'             => 'required|string|max:191',
+            'last_name'        => 'required|string|max:191',
+            'second_last_name' => 'required|string|max:191',
             'company_name'     => 'nullable|string|max:255',
             'marital_status'   => 'nullable|string|max:191',
-            'birthdate'        => 'nullable|date',
+            'birthdate'        => 'required|date',
         ];
     }
 }

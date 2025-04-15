@@ -12,16 +12,15 @@ use App\Http\Controllers\BrainLevelController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentConfigController;
 use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Models\Role;
 use App\Models\User;
 
 Route::get('/user', function (Request $request) {
@@ -52,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'roles'   => RoleController::class,
         'users'   => UserController::class,
         'sponsors'   => SponsorController::class,
+        'payment_configs'   => PaymentConfigController::class,
     ]);
 
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);

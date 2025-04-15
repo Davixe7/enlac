@@ -20,13 +20,13 @@ class Sponsor extends Model
         return $this->hasMany(PaymentConfig::class);
     }
 
-    public function scopeByCandidate($query){
-        if( !$query->candidate_id ){
+    public function scopeByCandidate($query, $candidateId){
+        if( !$candidateId ){
             return $query;
         }
 
-        return $query->whereHas(['payment_configs' => function($query){
-            $query->whereCandidateId( $query->candidate_id );
+        return $query->whereHas(['payment_configs' => function($query) use ($candidateId){
+            $query->whereCandidateId( $candidateId );
         }]);
     }
 }
