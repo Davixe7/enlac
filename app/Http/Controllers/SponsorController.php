@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaymentConfig;
 use App\Models\Sponsor;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,23 @@ class SponsorController extends Controller
      */
     public function store(Request $request)
     {
+        $data = $request->validated();
+        unset($data['candidate_id']);
+        $candidate_id = $request->candidate_id;
+
         $sponsor = Sponsor::create($request->all());
+
+        if($request->filled('candidate_id')){
+            PaymentConfig::create([
+                'sponsor_id'   => $sponsor->id,
+                'candidate_id' => $candidate_id,
+                'amount'       => 0,
+                'month_payday' => 1,
+                'address_type' => 'home',
+                'frequency'    => 1,
+            ]);
+        }
+
         return response()->json(['data' => $sponsor]);
     }
 
