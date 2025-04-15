@@ -10,9 +10,10 @@ class SponsorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $sponsors = Sponsor::byCandidate( $request->candidate_id )->get();
+        return response()->json(['data'=>$sponsors]);
     }
 
     /**
@@ -20,7 +21,11 @@ class SponsorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string',
+            'last_name' => 'required|string',
+            'second_last_name' => 'nullable|string',
+        ]);
     }
 
     /**

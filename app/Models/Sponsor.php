@@ -15,4 +15,12 @@ class Sponsor extends Model
     public function payments(){
         $this->hasMany(Payment::class);
     }
+
+    public function scopeByCandidate($query){
+        if( !$query->candidate_id ){
+            return $query;
+        }
+
+        return $query->whereCandidateId( $query->candidate_id );
+    }
 }
