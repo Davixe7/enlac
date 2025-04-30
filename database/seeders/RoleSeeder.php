@@ -23,7 +23,7 @@ class RoleSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            Role::create(['name'=> $role]);
+            Role::create(['name'=> $role, 'guard_name'=>'sanctum']);
         }
     }
 }

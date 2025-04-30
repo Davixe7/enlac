@@ -22,9 +22,9 @@ class SponsorSeeder extends Seeder
             'second_last_name' => 'Dos',
             'birthdate' => Carbon::now()->subYears(20),
             'marital_status' => 'Casado(a)',
-            'razon_social' => 'Padrinos C.A',
-        ]); */
-
+            //'razon_social' => 'Padrinos C.A',
+        ]);
+ */
         $sponsor = Sponsor::find(1);
 
         //$sponsor->candidates()->attach([1]);

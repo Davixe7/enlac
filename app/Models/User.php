@@ -15,6 +15,10 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
+    public function guardName(){
+        return 'sanctum';
+    }
+
     protected $guarded = [];
 
     protected $hidden = [

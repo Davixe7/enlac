@@ -7,6 +7,7 @@ use App\Http\Resources\CandidateResource;
 use App\Services\CandidateService;
 use App\Http\Requests\StoreCandidateRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CandidateController extends Controller
 {
@@ -91,6 +92,16 @@ class CandidateController extends Controller
         ]);
 
         return new CandidateResource($candidate);
+    }
+
+    public function kardexes( Candidate $candidate ){
+        $list = DB::table('media')
+        ->whereModelType('App\Models\Candidate')
+        ->whereModelId($candidate->id)
+        ->where('collection_name', 'like', "kardex_%")
+        ->pluck('collection_name');
+
+        return response()->json(['data'=>$list]);
     }
 
     /**

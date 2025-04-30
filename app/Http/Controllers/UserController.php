@@ -45,15 +45,15 @@ class UserController extends Controller
 
         if( $request->filled('role_id') ){
             $role = Role::find( $request->role_id );
-            $user->assignRole( $role->id );
+            $user->assignRole( $role );
         }
 
-        if( $request->filled('is_admin') ){
+        if( $request->boolean('is_admin') ){
             $adminRole = Role::where('name', 'like', "%administrador%")->first();
             $user->assignRole( $adminRole );
         }
 
-        if( $request->filled('is_evaluator') ){
+        if( $request->boolean('is_evaluator') ){
             $evaluatorRole = Role::where('name', 'like', "%evaluador%")->first();
             $user->assignRole( $evaluatorRole );
         }
@@ -97,7 +97,7 @@ class UserController extends Controller
 
         if( $request->filled('role_id') ){
             $role = Role::find( $request->role_id );
-            $user->assignRole( $role->id );
+            $user->assignRole( $role );
         }
 
         if( $request->filled('is_admin') ){

@@ -11,6 +11,7 @@ use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
+use App\Http\Controllers\KardexController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentConfigController;
 use App\Http\Controllers\WorkAreaController;
@@ -52,9 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
         'users'   => UserController::class,
         'sponsors'   => SponsorController::class,
         'payment_configs'   => PaymentConfigController::class,
+        'kardexes'   => KardexController::class,
     ]);
 
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
+    Route::get('candidates/{candidate}/kardexes', [CandidateController::class, 'kardexes']);
 
     Route::post('contacts/validate', [ContactController::class, 'validate']);
 
