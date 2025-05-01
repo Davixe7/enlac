@@ -25,7 +25,8 @@ class UserSeeder extends Seeder
                 'name'             => $u[0],
                 'last_name'        => $u[1],
                 'second_last_name' => $u[2],
-                'email'            => strtolower($u[0]) . '@sistemaenlac.com'
+                'email'            => strtolower($u[0]) . '@sistemaenlac.com',
+                'entry_date'       => now()
             ]);
 
             $user->assignRole('admin');
