@@ -14,16 +14,21 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user1 = User::factory()->create([
-            'name' => 'Maria',
-            'last_name' => 'Salazar',
-            'second_last_name' => 'Garcia',
-            'phone' => '3211231230',
-            'leader_id' => null,
-            'email' => 'maria@sistemaenlac.com',
-            'password' => bcrypt('123456'),
-            'work_area_id'=> 1,
-            'entry_date' => now()
-        ]);
+        $users = [
+            ['Maria', 'Salazar', 'Garcia'],
+            ['Pamela', 'Guizar', ''],
+            ['Mario', 'Garcia', ''],
+        ];
+
+        foreach($users as $u){
+            $user = User::factory()->create([
+                'name'             => $u[0],
+                'last_name'        => $u[1],
+                'second_last_name' => $u[2],
+                'email'            => strtolower($u[0]) . '@sistemaenlac.com'
+            ]);
+
+            $user->assignRole('admin');
+        }
     }
 }

@@ -14,16 +14,17 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            'Administrador General',
-            'Evaluador',
-            'Recepción',
-            'Gestión del Beneficiario',
-            'Coordinación Física',
-            'Coordinación Académica'
+            ['name' => 'admin',          'label' => 'Administrador General'],
+            ['name' => 'evaluator',      'label' => 'Evaluador'],
+            ['name' => 'reception',      'label' => 'Recepción'],
+            ['name' => 'manager',        'label' => 'Gestión del Beneficiario'],
+            ['name' => 'coord_physical', 'label' => 'Coordinación Física'],
+            ['name' => 'coord_academic', 'label' => 'Coordinación Académica']
         ];
 
         foreach ($roles as $role) {
-            Role::create(['name'=> $role, 'guard_name'=>'sanctum']);
+            $role['guard_name'] = 'sanctum';
+            Role::create($role);
         }
     }
 }

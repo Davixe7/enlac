@@ -12,7 +12,8 @@ class RoleController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => Role::whereNotIn('id', [1,2])->get() ]);
+        $roles = Role::whereNotIn('name', ['admin', 'evaluator'])->get();
+        return response()->json(['data' => $roles ]);
     }
 
     /**
@@ -20,7 +21,11 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate(['name'=>'required']);
+        $data = $request->validate([
+            'name'  => 'required',
+            'label' => 'required'
+        ]);
+
         $role = Role::create($data);
         return response()->json(['data' => $role], 201 );
     }
@@ -38,7 +43,11 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        $data =  $request->validate(['name'=>'required']);
+        $data = $request->validate([
+            'name'  => 'required',
+            'label' => 'required'
+        ]);
+
         $role->update($data);
         return response()->json(['data' => $role]);
     }
