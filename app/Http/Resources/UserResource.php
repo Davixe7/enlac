@@ -16,14 +16,12 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $data = parent::toArray($request);
-        $adminRole     = DB::table('roles')->whereName('Administrador General')->first()->id;
-        $evaluatorRole = DB::table('roles')->whereName('Evaluador')->first()->id;
 
-        $actualRole = $this->roles()->whereNotIn('id', [$adminRole,$evaluatorRole])->first();
+        $actualRole = $this->roles()->whereNotIn('name', ['admin','evaluator'])->first();
 
         return array_merge($data, [
-            'is_admin' => $this->roles()->find($adminRole) ? 1 : 0,
-            'is_evaluator' => $this->roles()->find($evaluatorRole) ? 1 : 0,
+            'is_admin' => $this->hasRole('admin') ? 1 : 0,
+            'is_evaluator' => $this->hasRole('evaluator') ? 1 : 0,
             'full_name' => $this->full_name,
             'leader' => $this->whenLoaded('leader'),
             'work_area' => $this->whenLoaded('work_area'),
