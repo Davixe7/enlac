@@ -6,6 +6,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\BeneficiaryController;
 use App\Http\Controllers\BrainFunctionController;
 use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
@@ -66,6 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('evaluators', function (Request $request) {
         return response()->json(['data' => User::role('evaluator')->get()]);
     });
+
+    Route::get('beneficiaries', [BeneficiaryController::class, 'index']);
+    Route::get('beneficiaries/{candidate}', [BeneficiaryController::class, 'show']);
+    Route::put('beneficiaries/{candidate}', [BeneficiaryController::class, 'update']);
 
     Route::get('personal', function(Request $request){
         $request->validate(['area'=>'required']);

@@ -15,7 +15,13 @@ class PaymentConfigController extends Controller
      */
     public function index(Request $request)
     {
-        $paymentConfigs = PaymentConfig::bySponsor( $request->sponsor_id )->with(['candidate'])->get();
+        if( $request->filled('sponsor_id') ){
+            $paymentConfigs = PaymentConfig::bySponsor( $request->sponsor_id )->with(['candidate'])->get();
+        }
+        else {
+            $paymentConfigs = PaymentConfig::byCandidate( $request->candidate_id )->with(['sponsor'])->get();
+        }
+
         return PaymentConfigResource::collection( $paymentConfigs );
     }
 

@@ -49,7 +49,7 @@ class User extends Authenticatable
     }
 
     public function work_area(){
-        return $this->belongsTo(WorkArea::class);
+        return $this->belongsTo(WorkArea::class)->withDefault(['name'=>'Ninguna']);
     }
 
     public function leader(){

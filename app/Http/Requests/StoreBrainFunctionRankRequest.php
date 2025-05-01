@@ -23,8 +23,8 @@ class StoreBrainFunctionRankRequest extends FormRequest
     {
         return [
             'caracteristic'     => 'required|in:0,F,P',
-            'comments'          => 'nullable|string|required_if:caracteristic,0,F|max:500',
-            'laterality_impact' => 'nullable|in:l,r|required_if:caracteristic,0,F',
+            'comments'          => '', /* required_if:caracteristic,0,F|string|max:500 */
+            'laterality_impact' => 'required_if:caracteristic,0,F|in:l,r,b',
             'brain_level_id'    => 'required|exists:brain_levels,id',
             'brain_function_id' => 'required|exists:brain_functions,id',
             'candidate_id'      => 'required|exists:candidates,id',

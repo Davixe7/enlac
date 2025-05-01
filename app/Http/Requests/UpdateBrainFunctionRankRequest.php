@@ -24,7 +24,7 @@ class UpdateBrainFunctionRankRequest extends FormRequest
         return [
             'caracteristic' => 'in:0,F,P',
             'comments' => 'nullable|string|required_if:caracteristic,0,F|max:500',
-            'laterality_impact' => 'in:l,r|required_if:caracteristic,0,F',
+            'laterality_impact' => 'in:l,r,b|required_if:caracteristic,0,F',
             'brain_level_id' => 'exists:brain_levels,id',
             'brain_function_id' => 'exists:brain_functions,id',
             'candidate_id' => 'exists:candidates,id',

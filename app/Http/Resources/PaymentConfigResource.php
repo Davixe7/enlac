@@ -16,6 +16,7 @@ class PaymentConfigResource extends JsonResource
     {
         $data = parent::toArray($request);
         return array_merge($data, [
+            'type'      => $this->sponsor_id ? 'Cuota de Padrinos' : 'Cuota de Padres',
             'candidate' => new CandidateResource($this->whenLoaded('candidate')),
             'sponsor'   => new SponsorResource($this->whenLoaded('sponsor')),
         ]);

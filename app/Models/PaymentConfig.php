@@ -13,7 +13,7 @@ class PaymentConfig extends Model
     }
 
     public function sponsor(){
-        return  $this->belongsToMany(Sponsor::class);
+        return  $this->belongsTo(Sponsor::class);
     }
 
     public function getMonthlyAmountAttribute(){
@@ -30,5 +30,13 @@ class PaymentConfig extends Model
         }
 
         return $query->whereSponsorId( $sponsor_id );
+    }
+
+    public function scopeByCandidate($query, $candidate_id){
+        if( !$candidate_id ){
+            return $query;
+        }
+
+        return $query->whereCandidateId( $candidate_id );
     }
 }

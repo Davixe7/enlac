@@ -70,6 +70,10 @@ class Candidate extends Model implements HasMedia
             : $query;
     }
 
+    public function scopeBeneficiaries(Builder $query){
+        return $query->whereAcceptanceStatus(1);
+    }
+
     public function scopeEvaluationBetween(Builder $query, $startDate, $endDate): Builder
     {
         if( !$startDate || !$endDate ){

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('rejection_comment')->default(null)->nullable();
             $table->date('onboard_at')->default(null)->nullable();
             $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }

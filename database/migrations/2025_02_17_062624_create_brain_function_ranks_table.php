@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->enum('caracteristic', ['0', 'F', 'P']);
             $table->text('comments')->nullable();
-            $table->enum('laterality_impact', ['l', 'r'])->nullable();
+            $table->enum('laterality_impact', ['l', 'r', 'b'])->nullable();
             $table->foreignId('brain_level_id')->constrained();
             $table->foreignId('brain_function_id')->constrained();
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
