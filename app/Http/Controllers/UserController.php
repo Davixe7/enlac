@@ -49,12 +49,12 @@ class UserController extends Controller
         }
 
         if( $request->boolean('is_admin') ){
-            $adminRole = Role::where('name', 'like', "%administrador%")->first();
+            $adminRole = Role::where('name', 'like', "%admin%")->first();
             $user->assignRole( $adminRole );
         }
 
         if( $request->boolean('is_evaluator') ){
-            $evaluatorRole = Role::where('name', 'like', "%evaluador%")->first();
+            $evaluatorRole = Role::where('name', 'like', "%evaluator%")->first();
             $user->assignRole( $evaluatorRole );
         }
 
