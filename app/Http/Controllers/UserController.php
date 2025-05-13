@@ -15,8 +15,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = UserResource::collection(User::with(['work_area', 'leader', 'roles'])->get());
-        return response()->json(['data' => $users]);
+        $users = User::with(['work_area', 'leader', 'roles'])->orderBy('name')->get();
+        $data = UserResource::collection($users);
+        return response()->json(compact('data'));
     }
 
     /**
@@ -28,7 +29,7 @@ class UserController extends Controller
             'name' => 'required|string',
             'last_name' => 'required|string',
             'second_last_name' => 'required|string',
-            'phone' => 'required|string',
+            'phone' => 'nullable|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
             'leader_id' => 'required|exists:users,id',
@@ -63,14 +64,6 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, User $user)
@@ -79,7 +72,7 @@ class UserController extends Controller
             'name' => 'required|string',
             'last_name' => 'required|string',
             'second_last_name' => 'required|string',
-            'phone' => 'required|string',
+            'phone' => 'nullable|string',
             'email' => ['required', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:8',
             'leader_id' => 'required|exists:users,id',
@@ -101,14 +94,14 @@ class UserController extends Controller
         }
 
         if( $request->filled('is_admin') ){
-            $adminRole = Role::where('name', 'like', "%administrador%")->first();
+            $adminRole = Role::where('name', 'like', "%admin%")->firstOrFail();
             $request->is_admin
             ? $user->assignRole( $adminRole )
             : $user->removeRole( $adminRole );
         }
 
         if( $request->filled('is_evaluator') ){
-            $evaluatorRole = Role::where('name', 'like', "%evaluador%")->first();
+            $evaluatorRole = Role::where('name', 'like', "%evaluator%")->firstOrFail();
             $request->is_evaluator
             ? $user->assignRole( $evaluatorRole )
             : $user->removeRole( $evaluatorRole );

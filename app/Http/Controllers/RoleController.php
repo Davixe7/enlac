@@ -12,8 +12,8 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::whereNotIn('name', ['admin', 'evaluator'])->get();
-        return response()->json(['data' => $roles ]);
+        $data = Role::whereNotIn('name', ['admin', 'evaluator'])->orderBy('name')->get();
+        return response()->json(compact('data'));
     }
 
     /**

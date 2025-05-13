@@ -12,7 +12,8 @@ class WorkAreaController extends Controller
      */
     public function index()
     {
-        return response()->json(['data'=>WorkArea::all()]);
+        $data = WorkArea::orderBy('name')->get();
+        return response()->json(compact('data'));
     }
 
     /**
