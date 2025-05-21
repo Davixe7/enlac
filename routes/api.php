@@ -10,6 +10,7 @@ use App\Http\Controllers\BeneficiaryController;
 use App\Http\Controllers\BrainFunctionController;
 use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
+use App\Http\Controllers\DashboardSlideController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\KardexController;
@@ -55,7 +56,10 @@ Route::middleware('auth:sanctum')->group(function () {
         'sponsors'   => SponsorController::class,
         'payment_configs'   => PaymentConfigController::class,
         'kardexes'   => KardexController::class,
+        'dashboard-slides'   => DashboardSlideController::class,
     ]);
+
+    Route::post('dashboard-slides/reorder', [DashboardSlideController::class, 'reorder']);
 
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
     Route::get('candidates/{candidate}/kardexes', [CandidateController::class, 'kardexes']);
