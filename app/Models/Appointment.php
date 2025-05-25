@@ -29,4 +29,12 @@ class Appointment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeByCandidate($query, $candidate_id){
+        if( !$candidate_id ){
+            return $query;
+        }
+
+        return $query->whereCandidateId($candidate_id);
+    }
 }

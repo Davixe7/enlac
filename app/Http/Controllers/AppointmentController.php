@@ -11,9 +11,13 @@ use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $appointments = Appointment::all();
+        $appointments = Appointment::byCandidate($request->candidate_id)
+        ->with('evaluator')
+        ->orderBy('date')
+        ->get();
+
         return AppointmentResource::collection($appointments);
     }
 
