@@ -19,8 +19,10 @@ class CandidateController extends Controller
     }
 
     public function dashboard() {
-        $candidates = Candidate::whereHas('evaluation_schedules', function($query){
-            $query->whereEvaluatorId( auth()->id() );
+        $candidates = Candidate::whereHas('appointments', function($query){
+            $query
+            ->where('type_id', 0)
+            ->whereEvaluatorId( auth()->id() );
         })
         ->orderBy('first_name', 'ASC')
         ->get();
@@ -58,7 +60,7 @@ class CandidateController extends Controller
     public function store(StoreCandidateRequest $request)
     {
         $candidate = $this->candidateService->createCandidate($request);
-        return new CandidateResource($candidate->load('evaluation_schedules.evaluator'));
+        return new CandidateResource($candidate);
     }
 
     /**
@@ -66,9 +68,7 @@ class CandidateController extends Controller
      */
     public function show(Candidate $candidate)
     {
-        return new CandidateResource($candidate->load([
-            'contacts.addresses', 'evaluation_schedules.evaluator', 'interviewee'
-        ]));
+        return new CandidateResource($candidate->load(['contacts.addresses', 'interviewee']));
     }
 
     /**

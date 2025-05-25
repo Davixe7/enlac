@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EvaluationSchedule>
  */
-class EvaluationScheduleFactory extends Factory
+class AppointmentFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -20,7 +20,8 @@ class EvaluationScheduleFactory extends Factory
             "date" => $this->faker->date(),
             "evaluator_id" => 1,
             "candidate_id" => 1,
-            "status" => 'pending'
+            "status" => 'pending',
+            "type_id" => 0
         ];
     }
 

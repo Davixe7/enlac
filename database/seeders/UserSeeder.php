@@ -31,5 +31,17 @@ class UserSeeder extends Seeder
 
             $user->assignRole('admin');
         }
+
+        $roles = Role::get();
+        foreach( $roles as $role ){
+            $user = User::factory()->create([
+                'name'             => $role->name,
+                'last_name'        => $role->name,
+                'second_last_name' => $role->name,
+                'email'            => $role->name . '@sistemaenlac.com',
+                'entry_date'       => now()
+            ]);
+            $user->assignRole($role->name);
+        }
     }
 }

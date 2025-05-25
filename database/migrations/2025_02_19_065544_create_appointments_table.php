@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('type_id');
             $table->text('comments')->nullable();
             $table->dateTime('date');
+            $table->enum('status', ['pending','done','canceled'])->default('pending');
             $table->timestamps();
         });
     }

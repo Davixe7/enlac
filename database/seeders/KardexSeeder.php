@@ -14,47 +14,54 @@ class KardexSeeder extends Seeder
      */
     public function run(): void
     {
-        $items = [
-            // signed_by: null
-            ['name' => 'Acta de Nacimiento de', 'signed_by' => null],
-            ['name' => 'CURP', 'signed_by' => null],
-            ['name' => 'Cartilla de Vacunación', 'signed_by' => null],
-            ['name' => 'Comprobante de Domicilio', 'signed_by' => null],
-            ['name' => 'Número de Servicio Médico', 'signed_by' => null],
-            ['name' => 'INE Frente (Responsable del Beneficiario)', 'signed_by' => null],
-            ['name' => 'INE Atrás (Responsable del Beneficiario)', 'signed_by' => null],
-            ['name' => 'INE Frente (Tutor Legal)', 'signed_by' => null],
-            ['name' => 'INE Atrás (Tutor Legal)', 'signed_by' => null],
+        $kardexes = [
+            'default' => [
+                'Acta de Nacimiento de',
+                'CURP',
+                'Cartilla de Vacunación',
+                'Comprobante de Domicilio',
+                'Número de Servicio Médico',
+                'INE Frente (Responsable del Beneficiario)',
+                'INE Atrás (Responsable del Beneficiario)',
+                'INE Frente (Tutor Legal)',
+                'INE Atrás (Tutor Legal)',
+            ],
 
-            // signed_by: tutor
-            ['name' => 'Reglamento para Padres de Familia', 'signed_by' => 'tutor'],
-            ['name' => 'Carta de Consentimiento', 'signed_by' => 'tutor'],
-            ['name' => 'Carta de Asignación del Responsable del Beneficiario', 'signed_by' => 'tutor'],
-            ['name' => 'Código de Ética', 'signed_by' => 'tutor'],
-            ['name' => 'Autorización de Equinoterapia', 'signed_by' => 'tutor'],
-            ['name' => 'Autorización de Uso de Imagen y Pinturas', 'signed_by' => 'tutor'],
-            ['name' => 'Aviso de Privacidad', 'signed_by' => 'tutor'],
-            ['name' => 'Autorización de Salidas', 'signed_by' => 'tutor'],
-            ['name' => 'Acuerdo de No Divulgación', 'signed_by' => 'tutor'],
-            ['name' => 'Convenio de Pago Líderes ENLAC (sólo para Programa Asistido)', 'signed_by' => 'tutor'],
-            ['name' => 'Compromiso Previo de Pago (sólo para Programa Asistido)', 'signed_by' => 'tutor'],
+            'tutor' => [
+                'Reglamento para Padres de Familia *',
+                'Carta de Consentimiento *',
+                'Carta de Asignación del Responsable del Beneficiario *',
+                'Código de Ética *',
+                'Autorización de Equinoterapia *',
+                'Autorización de Uso de Imagen y Pinturas *',
+                'Aviso de Privacidad *',
+                'Autorización de Salidas *',
+                'Acuerdo de No Divulgación *',
+                'Convenio de Pago Líderes ENLAC (sólo para Programa Asistido) *',
+                'Compromiso Previo de Pago (sólo para Programa Asistido) *'
+            ],
 
-            // signed_by: doctor
-            ['name' => 'Autorización de Equinoterapia', 'signed_by' => 'doctor'],
-            ['name' => 'Autorización Médica para Realizar el Programa Físico', 'signed_by' => 'doctor'],
+            'doctor' => [
+                'Autorización de Equinoterapia',
+                'Autorización Médica para Realizar el Programa Físico',
+            ],
 
-            // signed_by: external
-            ['name' => 'Hoja de Datos Generales de Contacto', 'signed_by' => 'external'],
-            ['name' => 'Reglamento de Uso de Alberca', 'signed_by' => 'external'],
-            ['name' => 'Reglamento para Usuarios Externos de Alberca', 'signed_by' => 'external'],
+            'externo' => [
+                'Hoja de Datos Generales de Contacto',
+                'Reglamento de Uso de Alberca',
+                'Reglamento para Usuarios Externos de Alberca',
+            ]
         ];
 
-        foreach ($items as $item) {
-            Kardex::create([
-                'name' => $item['name'],
-                'slug' => Str::slug($item['name']),
-                'signed_by' => $item['signed_by'],
-            ]);
+        foreach ($kardexes as $category => $items) {
+            foreach($items as $item){
+                Kardex::create([
+                    'category' => $category,
+                    'name' => $item,
+                    'slug' => Str::slug($item),
+                    'required' => false
+                ]);
+            }
         }
     }
 }

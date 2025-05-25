@@ -78,9 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('personal', function(Request $request){
         $request->validate(['area'=>'required']);
-        $users = User::whereHas('roles', function($query) use ($request) {
-            $query->where('id', $request->area);
-        })->get();
+        $users = User::whereWorkAreaId($request->area)->get();
         return response()->json(['data' => $users]);
     });
 });

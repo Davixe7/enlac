@@ -83,7 +83,8 @@ class Candidate extends Model implements HasMedia
         $endDate = Carbon::parse($endDate)->endOfDay();
         // Subquery to find the most recent evaluation schedule ID for each candidate within the date range
 
-        $mostRecentScheduleIds = EvaluationSchedule::query()
+        $mostRecentScheduleIds = Appointment::query()
+            ->where('type_id', 0)
             ->whereBetween('date', [$startDate, $endDate])
             ->select('candidate_id', DB::raw('MAX(id) as most_recent_id'))
             ->groupBy('candidate_id');
@@ -107,16 +108,25 @@ class Candidate extends Model implements HasMedia
             ->useDisk('public');
     }
 
-    public function evaluation_schedules(){
-        return $this->hasMany(EvaluationSchedule::class);
+    public function appointments(){
+        return $this->hasMany(Appointment::class);
     }
 
     public function getEvaluationScheduleAttribute(){
-        return $this->evaluation_schedules()
-        ->orderBy('created_at', 'desc')
+        return $this->appointments()
+        ->where('type_id', 0)
         ->where('status', '!=', 'canceled')
         ->with('evaluator')
+        ->orderBy('created_at', 'desc')
         ->first();
+    }
+
+    public function getEvaluationSchedulesAttribute(){
+        return $this->appointments()
+        ->where('type_id', 0)
+        ->with('evaluator')
+        ->orderBy('created_at', 'desc')
+        ->get();
     }
 
     public function getFullNameAttribute(){

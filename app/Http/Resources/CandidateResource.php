@@ -26,7 +26,7 @@ class CandidateResource extends JsonResource
             'picture' => $this->getFirstMediaUrl('profile_picture'),
             'contacts' => $this->contacts,
             'medications' => $this->medications,
-            'evaluation_schedules' => $this->whenLoaded('evaluation_schedules'),
+            'evaluation_schedules' => $this->evaluation_schedules,
             'evaluation_schedule' => $this->evaluation_schedule,
             'brain_function_ranks' => $ranks,
             'program' => $this->program,

@@ -22,11 +22,10 @@ class AppointmentSeeder extends Seeder
             foreach ($users as $user) {
                 Appointment::create([
                     'candidate_id' => $candidate->id,
-                    'appointment_type' => 'entrevista',
-                    'user_id' => $user->id,
-                    'date' => '2024-05-15',
-                    'time_slot' => '10:00-11:00',
-                    'observation' => 'Paciente presenta buen estado de salud.',
+                    'evaluator_id' => $user->id,
+                    'type_id'      => 1,
+                    'date'         => '2024-05-30 12:00:00',
+                    'observation'  => 'Paciente presenta buen estado de salud.',
                 ]);
             }
         }

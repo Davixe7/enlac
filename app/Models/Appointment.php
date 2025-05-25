@@ -12,7 +12,7 @@ class Appointment extends Model
     protected $guarded = [];
 
     public const APPOINTMENT_TYPES = [
-        1,2,3
+        0,1,2,3
     ];
 
     public function candidate()

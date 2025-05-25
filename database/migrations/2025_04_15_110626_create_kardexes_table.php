@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
-            $table->enum('signed_by', ['doctor', 'tutor', 'external'])->nullable();
+            $table->boolean('required');
+            $table->string('category')->nullable()->default('default');
             $table->timestamps();
         });
     }

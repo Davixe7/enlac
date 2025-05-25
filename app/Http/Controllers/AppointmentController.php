@@ -20,7 +20,6 @@ class AppointmentController extends Controller
     public function store(StoreAppointmentRequest $request)
     {
         $data = $request->validated();
-        $data['type_id'] = 1;
         $appointment = Appointment::create($data);
         $appointment->evaluator->notify(new AppointmentScheduled($appointment));
         return new AppointmentResource($appointment);
