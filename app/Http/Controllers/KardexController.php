@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Kardex as ResourcesKardex;
+use App\Http\Resources\KardexResource;
 use App\Models\Candidate;
 use App\Models\Kardex;
 use Illuminate\Http\Request;
@@ -14,8 +16,10 @@ class KardexController extends Controller
     public function index()
     {
         $kardexes = Kardex::with(['media'])->get();
-        $kardexes = $kardexes->groupBy('category');
-        return response()->json(['data'=>$kardexes]);
+        $data = $kardexes->groupBy('category')->map(function($kardex){
+            return KardexResource::collection($kardex);
+        });
+        return response()->json(compact('data'));
     }
 
     /**

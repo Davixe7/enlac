@@ -55,12 +55,17 @@ class KardexSeeder extends Seeder
 
         foreach ($kardexes as $category => $items) {
             foreach($items as $item){
-                Kardex::create([
+                $kardex = Kardex::create([
                     'category' => $category,
                     'name' => $item,
                     'slug' => Str::slug($item),
                     'required' => false
                 ]);
+
+                $kardex
+                ->addMediaFromDisk('template.pdf', 'local')
+                ->preservingOriginal()
+                ->toMediaCollection('template');
             }
         }
     }

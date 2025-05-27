@@ -10,6 +10,7 @@ use App\Http\Controllers\BeneficiaryController;
 use App\Http\Controllers\BrainFunctionController;
 use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
+use App\Http\Controllers\CandidateKardexController;
 use App\Http\Controllers\DashboardSlideController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
@@ -38,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::get('candidates/dashboard', [CandidateController::class, 'dashboard']);
 
+    Route::post('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'store']);
+    Route::get('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'show']);
+    Route::delete('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'destroy']);
+
     Route::apiResources([
         'candidates' => CandidateController::class,
         'medications' => MedicationController::class,
@@ -62,7 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('dashboard-slides/reorder', [DashboardSlideController::class, 'reorder']);
 
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
-    Route::get('candidates/{candidate}/kardexes', [CandidateController::class, 'kardexes']);
 
     Route::post('contacts/validate', [ContactController::class, 'validate']);
 
