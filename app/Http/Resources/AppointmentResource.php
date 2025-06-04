@@ -16,7 +16,10 @@ class AppointmentResource extends JsonResource
     public function toArray(Request $request): array
     {
         return array_merge(parent::toArray($request), [
-            'date' => Carbon::parse($this->date)->format('Y-m-d H:i:s')
+            'evaluator' => new UserResource($this->evaluator),
+            'date' => Carbon::parse($this->date)->format('Y-m-d H:i:s'),
+            'frontendDate' => Carbon::parse($this->date)->format('d/m/Y'),
+            'frontendTime' => Carbon::parse($this->date)->format('H:i'),
         ]);
     }
 }

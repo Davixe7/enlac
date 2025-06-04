@@ -17,7 +17,9 @@ class PaymentConfig extends Model
     }
 
     public function getMonthlyAmountAttribute(){
-        return $this->amount / 12;
+        $yearlyPaymentCount = 12 / $this->frequency;
+        $yearlyPaidAmount = $yearlyPaymentCount * $this->amount;
+        return $yearlyPaidAmount / 12;
     }
 
     public function getYearlyPaymentsCountAttribute(){

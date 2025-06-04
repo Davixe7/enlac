@@ -46,7 +46,7 @@ class KardexSeeder extends Seeder
                 'Autorización Médica para Realizar el Programa Físico',
             ],
 
-            'externo' => [
+            'external' => [
                 'Hoja de Datos Generales de Contacto',
                 'Reglamento de Uso de Alberca',
                 'Reglamento para Usuarios Externos de Alberca',

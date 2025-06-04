@@ -30,7 +30,6 @@ Route::get('test', function(){
             },0);
 
             $carry = $balance;
-
             foreach(range($start, $end) as $month){
                 //echo $paymentConfig->id . ' ' . $month . "<br/>";
                 $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
