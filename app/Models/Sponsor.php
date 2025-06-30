@@ -8,6 +8,10 @@ class Sponsor extends Model
 {
     protected $guarded = [];
 
+    public function addresses(){
+        return $this->hasMany(SponsorAddress::class);
+    }
+
     public function candidates(){
         return $this->belongsToMany(Candidate::class, 'payment_configs', 'candidate_id', 'sponsor_id');
     }

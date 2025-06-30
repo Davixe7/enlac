@@ -12,9 +12,9 @@ class BeneficiaryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $beneficiaries = Candidate::beneficiaries()->get();
+        $beneficiaries = Candidate::beneficiaries()->name($request->name)->get();
         return BeneficiaryResource::collection($beneficiaries);
     }
 

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sponsor_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('sponsor_id')->nullable();
             $table->enum('payment_type', ['parent', 'sponsor'])->default('parent');
             $table->boolean('is_partial')->default(false);
             $table->date('date');

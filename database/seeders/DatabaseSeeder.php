@@ -21,12 +21,12 @@ class DatabaseSeeder extends Seeder
         $this->call(BrainFunctionSeeder::class);
         $this->call(InterviewQuestionSeeder::class);
         $this->call(ProgramSeeder::class);
+        $this->call(KardexSeeder::class);
         /* $this->call(CandidateSeeder::class); */
-         Candidate::factory()->accepted()->count(1)->create()
+        /*  Candidate::factory()->accepted()->count(1)->create()
         ->each(function($candidate){
             Appointment::factory()->past()->count(1)
             ->create(["candidate_id"=>$candidate->id, 'evaluator_id' => 1]);
-        });
-        $this->call(KardexSeeder::class);
+        }); */
     }
 }

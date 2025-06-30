@@ -20,7 +20,20 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        //$paymentConfig =
+        $data = $request->validate([
+            'candidate_id' => ['required', 'exists:candidates,id'],
+            'sponsor_id' => ['nullable', 'exists:sponsors,id'],
+            'payment_type' => ['required', 'in:parent,sponsor'],
+            'is_partial' => ['required', 'boolean'],
+            'date' => ['required', 'date'],
+            'payment_method' => ['required', 'string'],
+            'ref' => ['nullable', 'string'],
+            'comments' => ['nullable', 'string'],
+            'amount' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $payment = Payment::create($data);
+        return response()->json(['data'=>$payment]);
     }
 
     /**

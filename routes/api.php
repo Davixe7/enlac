@@ -17,15 +17,75 @@ use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\KardexController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentConfigController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
+use App\Models\Candidate;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
+use Carbon\Carbon;
+
+Route::get('/test', function(Request $request){
+    $candidate = Candidate::first();
+    $paymentsConfigs = $candidate->payment_configs;
+    $wallets = [];
+    $year = now()->month > 7 ? now()->year : now()->year - 1;
+
+    $paymentsConfigs->each(function($paymentConfig) use(&$wallets, $year) {
+        $carry = 0;
+
+        for ($i=8; $i < 20; $i += $paymentConfig->frequency) {
+            $start = $i;
+            $end = $i + $paymentConfig->frequency - 1;
+
+            $startDate = Carbon::create($year, $start);
+            $endDate   = Carbon::create($year, $end)->endOfMonth();
+
+            $balance = Payment::where('candidate_id', $paymentConfig->candidate_id)
+                    ->where('sponsor_id', $paymentConfig->sponsor_id)
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->groupBy('candidate_id')
+                    ->sum('amount');
+
+            $carry = $carry + $balance;
+
+            foreach(range($start, $end) as $month){
+                $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
+
+                $date = Carbon::create($year, $month);
+                $maxDate = Carbon::create($year, $end)->endOfMonth();
+                $status = null;
+
+                if( $abono == $paymentConfig->monthly_amount ){
+                    $status = 'green';
+                }
+                elseif ( now() > $maxDate ) {
+                    $status = 'red';
+                }
+                else {
+                    $status = 'yellow';
+                }
+
+                $wallets[$paymentConfig->sponsor_id][] = [
+                    'date' => $date->format('Y-m-d'),
+                    'month' => $month,
+                    'monthName' => $date->format('F'),
+                    'abono' => number_format($abono, 2, '.', ''),
+                    'status' => $status
+                ];
+                $carry = $carry - $abono;
+            }
+        }
+    });
+
+    return $wallets;
+});
 
 Route::get('/user', function (Request $request) {
     $user = $request->user();
@@ -62,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'payment_configs'   => PaymentConfigController::class,
         'kardexes'   => KardexController::class,
         'dashboard-slides'   => DashboardSlideController::class,
+        'payments'   => PaymentController::class,
     ]);
 
     Route::post('dashboard-slides/reorder', [DashboardSlideController::class, 'reorder']);

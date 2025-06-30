@@ -19,6 +19,7 @@ class PaymentConfigResource extends JsonResource
             'type'      => $this->sponsor_id ? 'Cuota de Padrinos' : 'Cuota de Padres',
             'candidate' => new CandidateResource($this->whenLoaded('candidate')),
             'sponsor'   => new SponsorResource($this->whenLoaded('sponsor')),
+            'monthly_amount' => $this->monthly_amount
         ]);
     }
 }

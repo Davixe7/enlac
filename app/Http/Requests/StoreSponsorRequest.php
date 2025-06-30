@@ -28,6 +28,16 @@ class StoreSponsorRequest extends FormRequest
             'company_name'     => 'nullable|string|max:255',
             'marital_status'   => 'nullable|string|max:191',
             'birthdate'        => 'required|date',
+            'addresses.*.street'       => 'required',
+            'addresses.*.inner_number' => 'required',
+            'addresses.*.outer_number' => 'required',
+            'addresses.*.neighborhood' => 'required',
+            'addresses.*.city'         => 'required',
+            'addresses.*.state'        => 'required',
+            'addresses.*.country'      => 'required',
+            'addresses.*.email'        => 'required',
+            'addresses.*.phone'        => 'required',
+            'addresses.*.whatsapp'     => 'required'
         ];
     }
 }

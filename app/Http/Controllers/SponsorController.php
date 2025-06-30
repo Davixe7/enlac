@@ -24,8 +24,15 @@ class SponsorController extends Controller
      */
     public function store(StoreSponsorRequest $request)
     {
-        $sponsor = Sponsor::create($request->validated());
-        return response()->json(['data' => $sponsor]);
+        $data = $request->validated();
+        unset($data['addresses']);
+
+        $sponsor = Sponsor::create($data);
+        
+        foreach( $request->addresses as $address ){
+            $sponsor->addresses()->create($address);
+        }
+        return new SponsorResource($sponsor);
     }
 
     /**
@@ -42,7 +49,7 @@ class SponsorController extends Controller
     public function update(UpdateSponsorRequest $request, Sponsor $sponsor)
     {
         $sponsor->update($request->validated());
-        return response()->json(['data' => $sponsor]);
+        return new SponsorResource($sponsor);
     }
 
     /**
