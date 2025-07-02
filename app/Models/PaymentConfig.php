@@ -13,7 +13,11 @@ class PaymentConfig extends Model
     }
 
     public function sponsor(){
-        return  $this->belongsTo(Sponsor::class);
+        return $this->belongsTo(Sponsor::class);
+    }
+
+    public function deductible_receipt(){
+        return $this->hasOne(DeductibleReceipt::class);
     }
 
     public function getMonthlyAmountAttribute(){

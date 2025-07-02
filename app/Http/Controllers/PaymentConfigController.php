@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePaymentConfigRequest;
 use App\Http\Requests\UpdatePaymentConfigRequest;
 use App\Http\Resources\PaymentConfigResource;
+use App\Models\DeductibleReceipt;
 use App\Models\PaymentConfig;
 use Illuminate\Http\Request;
 
@@ -15,11 +16,13 @@ class PaymentConfigController extends Controller
      */
     public function index(Request $request)
     {
-        if( $request->filled('sponsor_id') ){
-            $paymentConfigs = PaymentConfig::bySponsor( $request->sponsor_id )->with(['candidate'])->get();
-        }
-        else {
-            $paymentConfigs = PaymentConfig::byCandidate( $request->candidate_id )->with(['sponsor'])->get();
+        $paymentConfigs = PaymentConfig::with(['candidate', 'sponsor'])
+        ->bySponsor( $request->sponsor_id )
+        ->byCandidate( $request->candidate_id )
+        ->get();
+
+        if( $request->filled(['candidate_id', 'sponsor_id']) ){
+            return new PaymentConfigResource( $paymentConfigs->first() );
         }
 
         return PaymentConfigResource::collection( $paymentConfigs );
@@ -31,7 +34,13 @@ class PaymentConfigController extends Controller
     public function store(StorePaymentConfigRequest $request)
     {
         $data = $request->validated();
+        unset($data['receipt']);
+
         $paymentConfig = PaymentConfig::create($data);
+        if( $request->filled('wants_deductible_receipt') ){
+            $data = $request->validated()['receipt'];
+            $paymentConfig->deductible_receipt()->create($data);
+        }
         return new PaymentConfigResource($paymentConfig);
     }
 
@@ -49,7 +58,15 @@ class PaymentConfigController extends Controller
     public function update(UpdatePaymentConfigRequest $request, PaymentConfig $paymentConfig)
     {
         $data = $request->validated();
+        unset($data['receipt']);
+
         $paymentConfig->update($data);
+        
+        if( array_key_exists('receipt', $request->validated()) ){
+            $data = $request->validated()['receipt'];
+            DeductibleReceipt::updateOrCreate(['payment_config_id'=>$paymentConfig->id], $data);
+        }
+
         return new PaymentConfigResource($paymentConfig);
     }
 

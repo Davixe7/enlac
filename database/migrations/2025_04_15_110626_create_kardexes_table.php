@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug');
             $table->boolean('required');
+            $table->boolean('has_template')->default(false);
+            $table->boolean('has_detail')->default(false);
             $table->string('category')->nullable()->default('default');
             $table->timestamps();
         });

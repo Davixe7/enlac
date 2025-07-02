@@ -15,12 +15,14 @@ class KardexResource extends JsonResource
     public function toArray(Request $request): array
     {
         return  [
-            'template' => $this->getFirstMediaUrl('template'),
-            "id" => $this->id,
-            "name" => $this->name,
-            "slug" => $this->slug,
-            "required" => $this->required,
-            "category" => $this->category,
+            'template'     => $this->getFirstMediaUrl('template'),
+            "id"           => $this->id,
+            "name"         => $this->name,
+            "slug"         => $this->slug,
+            "required"     => $this->required,
+            "category"     => $this->category,
+            "has_detail"   => $this->has_detail,
+            "has_template" => $this->has_template,
         ];
     }
 }

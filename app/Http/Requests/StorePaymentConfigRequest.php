@@ -23,7 +23,7 @@ class StorePaymentConfigRequest extends FormRequest
     {
         return [
             'candidate_id'             => 'required|exists:candidates,id',
-            'sponsor_id'               => 'required|exists:sponsors,id',
+            'sponsor_id'               => 'sometimes|exists:sponsors,id',
             'amount'                   => 'required|numeric|min:0',
             'frequency'                => 'required|integer|min:1|max:255',
             'month_payday'             => 'required|integer|min:1|max:31',
@@ -31,6 +31,21 @@ class StorePaymentConfigRequest extends FormRequest
             'wants_pickup'             => 'nullable|boolean',
             'wants_reminder'           => 'nullable|boolean',
             'wants_deductible_receipt' => 'nullable|boolean',
+
+            'receipt.rfc'                      => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.company_name'             => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.fiscalRegime'             => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.cfdi'                     => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.email'                    => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.observations'             => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.fiscalStatus'             => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.street'                   => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.external_number'          => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.neighborhood'             => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.city'                     => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.zip_code'                 => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.state'                    => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.country'                  => 'required_if_accepted:wants_deductible_receipt',
         ];
     }
 }

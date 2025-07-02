@@ -20,7 +20,8 @@ class MediaResource extends JsonResource
         $shortened = Str::limit($basename, 6, '...') . Str::substr($basename, -4);
 
         return array_merge(parent::toArray($request), [
-            'file_name' => "{$shortened}.{$extension}"
+            'file_name' => "{$shortened}.{$extension}",
+            'detail'    => $this->getCustomProperty('detail')
         ]);
     }
 }

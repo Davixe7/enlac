@@ -38,7 +38,7 @@ class KardexSeeder extends Seeder
                 'Autorización de Salidas *',
                 'Acuerdo de No Divulgación *',
                 'Convenio de Pago Líderes ENLAC (sólo para Programa Asistido) *',
-                'Compromiso Previo de Pago (sólo para Programa Asistido) *'
+                'Compromiso Previo de Pago (sólo para Programa Asistido) *',
             ],
 
             'doctor' => [

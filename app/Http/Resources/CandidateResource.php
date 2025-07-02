@@ -21,17 +21,18 @@ class CandidateResource extends JsonResource
         $ranks = $ranks->map(fn($rank)=>["functions" => $rank->keyBy('brain_function_id')]);
 
         return array_merge($data, [
-            'full_name' => $this->full_name,
-            'acceptance_status' => $this->acceptance_status,
-            'picture' => $this->getFirstMediaUrl('profile_picture'),
-            'contacts' => $this->contacts,
-            'medications' => $this->medications,
+            'full_name'            => $this->full_name,
+            'acceptance_status'    => $this->acceptance_status,
+            'picture'              => $this->getFirstMediaUrl('profile_picture'),
+            'contacts'             => $this->contacts,
+            'contact'              => $this->contacts()->first(),
+            'medications'          => $this->medications,
             'evaluation_schedules' => $this->evaluation_schedules,
-            'evaluation_schedule' => $this->evaluation_schedule,
+            'evaluation_schedule'  => $this->evaluation_schedule,
             'brain_function_ranks' => $ranks,
-            'program' => $this->program,
-            'chronological_age' => number_format( Carbon::parse($this->birth_date)->diffInMonths(now()), 2 ),
-            'interviewee' => $this->whenLoaded('interviewee')
+            'program'              => $this->program,
+            'chronological_age'    => number_format( Carbon::parse($this->birth_date)->diffInMonths(), 2 ),
+            'interviewee'          => $this->whenLoaded('interviewee')
         ]);
     }
 }

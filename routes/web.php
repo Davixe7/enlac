@@ -2,7 +2,6 @@
 
 use App\Models\Candidate;
 use App\Models\Payment;
-use App\Models\PaymentConfig;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;

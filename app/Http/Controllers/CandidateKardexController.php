@@ -25,7 +25,10 @@ class CandidateKardexController extends Controller
     {
         $collectionName = 'kardex_' . $request->collection_name;
         $candidate->clearMediaCollection($collectionName);
-        $candidate->addMediaFromRequest('upload')->toMediaCollection($collectionName);
+        $candidate
+        ->addMediaFromRequest('upload')
+        ->withCustomProperties(['detail'=>$request->detail])
+        ->toMediaCollection($collectionName);
         $media = $candidate->getFirstMedia($collectionName);
         return new MediaResource($media);
     }
@@ -39,9 +42,7 @@ class CandidateKardexController extends Controller
         ->where('collection_name', 'like', "kardex_%")
         ->get();
 
-        $media = $media->map(function($m){
-            return new MediaResource($m);
-        })
+        $media = $media->map(fn($m) => new MediaResource($m))
         ->groupBy('collection_name')
         ->map(fn($m)=>$m[0]);
 
@@ -62,6 +63,6 @@ class CandidateKardexController extends Controller
     public function destroy(Candidate $candidate, Request $request)
     {
         $candidate->clearMediaCollection('kardex_' . $request->collection_name);
-        return response()->json([], 200);
+        return response()->json([], 204);
     }
 }
