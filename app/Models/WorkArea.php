@@ -12,4 +12,12 @@ class WorkArea extends Model
     public function users(){
         return $this->hasMany(User::class);
     }
+
+    public function scopeAllowsAppointments($query, $allows_appointments){
+        if( $allows_appointments === null){
+            return $query;
+        }
+
+        return $query->where('allows_appointments', $allows_appointments);
+    }
 }

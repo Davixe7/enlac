@@ -12,6 +12,7 @@ use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
 use App\Http\Controllers\CandidateKardexController;
 use App\Http\Controllers\DashboardSlideController;
+use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\KardexController;
@@ -31,8 +32,10 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Carbon\Carbon;
 
+Route::get('financial', [FinancialController::class, 'index']);
+
 Route::get('/test', function(Request $request){
-    $candidate = Candidate::first();
+    $candidate = Candidate::findOrFail($request->candidate_id);
     $paymentsConfigs = $candidate->payment_configs;
     $wallets = [];
     $year = now()->month > 7 ? now()->year : now()->year - 1;
@@ -87,11 +90,8 @@ Route::get('/test', function(Request $request){
     return $wallets;
 });
 
-Route::get('/user', function (Request $request) {
-    $user = $request->user();
-    $user->load('notifications');
-    return new UserResource($user);
-})->middleware('auth:sanctum');
+Route::get('/user', fn () => new UserResource(auth()->user()))
+->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
 

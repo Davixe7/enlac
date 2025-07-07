@@ -116,6 +116,10 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(Appointment::class);
     }
 
+    public function payments(){
+        return $this->hasMany(Payment::class);
+    }
+
     public function getEvaluationScheduleAttribute(){
         return $this->appointments()
         ->where('type_id', 0)

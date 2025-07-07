@@ -28,7 +28,7 @@ class UserResource extends JsonResource
             'roles'   => $this->whenLoaded('roles'),
             'role_id' => $actualRole ? $actualRole->id : null,
             'role'    => $actualRole,
-            'notifications' => NotificationResource::collection($this->whenLoaded('notifications'))
+            'notifications' => $this->notifications
         ]);
     }
 }

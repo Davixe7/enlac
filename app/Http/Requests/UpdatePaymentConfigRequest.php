@@ -48,4 +48,25 @@ class UpdatePaymentConfigRequest extends FormRequest
             'receipt.country'          => 'required_if_accepted:wants_deductible_receipt',
         ];
     }
+
+    public function attributes()
+    {
+        return  [
+            'wants_deductible_receipt' => 'Requiere Recibo Deducible',
+            'receipt.rfc'             => 'RFC',
+            'receipt.company_name'    => 'razón social',
+            'receipt.fiscalRegime'    => 'régimen fiscal',
+            'receipt.cfdi'            => 'uso de CFDI',
+            'receipt.email'           => 'correo electrónico',
+            'receipt.observations'    => 'observaciones',
+            'receipt.fiscalStatus'    => 'estatus fiscal',
+            'receipt.street'          => 'calle',
+            'receipt.external_number' => 'número exterior',
+            'receipt.neighborhood'    => 'colonia',
+            'receipt.city'            => 'ciudad',
+            'receipt.zip_code'        => 'código postal',
+            'receipt.state'           => 'estado',
+            'receipt.country'         => 'país',
+        ];
+    }
 }

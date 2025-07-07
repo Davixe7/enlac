@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('work_areas', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('allows_appointments')->default(false);
             $table->timestamps();
         });
     }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('sponsor_id')->nullable();
+            $table->enum('type', ['parent', 'sponsor'])->default('parent');
             $table->decimal('amount');
             $table->unsignedTinyInteger('frequency');
             $table->unsignedTinyInteger('month_payday');

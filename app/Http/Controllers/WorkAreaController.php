@@ -10,9 +10,9 @@ class WorkAreaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = WorkArea::orderBy('name')->get();
+        $data = WorkArea::allowsAppointments($request->allows_appointments)->orderBy('name')->get();
         return response()->json(compact('data'));
     }
 
@@ -21,7 +21,7 @@ class WorkAreaController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate(['name'=>'required']);
+        $data = $request->validate(['name'=>'required', 'allows_appointments'=>'sometimes']);
         $workArea = WorkArea::create( $data );
         return response()->json(['data' => $workArea], 201 );
     }
@@ -39,7 +39,7 @@ class WorkAreaController extends Controller
      */
     public function update(Request $request, WorkArea $workArea)
     {
-        $data = $request->validate(['name'=>'required']);
+        $data = $request->validate(['name'=>'required', 'allows_appointments'=>'sometimes']);
         $workArea->update( $data );
         return response()->json(['data' => $workArea]);
     }
