@@ -63,10 +63,10 @@ class KardexSeeder extends Seeder
                     'has_template' => false
                 ]);
 
-                $kardex
-                ->addMediaFromDisk('template.pdf', 'local')
-                ->preservingOriginal()
-                ->toMediaCollection('template');
+                //$kardex
+                //->addMediaFromDisk('template.pdf', 'local')
+                //->preservingOriginal()
+                //->toMediaCollection('template');
             }
         }
     }

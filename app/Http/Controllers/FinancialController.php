@@ -23,11 +23,7 @@ class FinancialController extends Controller
         $candidates = Candidate::whereAcceptanceStatus(1)
             ->with([
                 'program',
-                'payment_configs' => function ($query) {
-                    $query
-                        ->groupBy(['candidate_id', 'type'])
-                        ->selectRaw('candidate_id, type, SUM(amount) as quota');
-                },
+                'payment_configs' => fn ($q) => $q->groupBy(['candidate_id', 'type'])->selectRaw('candidate_id, type, SUM(amount) as quota'),
                 'payments' => function ($query) use ($start, $end) {
                     $query
                         ->whereBetween('date', [$start, $end])
