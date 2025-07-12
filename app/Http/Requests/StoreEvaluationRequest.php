@@ -23,7 +23,7 @@ class StoreEvaluationRequest extends FormRequest
     {
         return [
             'candidate_id' => 'required|exists:candidates,id',
-            'rejection_comment' => 'required_if:acceptance_status,false,0'
+            'admission_comment' => 'required_if:admission_status,false,0'
         ];
     }
 

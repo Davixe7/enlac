@@ -62,7 +62,7 @@ Route::get('/test', function(Request $request){
                 $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
 
                 $date = Carbon::create($year, $month);
-                $maxDate = Carbon::create($year, $end)->endOfMonth();
+                $maxDate = Carbon::create($year, $end)->startOfMonth()->addDays(10);
                 $status = null;
 
                 if( $abono == $paymentConfig->monthly_amount ){

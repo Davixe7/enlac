@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PaymentsResource;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 
@@ -10,9 +11,10 @@ class PaymentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $payments = Payment::whereCandidateId($request->candidate_id)->get();
+        return PaymentsResource::collection($payments);
     }
 
     /**

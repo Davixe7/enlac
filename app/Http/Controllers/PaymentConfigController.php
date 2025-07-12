@@ -37,10 +37,12 @@ class PaymentConfigController extends Controller
         unset($data['receipt']);
 
         $paymentConfig = PaymentConfig::create($data);
-        if( $request->filled('wants_deductible_receipt') ){
-            $data = $request->validated()['receipt'];
-            $paymentConfig->deductible_receipt()->create($data);
+
+        $receiptData = $request->validated()['receipt'] ?? null;
+        if( $receiptData ){
+            $paymentConfig->deductible_receipt()->create($receiptData);
         }
+        
         return new PaymentConfigResource($paymentConfig);
     }
 

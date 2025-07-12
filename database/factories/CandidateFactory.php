@@ -27,9 +27,9 @@ class CandidateFactory extends Factory
             'diagnosis' => $this->faker->sentence(),
             'sheet' => $this->faker->unique()->randomNumber(5), // Genera un número de hoja único
             'info_channel' => $this->faker->randomElement(['Redes Sociales', 'Referencia', 'Publicidad', 'Otro']),
-            'acceptance_status' => $this->faker->randomElement([null, true, false]),
-            'rejection_comment' => $this->faker->optional()->sentence(),
-            'onboard_at' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
+            'admission_status' => $this->faker->randomElement([null, true, false]),
+            'admission_comment' => $this->faker->optional()->sentence(),
+            'entry_date' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
             'program_id' => 1, // Asocia un programa existente o crea uno nuevo
             'created_at' => now(),
             'updated_at' => now(),
@@ -45,10 +45,10 @@ class CandidateFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'acceptance_status' => true,
-                'rejection_comment' => null,
-                'onboard_at' => $this->faker->randomElement([$this->faker->dateTimeBetween('-1 year', 'now'), null]),
-                //'onboard_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+                'admission_status' => true,
+                'admission_comment' => null,
+                'entry_date' => $this->faker->randomElement([$this->faker->dateTimeBetween('-1 year', 'now'), null]),
+                //'entry_date' => $this->faker->dateTimeBetween('-1 year', 'now'),
             ];
         });
     }
@@ -62,9 +62,9 @@ class CandidateFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'acceptance_status' => false,
-                'rejection_comment' => $this->faker->sentence(),
-                'onboard_at' => null,
+                'admission_status' => false,
+                'admission_comment' => $this->faker->sentence(),
+                'entry_date' => null,
                 'program_id' => null,
             ];
         });
@@ -79,9 +79,9 @@ class CandidateFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'acceptance_status' => null,
-                'rejection_comment' => null,
-                'onboard_at' => null,
+                'admission_status' => null,
+                'admission_comment' => null,
+                'entry_date' => null,
             ];
         });
     }

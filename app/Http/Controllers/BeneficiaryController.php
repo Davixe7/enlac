@@ -14,7 +14,7 @@ class BeneficiaryController extends Controller
      */
     public function index(Request $request)
     {
-        $beneficiaries = Candidate::beneficiaries()->name($request->name)->get();
+        $beneficiaries = Candidate::beneficiaries()->name($request->name)->orderBy('first_name')->get();
         return BeneficiaryResource::collection($beneficiaries);
     }
 

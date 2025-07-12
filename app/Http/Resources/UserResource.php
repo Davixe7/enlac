@@ -28,7 +28,8 @@ class UserResource extends JsonResource
             'roles'   => $this->whenLoaded('roles'),
             'role_id' => $actualRole ? $actualRole->id : null,
             'role'    => $actualRole,
-            'notifications' => $this->notifications
+            'notifications' => $this->notifications,
+            'permissions' => auth()->user()->getAllPermissions()->pluck('name')
         ]);
     }
 }

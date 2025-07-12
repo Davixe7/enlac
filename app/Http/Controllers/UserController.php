@@ -90,7 +90,7 @@ class UserController extends Controller
 
         if( $request->filled('role_id') ){
             $role = Role::find( $request->role_id );
-            $user->assignRole( $role );
+            $user->roles()->sync( $role );
         }
 
         if( $request->filled('is_admin') ){

@@ -21,11 +21,11 @@ return new class extends Migration
             $table->unsignedBigInteger('sheet');
 
             $table->string('info_channel');
-            $table->boolean('acceptance_status')->default(null)->nullable();
-            $table->string('rejection_comment')->default(null)->nullable();
-            $table->date('onboard_at')->default(null)->nullable();
+            $table->boolean('admission_status')->default(null)->nullable();
+            $table->string('admission_comment')->default(null)->nullable();
+            $table->date('entry_date')->default(null)->nullable();
+            $table->string('entry_status')->default('pendiente_ingresar');
             $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }

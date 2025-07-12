@@ -22,7 +22,7 @@ class CandidateResource extends JsonResource
 
         return array_merge($data, [
             'full_name'            => $this->full_name,
-            'acceptance_status'    => $this->acceptance_status,
+            'admission_status'    => $this->admission_status,
             'picture'              => $this->getFirstMediaUrl('profile_picture'),
             'contacts'             => $this->contacts,
             'contact'              => $this->contacts()->first(),

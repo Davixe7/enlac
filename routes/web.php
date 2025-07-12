@@ -32,62 +32,6 @@ Route::get('seasons', function(){
     return $seasons;
 });
 
-Route::get('/test', function(Request $request){
-    $candidate = Candidate::first();
-    $paymentsConfigs = $candidate->payment_configs;
-    $wallets = [];
-    $year = now()->month > 7 ? now()->year : now()->year - 1;
-
-    $paymentsConfigs->each(function($paymentConfig) use($candidate, &$wallets, $year) {
-        $carry = 0;
-
-        for ($i=8; $i < 20; $i += $paymentConfig->frequency) {
-            $start = $i;
-            $end = $i + $paymentConfig->frequency - 1;
-
-            $startDate = Carbon::create($year, $start);
-            $endDate   = Carbon::create($year, $end)->endOfMonth();
-
-            $balance = Payment::where('candidate_id', $paymentConfig->candidate_id)
-                    ->where('sponsor_id', $paymentConfig->sponsor_id)
-                    ->whereBetween('date', [$startDate, $endDate])
-                    ->groupBy('candidate_id')
-                    ->sum('amount');
-
-            $carry = $carry + $balance;
-            foreach(range($start, $end) as $month){
-                //echo $paymentConfig->id . ' ' . $month . "<br/>";
-                $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
-
-                $date = Carbon::create($year, $month);
-                $maxDate = Carbon::create($year, $end)->endOfMonth();
-                $status = null;
-
-                if( $abono == $paymentConfig->monthly_amount ){
-                    $status = 'green';
-                }
-                elseif ( now() > $maxDate ) {
-                    $status = 'red';
-                }
-                else {
-                    $status = 'yellow';
-                }
-
-                $wallets[$paymentConfig->sponsor_id][] = [
-                    'date' => $date->format('Y-m-d'),
-                    'month' => $month,
-                    'monthName' => $date->format('F'),
-                    'abono' => number_format($abono, 2, '.', ''),
-                    'status' => $status
-                ];
-                $carry = $carry - $abono;
-            }
-        }
-    });
-
-    return $wallets;
-});
-
 Route::get('migrate', function(){
     $exitCode = Artisan::call('migrate:fresh --seed');
     $output = Artisan::output();

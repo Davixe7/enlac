@@ -18,8 +18,8 @@ class BeneficiaryResource extends JsonResource
             'id'           => $this->id,
             'name'         => $this->full_name,
             'sheet'        => $this->sheet,
-            'status'       => $this->status,
-            'onboard_at'   => $this->onboard_at,
+            'entry_status' => $this->entry_status,
+            'entry_date'   => $this->entry_date,
             'program_name' => $this->program->name,
             'program_price' => $this->program->price,
         ];

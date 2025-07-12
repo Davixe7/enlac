@@ -39,11 +39,11 @@ class CandidateController extends Controller
         ->get();
 
         $counts = $candidates->countBy(function ($u) {
-            $status = $u->acceptance_status;
+            $status = $u->admission_status;
             if ($status === null)                        return 'en_proceso';
             if ($status === 0)                           return 'rechazados';
-            if ($status === 1 && $u->onboard_at == null) return 'aceptados_no_ingresados';
-            if ($status === 1 && $u->onboard_at != null) return 'aceptados_ingresados';
+            if ($status === 1 && $u->entry_date == null) return 'aceptados_no_ingresados';
+            if ($status === 1 && $u->entry_date != null) return 'aceptados_ingresados';
         });
 
         $counts = [
@@ -82,12 +82,12 @@ class CandidateController extends Controller
 
     public function admission(Request $request, Candidate $candidate){
         $request->validate([
-            'rejection_comment' => 'required_if:acceptance_status,0,null,false'
+            'admission_comment' => 'required_if:admission_status,0,null,false'
         ]);
 
         $candidate->update([
-            'acceptance_status' => $request->acceptance_status,
-            'rejection_comment' => $request->rejection_comment,
+            'admission_status' => $request->admission_status,
+            'admission_comment' => $request->admission_comment,
             'program_id'        => $request->program_id
         ]);
 

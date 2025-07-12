@@ -18,7 +18,7 @@ class CandidateResultsResource extends JsonResource
             'full_name' => $this->full_name,
             'full_name' => $this->full_name,
             'sheet' => $this->sheet,
-            'acceptance_status' => !is_null($this->acceptance_status) ? intval($this->acceptance_status) : null,
+            'admission_status' => !is_null($this->admission_status) ? intval($this->admission_status) : null,
             'evaluator' => $this->evaluator,
             'evaluation_schedule' => $this->evaluation_schedule,
         ];

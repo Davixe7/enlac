@@ -59,6 +59,10 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(PaymentConfig::class);
     }
 
+    public function payment_confix(){
+        return $this->hasMany(PaymentConfig::class);
+    }
+
     public function scopeBirthDate(Builder $query, $birthDate): Builder
     {
         return $birthDate ? $query->where('birth_date', $birthDate) : $query;
@@ -75,7 +79,7 @@ class Candidate extends Model implements HasMedia
     }
 
     public function scopeBeneficiaries(Builder $query){
-        return $query->whereAcceptanceStatus(1);
+        return $query->whereAdmissionStatus(1);
     }
 
     public function scopeEvaluationBetween(Builder $query, $startDate, $endDate): Builder
