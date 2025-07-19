@@ -24,7 +24,7 @@ class FinancialController extends Controller
 
         //Sumariza todos los patrocinios por tipo en un monto total
         //Sumariza todos los pagos por tipo en un monto total y ultima fecha de pago
-        $candidates = Candidate::whereAcceptanceStatus(1)
+        $candidates = Candidate::beneficiaries()
         ->with([
             'program',
             'payment_configs',
