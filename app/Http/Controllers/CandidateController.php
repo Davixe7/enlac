@@ -86,7 +86,7 @@ class CandidateController extends Controller
         ]);
 
         $candidate->update([
-            'admission_status' => $request->admission_status,
+            'admission_status'  => $request->admission_status,
             'admission_comment' => $request->admission_comment,
             'program_id'        => $request->program_id
         ]);
