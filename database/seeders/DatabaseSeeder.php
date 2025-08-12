@@ -20,6 +20,6 @@ class DatabaseSeeder extends Seeder
         // $this->call(InterviewQuestionSeeder::class);
         // $this->call(ProgramSeeder::class);
         // $this->call(CandidateSeeder::class);
-        // $this->call(KardexSeeder::class);
+        $this->call(KardexSeeder::class);
     }
 }
