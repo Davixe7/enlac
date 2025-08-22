@@ -26,6 +26,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
 use App\Models\Candidate;
+use App\Models\Evaluation;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -131,7 +132,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('contacts/validate', [ContactController::class, 'validate']);
 
-    Route::get('evaluation_fields', fn (Request $request) => new EvaluationFields($request));
+    Route::get('evaluation_fields', function(Request $request){
+        $data = ['candidate_id' => $request->candidate_id, 'signed_at' => null];
+        $evaluationA = Evaluation::firstOrCreate($data, $data);
+        $evaluationB = Evaluation::whereCandidateId($request->candidate_id)->whereNotNull('signed_at')->latest()->first();
+        return response()->json(['data' => [
+            'a' => new EvaluationFields($evaluationA),
+            'b' => $evaluationB ? new EvaluationFields($evaluationB) : null
+        ]]);
+    });
 
     Route::get('evaluators', function (Request $request) {
         return response()->json(['data' => User::role('evaluator')->get()]);

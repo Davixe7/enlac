@@ -27,7 +27,8 @@ class StoreBrainFunctionRankRequest extends FormRequest
             'laterality_impact' => 'required_if:caracteristic,0,F|in:l,r,b',
             'brain_level_id'    => 'required|exists:brain_levels,id',
             'brain_function_id' => 'required|exists:brain_functions,id',
-            'candidate_id'      => 'required|exists:candidates,id',
+            'evaluation_id'     => 'required|exists:evaluations,id',
+            /* 'candidate_id'      => 'required|exists:candidates,id', */
         ];
     }
 

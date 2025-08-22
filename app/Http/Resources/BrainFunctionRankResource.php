@@ -21,7 +21,7 @@ class BrainFunctionRankResource extends JsonResource
             'laterality_impact' => $this->laterality_impact,
             'brain_level' => new BrainLevelResource($this->brainLevel),
             'brain_function' => new BrainFunctionResource($this->brainFunction),
-            'candidate' => new CandidateResource($this->candidate),
+            'evaluation_id'  => $this->evaluation_id,
             'brain_level_id' => $this->brain_level_id,
             'brain_function_id' => $this->brain_function_id,
             'created_at' => $this->created_at,

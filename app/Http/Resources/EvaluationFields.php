@@ -14,7 +14,7 @@ class EvaluationFields extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray($request): array
     {
         $brainLevels = BrainLevel::orderBy('id', 'DESC')->get();
         $brainLevels = $brainLevels->map(function ($level) use ($request) {
@@ -23,7 +23,7 @@ class EvaluationFields extends JsonResource
                     $join
                         ->on('brain_function_id', '=', 'brain_functions.id')
                         ->where('brain_function_ranks.brain_level_id', '=', $level->id)
-                        ->where('candidate_id', '=', $request->candidate_id);
+                        ->where('evaluation_id', '=', $this->id);
                 })
                 ->select(
                     'brain_functions.id as brain_function_id',
@@ -36,7 +36,7 @@ class EvaluationFields extends JsonResource
                 ->get();
 
             $level->ranks = $level->ranks->map(function ($rank) use ($request, $level) {
-                $rank->candidate_id = intval($request->candidate_id);
+                $rank->evaluation_id = intval($this->id);
                 $rank->brain_level_id = $level->id;
                 $rank->laterality_impact = $level->laterality_impact ?: 'l';
                 return $rank;
