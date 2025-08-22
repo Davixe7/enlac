@@ -9,4 +9,8 @@ class Medication extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function statusLogs(){
+        return $this->hasMany(MedicationLog::class);
+    }
 }

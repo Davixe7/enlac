@@ -16,6 +16,7 @@ use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\KardexController;
+use App\Http\Controllers\MedicationLogController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentConfigController;
 use App\Http\Controllers\PaymentController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
+use App\Http\Resources\EvaluatorResource;
 use App\Models\Candidate;
 use App\Models\Evaluation;
 use App\Models\Payment;
@@ -143,7 +145,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('evaluators', function (Request $request) {
-        return response()->json(['data' => User::role('evaluator')->get()]);
+        return EvaluatorResource::collection( User::role('evaluator')->orderBy('name')->get() );
     });
 
     Route::get('beneficiaries', [BeneficiaryController::class, 'index']);
@@ -155,4 +157,6 @@ Route::middleware('auth:sanctum')->group(function () {
         $users = User::whereWorkAreaId($request->area)->get();
         return response()->json(['data' => $users]);
     });
+
+    Route::post('medication_logs/{medication}', [MedicationLogController::class, 'store']);
 });

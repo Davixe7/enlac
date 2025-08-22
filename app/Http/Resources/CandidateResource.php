@@ -17,8 +17,8 @@ class CandidateResource extends JsonResource
     {
         $data = parent::toArray($request);
 
-        /* $ranks = $this->brainFunctionRanks->groupBy('brain_level_id');
-        $ranks = $ranks->map(fn($rank)=>["functions" => $rank->keyBy('brain_function_id')]); */
+        //$ranks = $this->brainFunctionRanks->groupBy('brain_level_id');
+        //$ranks = $ranks->map(fn($rank)=>["functions" => $rank->keyBy('brain_function_id')]);
 
         return array_merge($data, [
             'full_name'            => $this->full_name,
@@ -29,7 +29,6 @@ class CandidateResource extends JsonResource
             'medications'          => $this->medications,
             'evaluation_schedules' => $this->evaluation_schedules,
             'evaluation_schedule'  => $this->evaluation_schedule,
-            /* 'brain_function_ranks' => $ranks, */
             'program'              => $this->program,
             'chronological_age'    => number_format( Carbon::parse($this->birth_date)->diffInMonths(), 2 ),
             'chronological_age2'   => number_format( Carbon::parse($this->birth_date)->diffInYears(), 2 ),
