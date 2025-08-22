@@ -16,7 +16,7 @@ class InterviewQuestionSeeder extends Seeder
         $preguntas = [
 	    "Cuénteme, ¿por qué acudió a ENLAC?, y, ¿qué espera del Instituto?",
 	    "¿Lo ha checado un médico especialista?",
-	    "El embarazo de su hijo(a), ¿fue un embarazado planeado?",
+	    "El embarazo de su hijo(a), ¿fue un embarazo planeado?",
 	    "¿Cuántos embarazos ha tenido? (contando los abortos en caso de haber tenido)",
 	    "¿Cómo fue el embarazo y qué edad tenía la madre cuando nació su hijo(a)?",
 	    "¿Qué número de hijo(a) es? (Contando todos los embarazos)",

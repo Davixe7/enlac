@@ -24,6 +24,7 @@ class CandidateController extends Controller
             ->where('type_id', 0)
             ->whereEvaluatorId( auth()->id() );
         })
+        ->where('admission_status', null)
         ->orderBy('first_name', 'ASC')
         ->get();
 

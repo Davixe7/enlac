@@ -15,7 +15,7 @@ class ProgramSeeder extends Seeder
     {
         Program::create(['price'=>12000,'name' => 'Programa escolarizado matutino']);
         Program::create(['price'=>12000,'name' => 'Programa escolarizado vespertino']);
-        Program::create(['price'=>12000,'name' => 'Programa asistido con sombra']);
+        Program::create(['price'=>12000,'name' => 'Programa asistido con Líder']);
         Program::create(['price'=>12000,'name' => 'Programa asistido con padres']);
         Program::create(['price'=>12000,'name' => 'Sabor alegría']);
         Program::create(['price'=>12000,'name' => 'Estimulación temprana']);
