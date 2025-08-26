@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\BrainFunctionRank;
 use App\Models\Candidate;
+use App\Models\Evaluation;
 use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -8,6 +10,19 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+
+/* Route::get('evaluations', function(){
+    $data = DB::table('appointments')
+    ->groupBy(['candidate_id', 'type_id'])
+    ->select(['candidate_id', 'type_id', DB::raw('MAX(`id`) as id')])
+    ->where('type_id',0)
+    ->get();
+
+    foreach($data as $appoint){
+        $evaluation = Evaluation::create(['candidate_id' => $appoint->candidate_id]);
+        BrainFunctionRank::whereCandidateId($appoint->candidate_id)->update(['evaluation_id'=>$evaluation->id]);
+    }
+}); */
 
 Route::get('beca', function(){
     return DB::table('payment_configs')

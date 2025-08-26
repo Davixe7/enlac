@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kardexes', function (Blueprint $table) {
+        Schema::create('personal_programs', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug');
-            $table->boolean('has_template')->default(false);
-            $table->boolean('has_detail')->default(false);
-            $table->string('category')->nullable()->default('default');
             $table->timestamps();
+            $table->foreignId('plan_id');
+            $table->foreignId('plan_type_id');
+            $table->foreignId('candidate_id');
+            $table->string('name');
+            $table->string('status');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kardexes');
+        Schema::dropIfExists('personal_programs');
     }
 };

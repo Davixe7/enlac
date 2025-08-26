@@ -6,6 +6,7 @@ use App\Models\Candidate;
 use App\Http\Resources\CandidateResource;
 use App\Services\CandidateService;
 use App\Http\Requests\StoreCandidateRequest;
+use App\Models\Evaluation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -86,6 +87,10 @@ class CandidateController extends Controller
             'admission_comment' => 'required_if:admission_status,0,null,false'
         ]);
 
+        if($request->filled('sign_evaluation')){
+            Evaluation::find($request->evaluation_id)->update(['signed_at'=>now()]);
+        }
+
         $candidate->update([
             'admission_status'  => $request->admission_status,
             'admission_comment' => $request->admission_comment,
@@ -103,6 +108,12 @@ class CandidateController extends Controller
         ->pluck('collection_name');
 
         return response()->json(['data'=>$list]);
+    }
+
+    public function review(Request $request, Candidate $candidate){
+        $data = $request->validate(['review'=>'required']);
+        $candidate->update($data);
+        return response()->json([], 204);
     }
 
     /**

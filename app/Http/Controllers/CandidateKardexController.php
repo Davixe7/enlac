@@ -25,10 +25,20 @@ class CandidateKardexController extends Controller
     {
         $collectionName = 'kardex_' . $request->collection_name;
         $candidate->clearMediaCollection($collectionName);
-        $candidate
-        ->addMediaFromRequest('upload')
-        ->withCustomProperties(['detail'=>$request->detail])
-        ->toMediaCollection($collectionName);
+
+        if( !$request->filled('detail') ){
+            $candidate
+            ->addMediaFromRequest('upload')
+            ->toMediaCollection($collectionName);
+        } else {
+            $candidate
+            ->addMediaFromDisk('template.pdf')
+            ->preservingOriginal()
+            ->withCustomProperties(['detail'=>$request->detail])
+            ->toMediaCollection($collectionName);
+        }
+        
+        
         $media = $candidate->getFirstMedia($collectionName);
         return new MediaResource($media);
     }

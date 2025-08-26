@@ -28,7 +28,7 @@ class StoreBrainFunctionRankRequest extends FormRequest
             'brain_level_id'    => 'required|exists:brain_levels,id',
             'brain_function_id' => 'required|exists:brain_functions,id',
             'evaluation_id'     => 'required|exists:evaluations,id',
-            /* 'candidate_id'      => 'required|exists:candidates,id', */
+            'candidate_id'      => 'required|exists:candidates,id',
         ];
     }
 

@@ -23,6 +23,10 @@ class Candidate extends Model implements HasMedia
         // ... otros casts
     ];
 
+    public function medication_logs(){
+        return $this->hasManyThrough(MedicationLog::class, Medication::class);
+    }
+
     public function contacts()
     {
         return $this->hasMany(Contact::class);

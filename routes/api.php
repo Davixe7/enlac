@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AddressController;
-use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\ProgramController;
@@ -10,6 +10,7 @@ use App\Http\Controllers\BeneficiaryController;
 use App\Http\Controllers\BrainFunctionController;
 use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
+use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\CandidateKardexController;
 use App\Http\Controllers\DashboardSlideController;
 use App\Http\Controllers\FinancialController;
@@ -20,6 +21,9 @@ use App\Http\Controllers\MedicationLogController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentConfigController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PersonalProgramController;
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\PlanTypeController;
 use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SponsorController;
@@ -158,5 +162,12 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['data' => $users]);
     });
 
+    Route::get('medication_logs/{candidate}', [MedicationLogController::class, 'index']);
     Route::post('medication_logs/{medication}', [MedicationLogController::class, 'store']);
+
+    Route::apiResource('activities', ActivityController::class);
+    Route::apiResource('plan_types', PlanTypeController::class);
+    Route::apiResource('plans', PlanController::class);
+    Route::apiResource('personal_programs', PersonalProgramController::class);
+    Route::put('candidates/{candidate}/review', [CandidateController::class, 'review']);
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Candidate;
 use App\Models\Medication;
 use App\Models\MedicationLog;
 use Illuminate\Http\Request;
@@ -11,9 +12,10 @@ class MedicationLogController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Medication $medication)
+    public function index(Candidate $candidate)
     {
-        $data = $medication->statusLogs;
+        $candidate->load(['medication_logs.medication']);
+        $data = $candidate->medication_logs->sortByDesc('created_at')->values();
         return response()->json(compact('data'));
     }
 
