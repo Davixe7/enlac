@@ -27,7 +27,8 @@ class StoreMedicationRequest extends FormRequest
             'frequency' => 'required|string|max:255',
             'duration' => 'required|string|max:255',
             'candidate_id' => 'required|exists:candidates,id',
-            'status' => 'required'
+            'status' => 'required',
+            'observations' => 'nullable'
         ];
     }
 
