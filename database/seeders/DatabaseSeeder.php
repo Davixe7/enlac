@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
         //$this->call(ProgramSeeder::class);
         //$this->call(CandidateSeeder::class);
         $this->call(KardexSeeder::class);
+        $this->call(PlanSeeder::class);
     }
 }

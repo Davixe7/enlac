@@ -20,12 +20,7 @@ class CandidateController extends Controller
     }
 
     public function dashboard() {
-        $candidates = Candidate::whereHas('appointments', function($query){
-            $query
-            ->where('type_id', 0)
-            ->whereEvaluatorId( auth()->id() );
-        })
-        ->where('admission_status', null)
+        $candidates = Candidate::where('admission_status', null)
         ->orderBy('first_name', 'ASC')
         ->get();
 
