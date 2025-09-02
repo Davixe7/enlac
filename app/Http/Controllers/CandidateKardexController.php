@@ -26,7 +26,7 @@ class CandidateKardexController extends Controller
         $collectionName = 'kardex_' . $request->collection_name;
         $candidate->clearMediaCollection($collectionName);
 
-        if( !$request->filled('detail') ){
+        if( is_null($request->detail) || $request->detail == 'null'){
             $candidate
             ->addMediaFromRequest('upload')
             ->toMediaCollection($collectionName);
