@@ -12,7 +12,7 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        $data = Activity::with(['plan_type'])->get();
+        $data = Activity::with(['plan_category'])->get();
         return response()->json(compact('data'));
     }
 
@@ -23,13 +23,13 @@ class ActivityController extends Controller
     {
         $data = $request->validate([
             'name'             => 'required',
-            'plan_type_id'     => 'required|exists:plan_types,id',
+            'plan_category_id' => 'required|exists:plan_categories,id',
             'measurement_unit' => 'required',
             'goal_type'        => 'required'
         ]);
 
         $data = Activity::create($data);
-        $data->load('plan_type');
+        $data->load('plan_category');
         return response()->json(compact('data'), 201);
     }
 
@@ -48,13 +48,13 @@ class ActivityController extends Controller
     {
         $data = $request->validate([
             'name'             => 'required',
-            'plan_type_id'     => 'required|exists:plan_types,id',
+            'plan_category_id' => 'required|exists:plan_categories,id',
             'measurement_unit' => 'required',
             'goal_type'        => 'required'
         ]);
 
         $activity->update($data);
-        $data = $activity->load('plan_type');
+        $data = $activity->load('plan_category');
         return response()->json(compact('data'), 200);
     }
 

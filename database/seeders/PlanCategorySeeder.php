@@ -3,12 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Plan;
+use App\Models\PlanCategory;
 use App\Models\PlanType;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-class PlanSeeder extends Seeder
+class PlanCategorySeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,7 +18,7 @@ class PlanSeeder extends Seeder
     {
         $plan_types = ['Fisico', 'Academico', 'Expresión Artística'];
         foreach($plan_types as $planTypeName){
-            PlanType::create([
+            PlanCategory::create([
                 'label' => $planTypeName,
                 'name'  => Str::slug($planTypeName, '_')
             ]);
@@ -34,9 +35,10 @@ class PlanSeeder extends Seeder
         ];
 
         foreach($fisicos as $planName){
-            Plan::create([
-                'plan_type_id' => 1,
-                'name' => $planName
+            PlanCategory::create([
+                'parent_id' => 1,
+                'name' => $planName,
+                'label' => $planName
             ]);
         }
 
@@ -50,9 +52,10 @@ class PlanSeeder extends Seeder
         ];
 
         foreach($academico as $planName){
-            Plan::create([
-                'plan_type_id' => 2,
-                'name' => $planName
+            PlanCategory::create([
+                'parent_id' => 2,
+                'name' => $planName,
+                'label' => $planName
             ]);
         }
 
@@ -69,9 +72,10 @@ class PlanSeeder extends Seeder
         ];
 
         foreach($artistico as $planName){
-            Plan::create([
-                'plan_type_id' => 3,
-                'name' => $planName
+            PlanCategory::create([
+                'parent_id' => 3,
+                'name' => $planName,
+                'label' => $planName
             ]);
         }
 

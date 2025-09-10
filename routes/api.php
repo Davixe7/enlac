@@ -14,6 +14,7 @@ use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\CandidateKardexController;
 use App\Http\Controllers\DashboardSlideController;
 use App\Http\Controllers\FinancialController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\KardexController;
@@ -22,8 +23,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentConfigController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PersonalProgramController;
+use App\Http\Controllers\PlanCategoryController;
 use App\Http\Controllers\PlanController;
-use App\Http\Controllers\PlanTypeController;
 use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SponsorController;
@@ -111,25 +112,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'destroy']);
 
     Route::apiResources([
-        'candidates' => CandidateController::class,
-        'medications' => MedicationController::class,
-        'contacts' => ContactController::class,
-        'addresses' => AddressController::class,
-        'programs'  => ProgramController::class,
-        'appointments'  => AppointmentController::class,
-        'interviews'  => InterviewController::class,
-        'brain_levels'  => BrainLevelController::class,
-        'brain_functions'  => BrainFunctionController::class,
-        'brain_function_ranks'  => BrainFunctionRankController::class,
-        'interview_questions'   => InterviewQuestionController::class,
-        'work_areas'   => WorkAreaController::class,
-        'roles'   => RoleController::class,
-        'users'   => UserController::class,
-        'sponsors'   => SponsorController::class,
-        'payment_configs'   => PaymentConfigController::class,
-        'kardexes'   => KardexController::class,
-        'dashboard-slides'   => DashboardSlideController::class,
-        'payments'   => PaymentController::class,
+        'candidates'           => CandidateController::class,
+        'medications'          => MedicationController::class,
+        'contacts'             => ContactController::class,
+        'addresses'            => AddressController::class,
+        'programs'             => ProgramController::class,
+        'appointments'         => AppointmentController::class,
+        'interviews'           => InterviewController::class,
+        'brain_levels'         => BrainLevelController::class,
+        'brain_functions'      => BrainFunctionController::class,
+        'brain_function_ranks' => BrainFunctionRankController::class,
+        'interview_questions'  => InterviewQuestionController::class,
+        'work_areas'           => WorkAreaController::class,
+        'roles'                => RoleController::class,
+        'users'                => UserController::class,
+        'sponsors'             => SponsorController::class,
+        'payment_configs'      => PaymentConfigController::class,
+        'kardexes'             => KardexController::class,
+        'dashboard-slides'     => DashboardSlideController::class,
+        'payments'             => PaymentController::class,
+        'groups'               => GroupController::class,
+        'plans'                => PlanController::class,
     ]);
 
     Route::post('dashboard-slides/reorder', [DashboardSlideController::class, 'reorder']);
@@ -166,8 +169,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('medication_logs/{medication}', [MedicationLogController::class, 'store']);
 
     Route::apiResource('activities', ActivityController::class);
-    Route::apiResource('plan_types', PlanTypeController::class);
-    Route::apiResource('plans', PlanController::class);
+    Route::apiResource('plan_categories', PlanCategoryController::class);
     Route::apiResource('personal_programs', PersonalProgramController::class);
     Route::put('candidates/{candidate}/review', [CandidateController::class, 'review']);
 });

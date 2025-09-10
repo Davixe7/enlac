@@ -15,6 +15,7 @@ class PersonalProgramResource extends JsonResource
     public function toArray(Request $request): array
     {
         return array_merge(parent::toArray($request), [
+            'plan_category'   => $this->plan_category,
             'activities' => $this->whenLoaded('activities', PlanActivitiesResource::collection($this->activities))
         ]);
     }

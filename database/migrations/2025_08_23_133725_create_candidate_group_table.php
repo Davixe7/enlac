@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Candidate;
+use App\Models\Group;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,14 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('personal_programs', function (Blueprint $table) {
-            $table->id();
+        Schema::create('candidate_group', function (Blueprint $table) {
+            $table->foreignIdFor(Candidate::class);
+            $table->foreignIdFor(Group::class);
             $table->timestamps();
-            $table->foreignId('plan_id');
-            $table->foreignId('plan_type_id');
-            $table->foreignId('candidate_id');
-            $table->string('name');
-            $table->string('status');
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('personal_programs');
+        Schema::dropIfExists('candidate_group');
     }
 };

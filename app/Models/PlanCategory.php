@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Activity extends Model
+class PlanCategory extends Model
 {
     protected $guarded = [];
-    protected $hidden = ['created_at', 'updated_at'];
 
-    public function plan_category(){
+    public function subcategory(){
         return $this->belongsTo(PlanCategory::class);
     }
 }

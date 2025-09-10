@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Candidate;
 use App\Models\PlanCategory;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,13 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activities', function (Blueprint $table) {
+        Schema::create('groups', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignIdFor(PlanCategory::class);
-            $table->string('goal_type');
-            $table->string('measurement_unit');
             $table->string('name');
+            $table->foreignIdFor(Candidate::class)->nullable();
+            $table->foreignIdFor(PlanCategory::class)->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activities');
+        Schema::dropIfExists('groups');
     }
 };
