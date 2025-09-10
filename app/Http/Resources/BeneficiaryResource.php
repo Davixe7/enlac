@@ -15,13 +15,13 @@ class BeneficiaryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'           => $this->id,
-            'name'         => $this->full_name,
-            'sheet'        => $this->sheet,
-            'entry_status' => $this->entry_status,
-            'entry_date'   => $this->entry_date,
-            'program_name' => $this->program ? $this->program : $this->program->name,
-            'program_price' => $this->program->price,
+            'id'            => $this->id,
+            'name'          => $this->full_name,
+            'sheet'         => $this->sheet,
+            'entry_status'  => $this->entry_status,
+            'entry_date'    => $this->entry_date,
+            'program_name'  => $this->program ? $this->program->name : 'Sin asignar',
+            'program_price' => $this->program ? $this->program->price : 'Sin asignar',
             'group_id'      => $this->group ? $this->group->id : null
         ];
 
