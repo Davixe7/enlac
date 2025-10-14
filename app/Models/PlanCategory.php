@@ -8,7 +8,15 @@ class PlanCategory extends Model
 {
     protected $guarded = [];
 
-    public function subcategory(){
-        return $this->belongsTo(PlanCategory::class);
+    public function parent(){
+        return $this->belongsTo(PlanCategory::class, 'parent_id');
+    }
+
+    public function children(){
+        return $this->hasMany(PlanCategory::class, 'parent_id');
+    }
+
+    public function scopeByParent($query, $parent_id){
+        return $query->whereParentId($parent_id);
     }
 }

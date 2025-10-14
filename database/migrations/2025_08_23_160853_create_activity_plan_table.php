@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('activity_plan', function (Blueprint $table) {
             $table->foreignIdFor(Activity::class);
-            $table->foreignIdFor(Plan::class);
+            $table->foreignIdFor(Plan::class)->constrained()->onDelete('cascade');
             $table->string('daily_goal');
+            $table->string('final_goal')->nullable();
         });
     }
 

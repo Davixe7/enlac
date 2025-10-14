@@ -16,10 +16,13 @@ return new class extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignIdFor(PlanCategory::class, 'plan_category_id');
+            $table->foreignIdFor(PlanCategory::class, 'category_id');
+            $table->foreignIdFor(PlanCategory::class, 'subcategory_id');
             $table->foreignIdFor(Group::class);
             $table->string('name');
             $table->string('status');
+            $table->date('start_date');
+            $table->date('end_date');
             $table->timestamps();
         });
     }

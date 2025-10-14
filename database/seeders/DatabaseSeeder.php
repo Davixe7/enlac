@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Activity;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -20,7 +21,9 @@ class DatabaseSeeder extends Seeder
         //$this->call(InterviewQuestionSeeder::class);
         //$this->call(ProgramSeeder::class);
         //$this->call(CandidateSeeder::class);
-        $this->call(KardexSeeder::class);
-        $this->call(PlanSeeder::class);
+        //$this->call(KardexSeeder::class);
+        //$this->call(PlanSeeder::class);
+        $this->call(PlanCategorySeeder::class);
+        $this->call(ActivityCategorySeeder::class);
     }
 }

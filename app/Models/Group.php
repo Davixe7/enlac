@@ -15,4 +15,18 @@ class Group extends Model
     public function plans(){
         return $this->hasMany(Plan::class);
     }
+
+    public function program(){
+        return $this->belongsTo(Program::class);
+    }
+
+    public function scopeByOwner($query, $ownerId){
+        return $query->whereHas('candidate', fn($q)=>$q->whereId($ownerId))
+        ->whereIsIndividual(1);
+    }
+
+    public function scopeIncludesCandidate($query, $candidateId){
+        if( !$candidateId ) {return $query; }
+        return $query->whereHas('candidates', fn($q)=>$q->whereId($candidateId));
+    }
 }

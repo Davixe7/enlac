@@ -10,9 +10,13 @@ class ActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Activity::with(['plan_category'])->get();
+        $data = Activity::with(['plan_category']);
+        if( $request->plan_category_id ){
+            $data = $data->wherePlanCategoryId($request->plan_category_id);
+        }
+        $data = $data->get();
         return response()->json(compact('data'));
     }
 

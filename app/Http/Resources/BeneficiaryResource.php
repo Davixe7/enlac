@@ -22,8 +22,7 @@ class BeneficiaryResource extends JsonResource
             'entry_date'    => $this->entry_date,
             'program_name'  => $this->program ? $this->program->name : 'Sin asignar',
             'program_price' => $this->program ? $this->program->price : 'Sin asignar',
-            'group_id'      => $this->group ? $this->group->id : null
+            'group_id'      => $this->whenLoaded('personal_groups', fn() => $this->personal_groups->first()?->id, null)
         ];
-
     }
 }

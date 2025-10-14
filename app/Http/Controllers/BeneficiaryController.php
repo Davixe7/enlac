@@ -23,7 +23,7 @@ class BeneficiaryController extends Controller
      */
     public function show(Candidate $candidate)
     {
-        return new BeneficiaryResource($candidate);
+        return new BeneficiaryResource($candidate->load(['personal_groups']));
     }
 
 

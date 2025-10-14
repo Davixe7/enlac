@@ -13,28 +13,17 @@ class BrainFunctionseeder extends Seeder
      */
     public function run(): void
     {
-        BrainFunction::create([
-            'name' => 'Capacidad Visual',
-        ]);
-
-        BrainFunction::create([
-            'name' => 'Capacidad Auditiva',
-        ]);
-
-        BrainFunction::create([
-            'name' => 'Capacidad Táctil',
-        ]);
-
-        BrainFunction::create([
-            'name' => 'Movilidad',
-        ]);
-
-        BrainFunction::create([
-            'name' => 'Lenguaje',
-        ]);
-
-        BrainFunction::create([
-            'name' => 'Capacidad Manual',
-        ]);
+        $brainFunctions = [
+            'Capacidad Visual',
+            'Capacidad Auditiva',
+            'Capacidad Táctil',
+            'Movilidad',
+            'Lenguaje',
+            'Capacidad Manual'
+        ];
+        
+        foreach($brainFunctions as $functionName){
+            BrainFunction::create(['name' => $functionName]);
+        }
     }
 }

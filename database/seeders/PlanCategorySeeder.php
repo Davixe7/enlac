@@ -16,7 +16,7 @@ class PlanCategorySeeder extends Seeder
      */
     public function run(): void
     {
-        $plan_types = ['Fisico', 'Academico', 'Expresión Artística'];
+        $plan_types = ['Físico', 'Académico', 'Expresión Artística', 'Natación', 'Equinoterapia', 'Gimnasia'];
         foreach($plan_types as $planTypeName){
             PlanCategory::create([
                 'label' => $planTypeName,

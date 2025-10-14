@@ -23,8 +23,12 @@ class Candidate extends Model implements HasMedia
         // ... otros casts
     ];
 
-    public function group(){
-        return $this->hasOne(Group::class);
+    public function groups(){
+        return $this->belongsToMany(Group::class);
+    }
+
+    public function personal_groups(){
+        return $this->belongsToMany(Group::class)->whereIsIndividual(1);
     }
 
     public function medication_logs(){

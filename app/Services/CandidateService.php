@@ -7,6 +7,7 @@ use App\Models\Candidate;
 use App\Models\Contact;
 use App\Models\Address;
 use App\Models\EvaluationSchedule;
+use App\Models\Group;
 use App\Models\Medication;
 use App\Models\User;
 use App\Notifications\EvaluationScheduled;
@@ -46,6 +47,12 @@ class CandidateService
             if( $request->filled('evaluation_schedule') ){
                 $schedule = $candidate->appointments()->create($request->evaluation_schedule);
                 $schedule->evaluator->notify( new EvaluationScheduled( $schedule ) );
+            }
+
+            // 5. Crear Grupo Individual para actividades posteriores
+            if( $candidate ){
+                $group = Group::create(['is_individual' => 1]);
+                $group->candidates()->attach([$candidate->id]);
             }
 
             return $candidate;

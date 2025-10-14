@@ -17,7 +17,11 @@ class Plan extends Model
         return $this->belongsToMany(Activity::class)->withPivot('daily_goal');
     }
 
-    public function plan_category(){
-        return $this->belongsTo(PlanCategory::class);
+    public function category(){
+        return $this->belongsTo(PlanCategory::class, 'category_id');
+    }
+
+    public function subcategory(){
+        return $this->belongsTo(PlanCategory::class, 'subcategory_id');
     }
 }

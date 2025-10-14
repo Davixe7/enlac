@@ -10,9 +10,14 @@ class GroupController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Group::withCount('candidates')->get();
+        $data = Group::withCount('candidates')
+        ->whereIsIndividual(false)
+        ->includesCandidate( $request->candidate_id )
+        ->with(['program'])
+        ->get();
+
         return response()->json(compact('data'));
     }
 
@@ -21,8 +26,13 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate(['name'=>'required']);
-        $data = Group::create($data);
+        $data = $request->validate([
+            'name'       => 'required',
+            'program_id' => 'required'
+        ]);
+
+        $data = Group::create(array_merge($data, ['is_individual'=>0]));
+
         if( $request->filled('candidates') ){
             $data->candidates()->sync( $request->candidates );
         }
@@ -34,7 +44,7 @@ class GroupController extends Controller
      */
     public function show(Group $group)
     {
-        $data = $group->load(['candidates', 'plans']);
+        $data = $group->load(['candidates', 'plans.subcategory.parent']);
         return response()->json(compact('data'));
     }
 

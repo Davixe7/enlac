@@ -2,6 +2,7 @@
 
 use App\Models\Candidate;
 use App\Models\PlanCategory;
+use App\Models\Program;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,8 +17,8 @@ return new class extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignIdFor(Candidate::class)->nullable();
-            $table->foreignIdFor(PlanCategory::class)->nullable();
+            $table->boolean('is_individual');
+            $table->foreignIdFor(Program::class);
             $table->timestamps();
         });
     }

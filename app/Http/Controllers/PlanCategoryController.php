@@ -11,9 +11,9 @@ class PlanCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = PlanCategory::all();
+        $data = PlanCategory::get();
         return response()->json(compact('data'));
     }
 
