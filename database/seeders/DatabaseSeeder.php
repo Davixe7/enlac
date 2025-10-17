@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Activity;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -25,5 +23,7 @@ class DatabaseSeeder extends Seeder
         //$this->call(PlanSeeder::class);
         $this->call(PlanCategorySeeder::class);
         $this->call(ActivityCategorySeeder::class);
+        $this->call(ActivitySeeder::class);
+        $this->call(GroupSeeder::class);
     }
 }

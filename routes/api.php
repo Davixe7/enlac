@@ -171,5 +171,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('activities', ActivityController::class);
     Route::apiResource('plan_categories', PlanCategoryController::class);
     Route::apiResource('personal_programs', PersonalProgramController::class, ['parameters' => ['personal_programs' => 'plan']]);
+    Route::post('personal_programs/{plan}/copy', [PersonalProgramController::class, 'copy']);
     Route::put('candidates/{candidate}/review', [CandidateController::class, 'review']);
 });

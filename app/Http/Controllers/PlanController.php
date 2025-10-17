@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PersonalProgramResource;
+use App\Models\Group;
 use App\Models\Plan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class PlanController extends Controller
         ->orderBy('created_at', 'desc')
         ->get();
         
-        return PersonalProgramResource::collection($data);
+        return response()->json(compact('data'));
     }
 
     /**
@@ -28,6 +29,7 @@ class PlanController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'candidate_id'     => 'required|whitout:group_id',
             'category_id'      => 'required|exists:plan_categories,id',
             'subcategory_id'   => 'required|exists:plan_categories,id',
             'group_id'         => 'required|exists:groups,id',
@@ -46,8 +48,17 @@ class PlanController extends Controller
             'start_date'       => 'Fecha de inicio',
             'end_date'         => 'Fecha de cierre',
         ]);
+
+        if( !$request->group_id ){
+            $data['group_id'] = Group::where('is_individual', 1)
+            ->whereHas('candidates', fn($q)=>$q->whereId($request->candidate_id))
+            ->first()
+            ->id;
+        }
         
         unset($data['activities']);
+        unset($data['candidate_id']);
+
         $data['start_date'] = Carbon::createFromFormat('d/m/Y', $data['start_date']);
         $data['end_date'] = Carbon::createFromFormat('d/m/Y', $data['end_date']);
         $data = Plan::create($data);

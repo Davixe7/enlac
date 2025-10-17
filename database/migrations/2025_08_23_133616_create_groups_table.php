@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->boolean('is_individual');
-            $table->foreignIdFor(Program::class);
+            $table->foreignIdFor(Program::class)->nullable();
             $table->timestamps();
         });
     }

@@ -15,21 +15,52 @@ class PersonalProgramController extends Controller
      */
     public function index(Request $request)
     {
-        $candidate = Candidate::findOrFail($request->candidate_id);
+        /* $candidate = Candidate::findOrFail($request->candidate_id);
         $personalGroup = $candidate->groups()->whereIsIndividual(1)->first();
         if(!$personalGroup){
             $personalGroup = Group::create(['is_individual'=>1, 'name'=>$candidate->id]);
             $personalGroup->candidates()->attach($request->candidate_id);
         }
-        return PersonalProgramResource::collection($personalGroup->plans->orderBy('created_at'));
+        return PersonalProgramResource::collection($personalGroup->plans->orderBy('created_at')); */
+
+        $groups = Group::whereIsIndividual(1);
+        if( $request->except ){
+            $groups->whereDoesntHave('candidates', function($query) use ($request){
+                $query->whereNotIn('id', $request->except);
+            });
+        }
+        $programs = Plan::with(['activities', 'group.candidates'])
+        ->whereIn('group_id', $groups->pluck('id')->toArray())
+        ->get();
+        return response()->json(['data'=>$programs]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function copy(Request $request, Plan $plan)
     {
-        //
+        $newPlan = Plan::create([
+            'group_id'       => $request->group_id,
+            'name'           => $request->name,
+            'category_id'    => $plan->category_id,
+            'subcategory_id' => $plan->subcategory_id,
+            'start_date'     => $plan->start_date,
+            'end_date'       => $plan->end_date,
+            'status'         => $plan->status,
+        ]);
+
+        $sourceActivities = $plan->activities;
+        $newAssociations = $sourceActivities->mapWithKeys(function ($activity) {
+            $pivotData = $activity->pivot->toArray();
+            unset($pivotData['plan_id']);
+            unset($pivotData['activity_id']);
+            return [$activity->id => $pivotData];
+        })->all();
+
+        $newPlan->activities()->attach($newAssociations);
+
+        return response()->json(['data'=>$newPlan->load(['category', 'subcategory'])]);
     }
 
     /**

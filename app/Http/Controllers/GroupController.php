@@ -44,7 +44,7 @@ class GroupController extends Controller
      */
     public function show(Group $group)
     {
-        $data = $group->load(['candidates', 'plans.subcategory.parent']);
+        $data = $group->load(['program', 'candidates', 'plans.subcategory.parent']);
         return response()->json(compact('data'));
     }
 
