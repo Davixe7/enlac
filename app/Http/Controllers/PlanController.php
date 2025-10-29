@@ -32,7 +32,7 @@ class PlanController extends Controller
             'candidate_id'     => 'required_without:group_id',
             'category_id'      => 'required|exists:plan_categories,id',
             'subcategory_id'   => 'required|exists:plan_categories,id',
-            'group_id'         => 'required|exists:groups,id',
+            'group_id'         => 'nullable|exists:groups,id',
             'name'             => 'required',
             'activities'       => 'required|array',
             'status'           => 'nullable',
