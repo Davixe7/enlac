@@ -29,7 +29,7 @@ class PlanController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'candidate_id'     => 'required|without:group_id',
+            'candidate_id'     => 'required_without:group_id',
             'category_id'      => 'required|exists:plan_categories,id',
             'subcategory_id'   => 'required|exists:plan_categories,id',
             'group_id'         => 'required|exists:groups,id',
