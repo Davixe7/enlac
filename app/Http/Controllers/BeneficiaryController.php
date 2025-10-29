@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateTransportRequest;
 use App\Http\Resources\BeneficiaryResource;
 use App\Models\Beneficiary;
 use App\Models\Candidate;
+use App\Services\CandidateService;
 use Illuminate\Http\Request;
 
 class BeneficiaryController extends Controller
 {
+
+    protected $candidateService;
+
+    public function __construct(CandidateService $candidateService)
+    {
+        $this->candidateService = $candidateService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -27,11 +36,13 @@ class BeneficiaryController extends Controller
     }
 
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Candidate $candidate)
-    {
-        //
+    public function update(UpdateTransportRequest $request, Candidate $candidate){
+        $updated = $this->candidateService->updateTransport($candidate, $request->validated());
+
+        return response()->json([
+            'message' => 'Datos de transporte actualizados correctamente',
+            'data' => new BeneficiaryResource($updated)
+        ]);
     }
+
 }

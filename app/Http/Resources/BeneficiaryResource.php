@@ -20,6 +20,12 @@ class BeneficiaryResource extends JsonResource
             'sheet'         => $this->sheet,
             'entry_status'  => $this->entry_status,
             'entry_date'    => $this->entry_date,
+            // --- CAMPOS DE TRANSPORTE GENERAL ---
+            'requires_transport'      => (bool) $this->requires_transport,
+            'transport_address'       => $this->transport_address,
+            'transport_location_link' => $this->transport_location_link,
+            'curp'                    => $this->curp,
+
             'program_name'  => $this->program ? $this->program->name : 'Sin asignar',
             'program_price' => $this->program ? $this->program->price : 'Sin asignar',
             'group_id'      => $this->whenLoaded('personal_groups', fn() => $this->personal_groups->first()?->id, null)

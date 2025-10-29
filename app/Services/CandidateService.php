@@ -51,7 +51,7 @@ class CandidateService
 
             // 5. Crear Grupo Individual para actividades posteriores
             if( $candidate ){
-                $group = Group::create(['is_individual' => 1]);
+                $group = Group::create(['name' => $candidate->full_name, 'is_individual' => 1]);
                 $group->candidates()->attach([$candidate->id]);
             }
 
@@ -112,4 +112,18 @@ class CandidateService
             return $candidate;
         });
     }
+
+    public function updateTransport(Candidate $candidate, array $data){
+        return DB::transaction(function () use ($candidate, $data) {
+            $candidate->update([
+                'requires_transport'       => $data['requires_transport'],
+                'transport_address'        => $data['transport_address'] ?? null,
+                'transport_location_link'  => $data['transport_location_link'] ?? null,
+                'curp'                     => $data['curp'] ?? null,
+            ]);
+
+            return $candidate;
+        });
+    }
+
 }

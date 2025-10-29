@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
                 'last_name'        => $u[1],
                 'second_last_name' => $u[2],
                 'email'            => strtolower($u[0]) . '@sistemaenlac.com',
+                'password'         => bcrypt(123456),
                 'entry_date'       => now()
             ]);
 
