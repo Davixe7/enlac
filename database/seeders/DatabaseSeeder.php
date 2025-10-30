@@ -11,19 +11,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RoleSeeder::class);
-        $this->call(WorkAreaSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(BrainLevelSeeder::class);
-        $this->call(BrainFunctionSeeder::class);
-        $this->call(InterviewQuestionSeeder::class);
-        $this->call(ProgramSeeder::class);
-        $this->call(CandidateSeeder::class);
+        //$this->call(RoleSeeder::class);
+        //$this->call(WorkAreaSeeder::class);
+        //$this->call(UserSeeder::class);
+        //$this->call(BrainLevelSeeder::class);
+        //$this->call(BrainFunctionSeeder::class);
+        //$this->call(InterviewQuestionSeeder::class);
+        //$this->call(ProgramSeeder::class);
+        //$this->call(CandidateSeeder::class);
         //$this->call(KardexSeeder::class);
         //$this->call(PlanSeeder::class);
-        $this->call(PlanCategorySeeder::class);
-        $this->call(ActivityCategorySeeder::class);
-        $this->call(ActivitySeeder::class);
+        //$this->call(PlanCategorySeeder::class);
+        //$this->call(ActivityCategorySeeder::class);
+        //$this->call(ActivitySeeder::class);
         $this->call(GroupSeeder::class);
     }
 }
