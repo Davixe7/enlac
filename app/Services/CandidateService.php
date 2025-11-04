@@ -113,17 +113,6 @@ class CandidateService
         });
     }
 
-    public function updateTransport(Candidate $candidate, array $data){
-        return DB::transaction(function () use ($candidate, $data) {
-            $candidate->update([
-                'requires_transport'       => $data['requires_transport'],
-                'transport_address'        => $data['transport_address'] ?? null,
-                'transport_location_link'  => $data['transport_location_link'] ?? null,
-                'curp'                     => $data['curp'] ?? null,
-            ]);
-
-            return $candidate;
-        });
-    }
+    
 
 }

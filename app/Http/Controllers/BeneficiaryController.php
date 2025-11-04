@@ -35,14 +35,10 @@ class BeneficiaryController extends Controller
         return new BeneficiaryResource($candidate->load(['personal_groups']));
     }
 
-
-    public function update(UpdateTransportRequest $request, Candidate $candidate){
-        $updated = $this->candidateService->updateTransport($candidate, $request->validated());
-
-        return response()->json([
-            'message' => 'Datos de transporte actualizados correctamente',
-            'data' => new BeneficiaryResource($updated)
-        ]);
+    public function updateEquineTherapyPermissions(Candidate $candidate, Request $request){
+        $data = $request->only(['equinetherapy_permission_medical', 'equinetherapy_permission_legal_guardian']);
+        $candidate->update($data);
+        return response()->json([], 200);
     }
 
 }

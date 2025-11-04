@@ -28,6 +28,7 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SponsorController;
+use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
@@ -157,7 +158,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('beneficiaries', [BeneficiaryController::class, 'index']);
     Route::get('beneficiaries/{candidate}', [BeneficiaryController::class, 'show']);
-    Route::put('beneficiaries/{candidate}', [BeneficiaryController::class, 'update']);
+
+
+    Route::put('transport/{candidate}', [TransportController::class, 'update']);
+    Route::delete('transport/{candidate}', [TransportController::class, 'destroy']);
+    Route::put('beneficiaries/{candidate}/equinetherapy', [BeneficiaryController::class, 'updateEquineTherapyPermissions']);
 
     Route::get('personal', function(Request $request){
         $request->validate(['area'=>'required']);

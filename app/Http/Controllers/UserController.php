@@ -26,6 +26,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'employee_number' => 'nullable|string',
             'name' => 'required|string',
             'last_name' => 'required|string',
             'second_last_name' => 'required|string',
@@ -69,6 +70,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
+            'employee_number' => 'nullable|string',
             'name' => 'required|string',
             'last_name' => 'required|string',
             'second_last_name' => 'required|string',
