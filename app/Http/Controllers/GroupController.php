@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GroupResource;
 use App\Models\Group;
 use Illuminate\Http\Request;
 
@@ -12,13 +13,13 @@ class GroupController extends Controller
      */
     public function index(Request $request)
     {
-        $data = Group::withCount('candidates')
+        $groups = Group::withCount('candidates')
         ->whereIsIndividual(false)
         ->includesCandidate( $request->candidate_id )
-        ->with(['program'])
+        ->with(['program', 'leader', 'assistant'])
         ->get();
 
-        return response()->json(compact('data'));
+        return GroupResource::collection($groups);
     }
 
     /**
@@ -28,7 +29,9 @@ class GroupController extends Controller
     {
         $data = $request->validate([
             'name'       => 'required',
-            'program_id' => 'required'
+            'program_id' => 'required',
+            'group_leader_id'  => 'nullable|exists:users,id',
+            'assistant_id'     => 'nullable|exists:users,id'
         ]);
 
         $data = Group::create(array_merge($data, ['is_individual'=>0]));
@@ -36,7 +39,7 @@ class GroupController extends Controller
         if( $request->filled('candidates') ){
             $data->candidates()->sync( $request->candidates );
         }
-        return response()->json(compact('data'), 201);
+        return new GroupResource($data);
     }
 
     /**
@@ -44,8 +47,8 @@ class GroupController extends Controller
      */
     public function show(Group $group)
     {
-        $data = $group->load(['program', 'candidates', 'plans.subcategory.parent']);
-        return response()->json(compact('data'));
+        $group->load(['program', 'leader', 'assistant', 'candidates', 'plans.subcategory.parent']);
+        return new GroupResource($group);
     }
 
     /**
@@ -53,14 +56,19 @@ class GroupController extends Controller
      */
     public function update(Request $request, Group $group)
     {
-        $data = $request->validate(['name'=>'required']);
+        $data = $request->validate([
+            'name'=>'required',
+            'group_leader_id'  => 'nullable|exists:users,id',
+            'assistant_id'     => 'nullable|exists:users,id'
+        ]);
+
         $group->update($data);
 
         if( $request->filled('candidates') ){
             $group->candidates()->sync( $request->candidates );
         }
 
-        return response()->json(['data'=>$group]);
+        return new GroupResource($group);
     }
 
     /**

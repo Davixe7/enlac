@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Group extends Model
 {
     protected $guarded = [];
+    protected $appends = ['full_name'];
 
     public function candidates(){
         return $this->belongsToMany(Candidate::class);
@@ -28,5 +29,15 @@ class Group extends Model
     public function scopeIncludesCandidate($query, $candidateId){
         if( !$candidateId ) {return $query; }
         return $query->whereHas('candidates', fn($q)=>$q->whereId($candidateId));
+    }
+
+    public function leader()
+    {
+        return $this->belongsTo(User::class, 'group_leader_id');
+    }
+
+    public function assistant()
+    {
+        return $this->belongsTo(User::class, 'assistant_id');
     }
 }
