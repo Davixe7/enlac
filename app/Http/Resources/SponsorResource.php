@@ -38,7 +38,9 @@ class SponsorResource extends JsonResource
             'full_name'  => $fullName,
             'folio'      => str_pad($this->id, 4, '0', STR_PAD_LEFT),
             'entry_date' => $this->created_at->format('Y-m-d'),
-            'candidates_count' => $this->payment_configs()->count()
+            'candidates_count' => $this->payment_configs()->count(),
+            'profile_picture' => $this->getFirstMediaUrl('profile_picture'),
+            'gender' => $this->gender
         ]);
     }
 }

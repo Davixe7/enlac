@@ -19,12 +19,13 @@ return new class extends Migration
             $table->date('birth_date');
             $table->text('diagnosis');
             $table->unsignedBigInteger('sheet');
-
+ 
             $table->string('info_channel');
             $table->boolean('admission_status')->default(null)->nullable();
             $table->string('admission_comment')->default(null)->nullable();
             $table->date('entry_date')->default(null)->nullable();
-            $table->string('entry_status')->default('pendiente_ingresar');
+            $table->string('status')->default('pendiente_ingresar');
+            $table->date('scheduled_entry_date')->nullable();
             $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });

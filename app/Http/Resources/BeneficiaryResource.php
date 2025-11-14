@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -32,6 +33,18 @@ class BeneficiaryResource extends JsonResource
 
             'equinetherapy_permission_medical' => $this->equinetherapy_permission_medical,
             'equinetherapy_permission_legal_guardian' => $this->equinetherapy_permission_legal_guardian,
+
+            'status' => $this->status,
+            'status_history' => $this->whenLoaded('statusHistory', function () {
+                return $this->statusHistory->map(fn($h) => [
+                    'status'       => $h->status,
+                    'comment'      => $h->comment,
+                    'document_url' => $h->document_path ? asset('storage/'.$h->document_path) : null,
+                    'changed_at'   => \Carbon\Carbon::parse($h->changed_at)->format('Y-m-d H:i:s'),
+                ]);
+            }),
+            'can_reingresar' => ($this->status) === 'inactivo',
+            'scheduled_entry_date' => $this->scheduled_entry_date ? Carbon::parse($this->scheduled_entry_date)->format('d/m/Y') : null
         ];
     }
 }

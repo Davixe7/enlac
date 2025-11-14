@@ -28,9 +28,15 @@ class SponsorController extends Controller
         unset($data['addresses']);
 
         $sponsor = Sponsor::create($data);
+
+        if( $request->hasFile('profilePicture') ){
+            $sponsor->addMediaFromRequest('profilePicture')->toMediaCollection('profile_picture');
+        }
         
-        foreach( $request->addresses as $address ){
-            $sponsor->addresses()->create($address);
+        if( $request->addresses ){
+            foreach( $request->addresses as $address ){
+                $sponsor->addresses()->create($address);
+            }
         }
         return new SponsorResource($sponsor);
     }
@@ -49,6 +55,9 @@ class SponsorController extends Controller
     public function update(UpdateSponsorRequest $request, Sponsor $sponsor)
     {
         $sponsor->update($request->validated());
+        if( $request->hasFile('profilePicture') ){
+            $sponsor->addMediaFromRequest('profilePicture')->toMediaCollection('profile_picture');
+        }
         return new SponsorResource($sponsor);
     }
 

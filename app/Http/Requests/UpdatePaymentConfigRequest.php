@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePaymentConfigRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class UpdatePaymentConfigRequest extends FormRequest
             'candidate_id'             => 'required|exists:candidates,id',
             'sponsor_id'               => 'nullable|exists:sponsors,id',
             'amount'                   => 'required|numeric|min:0',
-            'frequency'                => 'required|integer|min:1|max:255',
+            'frequency'                => ['required','integer', Rule::in([1,2,4,6,12,24])],
             'month_payday'             => 'required|integer|min:1|max:31',
             'address_type'             => 'required|in:home,office',
             'wants_pickup'             => 'nullable|boolean',

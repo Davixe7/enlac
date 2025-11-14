@@ -72,11 +72,19 @@ class PaymentConfigController extends Controller
         return new PaymentConfigResource($paymentConfig);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(PaymentConfig $paymentConfig)
     {
-        //
+        if ($paymentConfig->type !== 'sponsor') {
+            return response()->json([
+                'error' => 'Solo se pueden desligar configuraciones de tipo sponsor'
+            ], 400);
+        }
+
+        $paymentConfig->delete();
+
+        return response()->json([
+            'message' => 'Patrocinio cancelado correctamente. Recuerda hablar con los padres de familia para reponer la Aportación de Padrinos.'
+        ]);
     }
+
 }

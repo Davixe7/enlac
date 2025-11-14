@@ -18,6 +18,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\InterviewQuestionController;
 use App\Http\Controllers\KardexController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MedicationLogController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentConfigController;
@@ -178,4 +179,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('personal_programs', PersonalProgramController::class, ['parameters' => ['personal_programs' => 'plan']]);
     Route::post('personal_programs/{plan}/copy', [PersonalProgramController::class, 'copy']);
     Route::put('candidates/{candidate}/review', [CandidateController::class, 'review']);
+
+    // Status history y reingreso
+    Route::post('beneficiaries/{candidate}/status', [BeneficiaryController::class, 'changeStatus']);
+    Route::post('beneficiaries/{candidate}/reingreso', [BeneficiaryController::class, 'reingreso']);
+
+    Route::delete('media/{media}', [MediaController::class, 'destroy']);
 });

@@ -27,7 +27,9 @@ class UpdateSponsorRequest extends FormRequest
             'second_last_name' => 'required|string|max:191',
             'company_name'     => 'nullable|string|max:255',
             'marital_status'   => 'nullable|string|max:191',
+            'gender'           => 'nullable|string|in:male,female,entity',
             'birthdate'        => 'required|date',
+            'contact_by'       => 'required',
         ];
     }
 }

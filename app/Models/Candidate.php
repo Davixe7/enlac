@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -156,5 +155,22 @@ class Candidate extends Model implements HasMedia
     public function getFullNameAttribute(){
         $fullNameArray = array_filter([$this->first_name, $this->last_name, $this->middle_name]);
         return join(" ", $fullNameArray);
+    }
+
+    public function statusHistory()
+    {
+        return $this->hasMany(CandidateStatusHistory::class);
+    }
+
+    public function changeStatus(string $newStatus, ?string $comment = null, ?string $documentPath = null): void
+    {
+        $this->update(['status' => $newStatus]);
+
+        $this->statusHistory()->create([
+            'status'        => $newStatus,
+            'comment'       => $comment,
+            'document_path' => $documentPath,
+            'changed_at'    => now(),
+        ]);
     }
 }
