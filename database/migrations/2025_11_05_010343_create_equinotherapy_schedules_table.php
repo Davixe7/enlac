@@ -18,6 +18,8 @@ return new class extends Migration
             $table->time('end_time');
             $table->foreignId('candidate_id')->nullable()->constrained()->onDelete('set null');
             $table->boolean('is_comodin')->default(false);
+            $table->time('departure_time')->nullable();
+            $table->time('arrival_time')->nullable();
             $table->timestamps();
         });
 

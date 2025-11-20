@@ -13,7 +13,11 @@ class PaymentController extends Controller
      */
     public function index(Request $request)
     {
-        $payments = Payment::whereCandidateId($request->candidate_id)->get();
+        $payments = Payment::whereCandidateId($request->candidate_id)
+        ->with([
+            'candidate' => fn($query)=>$query->select(['id', 'first_name', 'last_name']),
+            'user'      => fn($query)=>$query->select(['id', 'name', 'last_name']),
+        ])->get();
         return PaymentsResource::collection($payments);
     }
 
@@ -23,16 +27,18 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'candidate_id' => ['required', 'exists:candidates,id'],
-            'sponsor_id' => ['nullable', 'exists:sponsors,id'],
-            'payment_type' => ['required', 'in:parent,sponsor'],
-            'is_partial' => ['required', 'boolean'],
-            'date' => ['required', 'date'],
+            'candidate_id'   => ['required', 'exists:candidates,id'],
+            'sponsor_id'     => ['nullable', 'exists:sponsors,id'],
+            'payment_type'   => ['required', 'in:parent,sponsor'],
+            'is_partial'     => ['required', 'boolean'],
+            'date'           => ['required', 'date'],
             'payment_method' => ['required', 'string'],
-            'ref' => ['nullable', 'string'],
-            'comments' => ['nullable', 'string'],
-            'amount' => ['required', 'numeric', 'min:0'],
+            'ref'            => ['nullable', 'string'],
+            'comments'       => ['nullable', 'string'],
+            'amount'         => ['required', 'numeric', 'min:0'],
         ]);
+
+        $data['created_by_id'] = auth()->id();
 
         $payment = Payment::create($data);
         return response()->json(['data'=>$payment]);

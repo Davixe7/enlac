@@ -27,8 +27,9 @@ class BeneficiaryResource extends JsonResource
             'transport_location_link' => $this->transport_location_link,
             'curp'                    => $this->curp,
 
-            'program_name'  => $this->program ? $this->program->name : 'Sin asignar',
-            'program_price' => $this->program ? $this->program->price : 'Sin asignar',
+            'program'       => $this->whenLoaded('program'),
+            'program_name'  => $this->whenLoaded('program', $this->program->name, 'Sin asignar'),
+            'program_price' => $this->whenLoaded('program', $this->program->price, 'Sin asignar'),
             'group_id'      => $this->whenLoaded('personal_groups', fn() => $this->personal_groups->first()?->id, null),
 
             'equinetherapy_permission_medical' => $this->equinetherapy_permission_medical,
@@ -44,7 +45,7 @@ class BeneficiaryResource extends JsonResource
                 ]);
             }),
             'can_reingresar' => ($this->status) === 'inactivo',
-            'scheduled_entry_date' => $this->scheduled_entry_date ? Carbon::parse($this->scheduled_entry_date)->format('d/m/Y') : null
+            'scheduled_entry_date' => $this->scheduled_entry_date ? Carbon::parse($this->scheduled_entry_date)->format('d/m/Y') : '--',
         ];
     }
 }

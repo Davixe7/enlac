@@ -37,7 +37,7 @@ class EquinotherapyScheduleController extends Controller
             'start_time' => 'required',
             'end_time' => 'required',
             'candidate_id' => 'nullable|exists:candidates,id',
-            'is_comodin' => 'boolean'
+            'is_comodin' => 'nullable|boolean'
         ]);
 
         $schedule = EquinotherapySchedule::create($data);

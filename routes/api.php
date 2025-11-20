@@ -13,6 +13,7 @@ use App\Http\Controllers\BrainLevelController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\CandidateKardexController;
 use App\Http\Controllers\DashboardSlideController;
+use App\Http\Controllers\EquinotherapyScheduleController;
 use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\InterviewController;
@@ -35,6 +36,7 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
 use App\Http\Resources\EvaluatorResource;
 use App\Models\Candidate;
+use App\Models\EquinotherapySchedule;
 use App\Models\Evaluation;
 use App\Models\Payment;
 use Illuminate\Http\Request;
@@ -156,7 +158,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('evaluators', function (Request $request) {
         return EvaluatorResource::collection( User::role('evaluator')->orderBy('name')->get() );
     });
-
+    
+    Route::get('/beneficiaries/equinetherapy', [BeneficiaryController::class, 'beneficiariesWithEquinetherapyPlans']);
     Route::get('beneficiaries', [BeneficiaryController::class, 'index']);
     Route::get('beneficiaries/{candidate}', [BeneficiaryController::class, 'show']);
 
@@ -183,6 +186,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Status history y reingreso
     Route::post('beneficiaries/{candidate}/status', [BeneficiaryController::class, 'changeStatus']);
     Route::post('beneficiaries/{candidate}/reingreso', [BeneficiaryController::class, 'reingreso']);
-
     Route::delete('media/{media}', [MediaController::class, 'destroy']);
+
+    Route::resource('equinotherapy_schedules', EquinotherapyScheduleController::class);
 });

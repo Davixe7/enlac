@@ -30,6 +30,7 @@ class StoreSponsorRequest extends FormRequest
             'gender'           => 'nullable|string|in:male,female,entity',
             'birthdate'        => 'required|date',
             'contact_by'       => 'required',
+            'is_anonymous'     => 'required|boolean',
             'addresses.*.street'       => 'required',
             'addresses.*.inner_number' => 'required',
             'addresses.*.outer_number' => 'required',

@@ -28,6 +28,7 @@ class GroupResource extends JsonResource
             'program_id' => $this->program_id,
             'group_leader_id' => $this->group_leader_id,
             'assistant_id' => $this->assistant_id,
+            'plans' => $this->plans()->where('category_id', 5),
         ];
     }
 }

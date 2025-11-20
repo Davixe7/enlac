@@ -17,8 +17,8 @@ class BeneficiaryFinancialResource extends JsonResource
     {
         $data = parent::toArray($request);
         $month = $request->month ?: now()->month;
-        $year = now()->month > 7 ? now()->year : now()->subYear();
-        $date = Carbon::create( $year->year, $month );
+        $year = now()->month > 7 ? now()->year : now()->subYear()->year;
+        $date = Carbon::create( $year, $month );
 
         return array_merge($data, [
             'full_name'     => $this->full_name,

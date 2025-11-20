@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,9 @@ class PaymentConfigResource extends JsonResource
             'candidate' => new CandidateResource($this->whenLoaded('candidate')),
             'sponsor'   => new SponsorResource($this->whenLoaded('sponsor')),
             'monthly_amount' => $this->monthly_amount,
-            'receipt' => $this->deductible_receipt ?: []
+            'receipt' => $this->deductible_receipt ?: [],
+            'created_at' => Carbon::parse($this->created_at)->format('d/m/Y'),
+            'updated_at' => Carbon::parse($this->updated_at)->format('d/m/Y'),
         ]);
     }
 }

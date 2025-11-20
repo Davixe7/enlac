@@ -30,7 +30,9 @@ class BeneficiaryController extends Controller
 
         $beneficiaries = Candidate::beneficiaries()
             ->whereNotIn('status', ['graduado', 'inactivo', 'exenlac', 'fallecido'])
+            ->name($request->name)
             ->orderBy('first_name')
+            ->with('program')
             ->get();
 
         return BeneficiaryResource::collection($beneficiaries);
@@ -42,6 +44,12 @@ class BeneficiaryController extends Controller
     public function show(Candidate $candidate)
     {
         return new BeneficiaryResource($candidate->load(['personal_groups']));
+    }
+
+    public function beneficiariesWithEquinetherapyPlans(Request $request){
+        $beneficiaries = Candidate::beneficiariesEquinetherapyActivePlan()->get();
+
+        return BeneficiaryResource::collection($beneficiaries);
     }
 
     public function updateEquineTherapyPermissions(Candidate $candidate, Request $request){

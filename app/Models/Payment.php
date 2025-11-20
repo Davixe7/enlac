@@ -7,4 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     protected $guarded = [];
+
+    public function candidate(){
+        return $this->belongsTo(Candidate::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
 }

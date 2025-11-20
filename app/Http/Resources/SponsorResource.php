@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -40,7 +41,9 @@ class SponsorResource extends JsonResource
             'entry_date' => $this->created_at->format('Y-m-d'),
             'candidates_count' => $this->payment_configs()->count(),
             'profile_picture' => $this->getFirstMediaUrl('profile_picture'),
-            'gender' => $this->gender
+            'gender' => $this->gender,
+            'created_at' => Carbon::parse($this->created_at)->format('d/m/Y')
+
         ]);
     }
 }

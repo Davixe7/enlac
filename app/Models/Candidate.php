@@ -93,6 +93,15 @@ class Candidate extends Model implements HasMedia
         return $query->whereAdmissionStatus(1);
     }
 
+    public function scopeBeneficiariesEquinetherapyActivePlan($query)
+    {
+        return $query->whereHas('groups', function ($queryGroup) {
+            $queryGroup->whereHas('plans', function ($queryPlan) {
+                $queryPlan->where('category_id', 5);
+            });
+        });
+    }
+
     public function scopeEvaluationBetween(Builder $query, $startDate, $endDate): Builder
     {
         if( !$startDate || !$endDate ){
@@ -173,4 +182,9 @@ class Candidate extends Model implements HasMedia
             'changed_at'    => now(),
         ]);
     }
+
+    public function equinotherapy_schedules(){
+        return $this->hasMany(EquinotherapySchedule::class);
+    }
+
 }

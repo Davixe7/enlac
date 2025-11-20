@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class EquinotherapySchedule extends Model
 {
+    protected $guarded = [];
+    
     public function candidate()
     {
         return $this->belongsTo(Candidate::class);
