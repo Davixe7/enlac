@@ -1,4 +1,4 @@
-/usr/bin/mysqldump -h 50.6.207.213 -u pete75ru_enlac -p'Myenlacdb2025' \
+/usr/bin/mysqldump
     --no-tablespaces \
     --no-create-info \
     --extended-insert \
