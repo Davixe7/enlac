@@ -82,12 +82,12 @@ class BeneficiaryController extends Controller
         $candidate->changeStatus($request->status, $request->comment, $documentPath);
 
         // Notificación especial
-        if ($request->status === 'listo_ingresar') {
+        /* if ($request->status === 'listo_ingresar') {
             $users = User::role('coord_physical')->get();
             foreach ($users as $user) {
                 $user->notify(new BeneficiaryReadyToEnter($candidate));
             }
-        }
+        } */
 
         if ($request->status === 'programar_ingreso') {
             $candidate->changeStatus('ingreso_programado', $request->comment, $documentPath);
@@ -99,10 +99,10 @@ class BeneficiaryController extends Controller
             $candidate->scheduled_entry_date = $scheduledDate;
             $candidate->save();
 
-            $users = User::role('coord_physical')->get();
+            /* $users = User::role('coord_physical')->get();
             foreach ($users as $user) {
                 $user->notify(new BeneficiaryScheduleEntry($candidate, $programName, $scheduledDate, $observations));
-            }
+            } */
         }
 
         return new BeneficiaryResource($candidate->load(['statusHistory', 'personal_groups', 'program']));

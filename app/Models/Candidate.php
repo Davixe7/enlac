@@ -90,7 +90,7 @@ class Candidate extends Model implements HasMedia
     }
 
     public function scopeBeneficiaries(Builder $query){
-        return $query->whereAdmissionStatus(1);
+        return $query->whereAdmissionStatus(1)->whereNotNull('program_id');
     }
 
     public function scopeBeneficiariesEquinetherapyActivePlan($query)
