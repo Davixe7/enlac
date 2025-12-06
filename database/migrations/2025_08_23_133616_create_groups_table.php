@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('name');
             $table->boolean('is_individual');
             $table->foreignIdFor(Program::class)->nullable();
+            $table->foreignId('group_leader_id')->nullable()->constrained('users');
+            $table->foreignId('assistant_id')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

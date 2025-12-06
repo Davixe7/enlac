@@ -20,7 +20,7 @@ class CandidateController extends Controller
     }
 
     public function dashboard() {
-        $candidates = Candidate::where('admission_status', null)
+        $candidates = Candidate::pending()
         ->orderBy('first_name', 'ASC')
         ->get();
 
@@ -36,11 +36,11 @@ class CandidateController extends Controller
         ->get();
 
         $counts = $candidates->countBy(function ($u) {
-            $status = $u->admission_status;
-            if ($status === null)                        return 'en_proceso';
-            if ($status === 0)                           return 'rechazados';
-            if ($status === 1 && $u->entry_date == null) return 'aceptados_no_ingresados';
-            if ($status === 1 && $u->entry_date != null) return 'aceptados_ingresados';
+            $status = $u->candidate_status_id;
+            if ($status === 1)                           return 'en_proceso';
+            if ($status === 2)                           return 'rechazados';
+            if (!$u->entry_date || $u->entry_date < now() ) return 'aceptados_no_ingresados';
+            if ($u->entry_date && $u->entry_date > now() ) return 'aceptados_ingresados';
         });
 
         $counts = [
@@ -65,7 +65,12 @@ class CandidateController extends Controller
      */
     public function show(Candidate $candidate)
     {
-        return new CandidateResource($candidate->load(['contacts.addresses', 'interviewee']));
+        return new CandidateResource($candidate->load([
+            'program',
+            'contacts.addresses',
+            'interviewee',
+            'locationDetail'
+        ]));
     }
 
     /**
@@ -79,17 +84,21 @@ class CandidateController extends Controller
 
     public function admission(Request $request, Candidate $candidate){
         $request->validate([
+            'admission_status'  => 'required',
             'admission_comment' => 'required_if:admission_status,0,null,false'
         ]);
+
+        $status = intval($request->admission_status) + 2;
 
         if($request->filled('sign_evaluation')){
             Evaluation::find($request->evaluation_id)->update(['signed_at'=>now()]);
         }
 
         $candidate->update([
-            'admission_status'  => $request->admission_status,
-            'admission_comment' => $request->admission_comment,
-            'program_id'        => $request->program_id
+            'admission_status'    => $request->admission_status,
+            'candidate_status_id' => $status,
+            'admission_comment'   => $request->admission_comment,
+            'program_id'          => $request->program_id
         ]);
 
         return new CandidateResource($candidate);

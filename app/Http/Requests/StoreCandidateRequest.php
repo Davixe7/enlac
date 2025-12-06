@@ -23,6 +23,7 @@ class StoreCandidateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'candidate.sheet'        => 'nullable',
             'candidate.first_name'   => 'required|string|max:255',
             'candidate.middle_name'  => 'required|string|max:255',
             'candidate.last_name'    => 'required|string|max:255',
@@ -30,7 +31,6 @@ class StoreCandidateRequest extends FormRequest
             'candidate.diagnosis'    => 'required|string',
             'candidate.photo'        => 'nullable|string',
             'candidate.info_channel' => 'required',
-            'candidate.sheet'        => 'nullable',
 
             'contacts'                => 'required|array',
             'contacts.*.first_name'   => 'required|string|max:255',
@@ -70,6 +70,8 @@ class StoreCandidateRequest extends FormRequest
             'medications.*.frequency'    => 'frecuencia',
             'medications.*.duration'     => 'duracion',
             'medications.*.observations' => 'observaciones',
+
+            'evaluation_schedule.evaluator_id' => 'evaluador',
         ];
     }
 }

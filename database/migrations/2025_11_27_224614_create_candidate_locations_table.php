@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('equinotherapy_transfers', function (Blueprint $table) {
+        Schema::create('candidate_locations', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
-            $table->time('ida')->nullable();
-            $table->time('regreso')->nullable();
+            $table->string('transport_address')->nullable();
+            $table->string('transport_location_link')->nullable();
+            $table->string('curp')->nullable();
             $table->timestamps();
         });
-
     }
 
     /**
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('equinotherapy_transfers');
+        Schema::dropIfExists('candidate_locations');
     }
 };

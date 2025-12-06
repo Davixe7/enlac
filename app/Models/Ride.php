@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EquinotherapyTransfer extends Model
+class Ride extends Model
 {
+    protected $guarded = [];
+
     public function candidate()
     {
         return $this->belongsTo(Candidate::class);
     }
-
 }

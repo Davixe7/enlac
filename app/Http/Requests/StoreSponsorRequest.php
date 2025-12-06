@@ -32,7 +32,7 @@ class StoreSponsorRequest extends FormRequest
             'contact_by'       => 'required',
             'is_anonymous'     => 'required|boolean',
             'addresses.*.street'       => 'required',
-            'addresses.*.inner_number' => 'required',
+            'addresses.*.inner_number' => 'nullable',
             'addresses.*.outer_number' => 'required',
             'addresses.*.neighborhood' => 'required',
             'addresses.*.city'         => 'required',

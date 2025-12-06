@@ -18,6 +18,7 @@ class UserResource extends JsonResource
         $data = parent::toArray($request);
 
         $actualRole = $this->roles()->whereNotIn('name', ['admin','evaluator'])->first();
+        $actualRole = $actualRole ?? $this->roles()->first();
 
         return array_merge($data, [
             'is_admin' => $this->hasRole('admin') ? 1 : 0,

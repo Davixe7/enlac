@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('evaluations', function (Blueprint $table) {
-            $table->dateTime('signed_at')->nullable();
+        Schema::create('candidate_statuses', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('label');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('evaluations', function (Blueprint $table) {
-            $table->dropColumn('signed_at');
-        });
+        Schema::dropIfExists('candidate_statuses');
     }
 };

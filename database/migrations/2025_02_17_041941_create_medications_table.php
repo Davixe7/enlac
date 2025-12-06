@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('frequency');
             $table->string('duration');
             $table->string('observations')->nullable();
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

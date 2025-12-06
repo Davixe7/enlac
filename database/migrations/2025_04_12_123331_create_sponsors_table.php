@@ -19,7 +19,10 @@ return new class extends Migration
             $table->string('second_last_name', 191);
             $table->string('company_name')->nullable();
             $table->date('birthdate');
+            $table->string('gender')->nullable();
             $table->string('marital_status')->nullable();
+            $table->boolean('is_anonymous')->default(false);
+            $table->enum('contact_by', ['enlac', 'parent'])->default('parent');
         });
     }
 

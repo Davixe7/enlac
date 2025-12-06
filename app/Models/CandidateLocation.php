@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CandidateStatusHistory extends Model
+class CandidateLocation extends Model
 {
     protected $guarded = [];
-    
-    public function candidate() {
+    public function candidate()
+    {
         return $this->belongsTo(Candidate::class);
     }
 }

@@ -12,8 +12,11 @@ use App\Http\Controllers\BrainFunctionRankController;
 use App\Http\Controllers\BrainLevelController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\CandidateKardexController;
+use App\Http\Controllers\CandidateLocationController;
+use App\Http\Controllers\CandidateStatusController;
+use App\Http\Controllers\CandidateStatusUpdateController;
 use App\Http\Controllers\DashboardSlideController;
-use App\Http\Controllers\EquinotherapyScheduleController;
+use App\Http\Controllers\EquineRidesController;
 use App\Http\Controllers\FinancialController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\InterviewController;
@@ -27,96 +30,38 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PersonalProgramController;
 use App\Http\Controllers\PlanCategoryController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\RideController;
 use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SponsorController;
-use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\BeneficiaryFinancialResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
 use App\Http\Resources\EvaluatorResource;
-use App\Models\Candidate;
-use App\Models\EquinotherapySchedule;
 use App\Models\Evaluation;
-use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
-use Carbon\Carbon;
 
 Route::get('financial', [FinancialController::class, 'index']);
-
-Route::get('/test', function(Request $request){
-    $candidate = Candidate::findOrFail($request->candidate_id);
-    $paymentsConfigs = $candidate->payment_configs;
-    $wallets = [];
-    $year = now()->month > 7 ? now()->year : now()->year - 1;
-
-    $paymentsConfigs->each(function($paymentConfig) use(&$wallets, $year) {
-        $carry = 0;
-
-        for ($i=8; $i < 20; $i += $paymentConfig->frequency) {
-            $start = $i;
-            $end = $i + $paymentConfig->frequency - 1;
-
-            $startDate = Carbon::create($year, $start);
-            $endDate   = Carbon::create($year, $end)->endOfMonth();
-
-            $balance = Payment::where('candidate_id', $paymentConfig->candidate_id)
-                    ->where('sponsor_id', $paymentConfig->sponsor_id)
-                    ->whereBetween('date', [$startDate, $endDate])
-                    ->groupBy('candidate_id')
-                    ->sum('amount');
-
-            $carry = $carry + $balance;
-
-            foreach(range($start, $end) as $month){
-                $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
-
-                $date = Carbon::create($year, $month);
-                $maxDate = Carbon::create($year, $end)->startOfMonth()->addDays(10);
-                $status = null;
-
-                if( $abono == $paymentConfig->monthly_amount ){
-                    $status = 'green';
-                }
-                elseif ( now() > $maxDate ) {
-                    $status = 'red';
-                }
-                else {
-                    $status = 'yellow';
-                }
-
-                $wallets[$paymentConfig->sponsor_id][] = [
-                    'date' => $date->format('Y-m-d'),
-                    'month' => $month,
-                    'monthName' => $date->format('F'),
-                    'abono' => number_format($abono, 2, '.', ''),
-                    'status' => $status
-                ];
-                $carry = $carry - $abono;
-            }
-        }
-    });
-
-    return $wallets;
-});
-
-Route::get('/user', fn () => new UserResource(auth()->user()))
-->middleware('auth:sanctum');
+Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', fn () => new UserResource(auth()->user()));
+    Route::get('test', [FinancialController::class, 'semaforo']);
 
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::get('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
-    Route::get('candidates/dashboard', [CandidateController::class, 'dashboard']);
 
+    Route::get('candidates/dashboard', [CandidateController::class, 'dashboard']);
     Route::post('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'store']);
     Route::get('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'show']);
     Route::delete('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'destroy']);
 
     Route::apiResources([
         'candidates'           => CandidateController::class,
+        'candidate_locations'  => CandidateLocationController::class,
         'medications'          => MedicationController::class,
         'contacts'             => ContactController::class,
         'addresses'            => AddressController::class,
@@ -137,11 +82,22 @@ Route::middleware('auth:sanctum')->group(function () {
         'payments'             => PaymentController::class,
         'groups'               => GroupController::class,
         'plans'                => PlanController::class,
+        'rides'                => RideController::class,
+        'equinetherapy_rides'  => EquineRidesController::class,
+        'activities'           => ActivityController::class,
+        'plan_categories'      => PlanCategoryController::class,
+        'candidate_statuses'   => CandidateStatusController::class,
     ]);
 
-    Route::post('dashboard-slides/reorder', [DashboardSlideController::class, 'reorder']);
+    Route::put('candidatestatuses/{candidate}', [CandidateStatusUpdateController::class, 'update']);
 
-    Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
+    Route::get('personal', function(Request $request){
+        $request->validate(['area'=>'required']);
+        $users = User::whereWorkAreaId($request->area)->get();
+        return response()->json(['data' => $users]);
+    });
+
+    Route::get('evaluators', fn () => EvaluatorResource::collection( User::role('evaluator')->orderBy('name')->get() ));
 
     Route::post('contacts/validate', [ContactController::class, 'validate']);
 
@@ -155,38 +111,23 @@ Route::middleware('auth:sanctum')->group(function () {
         ]]);
     });
 
-    Route::get('evaluators', function (Request $request) {
-        return EvaluatorResource::collection( User::role('evaluator')->orderBy('name')->get() );
-    });
+    Route::post('dashboard-slides/reorder', [DashboardSlideController::class, 'reorder']);
     
-    Route::get('/beneficiaries/equinetherapy', [BeneficiaryController::class, 'beneficiariesWithEquinetherapyPlans']);
+    Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
+    Route::put('candidates/{candidate}/review', [CandidateController::class, 'review']);
     Route::get('beneficiaries', [BeneficiaryController::class, 'index']);
+    Route::get('beneficiaries/reports', [BeneficiaryController::class, 'reports']);
     Route::get('beneficiaries/{candidate}', [BeneficiaryController::class, 'show']);
-
-
-    Route::put('transport/{candidate}', [TransportController::class, 'update']);
-    Route::delete('transport/{candidate}', [TransportController::class, 'destroy']);
     Route::put('beneficiaries/{candidate}/equinetherapy', [BeneficiaryController::class, 'updateEquineTherapyPermissions']);
-
-    Route::get('personal', function(Request $request){
-        $request->validate(['area'=>'required']);
-        $users = User::whereWorkAreaId($request->area)->get();
-        return response()->json(['data' => $users]);
-    });
 
     Route::get('medication_logs/{candidate}', [MedicationLogController::class, 'index']);
     Route::post('medication_logs/{medication}', [MedicationLogController::class, 'store']);
 
-    Route::apiResource('activities', ActivityController::class);
-    Route::apiResource('plan_categories', PlanCategoryController::class);
     Route::apiResource('personal_programs', PersonalProgramController::class, ['parameters' => ['personal_programs' => 'plan']]);
     Route::post('personal_programs/{plan}/copy', [PersonalProgramController::class, 'copy']);
-    Route::put('candidates/{candidate}/review', [CandidateController::class, 'review']);
 
     // Status history y reingreso
     Route::post('beneficiaries/{candidate}/status', [BeneficiaryController::class, 'changeStatus']);
     Route::post('beneficiaries/{candidate}/reingreso', [BeneficiaryController::class, 'reingreso']);
     Route::delete('media/{media}', [MediaController::class, 'destroy']);
-
-    Route::resource('equinotherapy_schedules', EquinotherapyScheduleController::class);
 });
