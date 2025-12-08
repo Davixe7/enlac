@@ -18,15 +18,20 @@ return new class extends Migration
             $table->string('last_name');
             $table->date('birth_date');
             $table->text('diagnosis');
+            $table->text('review')->nullable();
             $table->unsignedBigInteger('sheet');
- 
             $table->string('info_channel');
+            $table->boolean('requires_transport')->default(false);
+ 
             $table->boolean('admission_status')->default(null)->nullable();
             $table->string('admission_comment')->default(null)->nullable();
+            $table->boolean('equinetherapy_permission_medical')->default(false);
+            $table->boolean('equinetherapy_permission_legal_guardian')->default(false);
             $table->date('entry_date')->default(null)->nullable();
-            $table->string('status')->default('pendiente_ingresar');
-            $table->date('scheduled_entry_date')->nullable();
+
+            $table->foreignId('candidate_status_id');
             $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
+
             $table->timestamps();
         });
     }

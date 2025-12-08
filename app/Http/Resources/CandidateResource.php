@@ -18,19 +18,19 @@ class CandidateResource extends JsonResource
         $data = parent::toArray($request);
 
         return array_merge($data, [
+            'program'              => $this->whenLoaded('program'),
+            'status'               => $this->whenLoaded('candidateStatus', new CandidateStatusResource($this->candidateStatus)),
             'full_name'            => $this->full_name,
-            'admission_status'     => $this->admission_status,
             'picture'              => $this->getFirstMediaUrl('profile_picture'),
             'contacts'             => $this->contacts,
             'contact'              => $this->contacts()->first(),
             'medications'          => $this->medications,
-            'evaluation_schedules' => $this->evaluation_schedules,
-            'evaluation_schedule'  => $this->evaluation_schedule,
-            'program'              => $this->program,
+            'evaluation_schedules' => $this->evaluationSchedules,
+            'evaluation_schedule'  => $this->evaluationSchedule,
             'chronological_age'    => number_format( Carbon::parse($this->birth_date)->diffInMonths(), 2 ),
             'chronological_age2'   => number_format( Carbon::parse($this->birth_date)->diffInYears(), 2 ),
             'interviewee'          => $this->whenLoaded('interviewee'),
-            'review'               => $this->review
+            'location_detail'      => $this->whenLoaded('locationDetail', fn()=>$this->locationDetail),
         ]);
     }
 }

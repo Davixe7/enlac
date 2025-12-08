@@ -16,7 +16,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
-    public function guardName(){
+    public function guardName()
+    {
         return 'sanctum';
     }
 
@@ -25,6 +26,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'email_verified_at',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'created_at',
+        'updated_at'
     ];
 
     protected function casts(): array
@@ -40,16 +47,19 @@ class User extends Authenticatable
         $this->notify((new ResetPasswordNotification($token))->locale('es'));
     }
 
-    public function getFullNameAttribute(){
+    public function getFullNameAttribute()
+    {
         $fullNameArray = array_filter([$this->name, $this->last_name, $this->second_last_name]);
         return join(" ", $fullNameArray);
     }
 
-    public function work_area(){
-        return $this->belongsTo(WorkArea::class)->withDefault(['name'=>'Ninguna']);
+    public function work_area()
+    {
+        return $this->belongsTo(WorkArea::class)->withDefault(['name' => 'Ninguna']);
     }
 
-    public function leader(){
+    public function leader()
+    {
         return $this->belongsTo(User::class, 'leader_id');
     }
 }

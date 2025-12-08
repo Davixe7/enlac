@@ -31,7 +31,7 @@ class UserFactory extends Factory
 
             'work_area_id' => 1,
             'leader_id'    => null,
-            'entry_date'   => 1,
+            'entry_date'   => now(),
 
             'email'             => fake()->unique()->safeEmail(),
             'password'          => static::$password ??= Hash::make('123456'),

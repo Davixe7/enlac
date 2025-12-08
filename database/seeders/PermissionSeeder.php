@@ -30,6 +30,7 @@ class PermissionSeeder extends Seeder
 
         Role::find(1)->permissions()->sync([1,2,3,4,5,6]);
         Role::find(3)->permissions()->sync([1,2,3,4,6]);
-        Role::find(10)->permissions()->sync([1,2,3,4,5]);
+        Role::find(6)->permissions()->sync([1,2,3,4,5]);
+        //Role::find(10)->permissions()->sync([1,2,3,4,5]);
     }
 }

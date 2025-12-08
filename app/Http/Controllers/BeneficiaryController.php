@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateTransportRequest;
+use App\Http\Resources\BeneficiaryReportsResource;
 use App\Http\Resources\BeneficiaryResource;
-use App\Models\Beneficiary;
 use App\Models\Candidate;
-use App\Models\User;
 use App\Services\CandidateService;
 use Illuminate\Http\Request;
-use App\Notifications\BeneficiaryReadyToEnter;
-use App\Notifications\BeneficiaryScheduleEntry;
 
 class BeneficiaryController extends Controller
 {
@@ -26,30 +22,22 @@ class BeneficiaryController extends Controller
      */
     public function index(Request $request)
     {
-        //$beneficiaries = Candidate::beneficiaries()->name($request->name)->orderBy('first_name')->get();
+        $beneficiaries = Candidate::name($request->name)
+            ->with(['program'])
+            ->beneficiaries();
 
-        $beneficiaries = Candidate::beneficiaries()
-            ->whereNotIn('status', ['graduado', 'inactivo', 'exenlac', 'fallecido'])
-            ->name($request->name)
-            ->orderBy('first_name')
-            ->with('program')
-            ->get();
+        if( $request->equinetherapy == 1 ){
+            $beneficiaries = $beneficiaries->equinetherapyActivePlan();
+        }
+
+        $beneficiaries = $beneficiaries->orderBy('first_name')->get();
 
         return BeneficiaryResource::collection($beneficiaries);
     }
  
-    /**
-     * Display the specified resource.
-     */
     public function show(Candidate $candidate)
     {
-        return new BeneficiaryResource($candidate->load(['personal_groups']));
-    }
-
-    public function beneficiariesWithEquinetherapyPlans(Request $request){
-        $beneficiaries = Candidate::beneficiariesEquinetherapyActivePlan()->get();
-
-        return BeneficiaryResource::collection($beneficiaries);
+        return new BeneficiaryResource($candidate->load(['program','personal_groups', 'locationDetail']));
     }
 
     public function updateEquineTherapyPermissions(Candidate $candidate, Request $request){
@@ -58,66 +46,28 @@ class BeneficiaryController extends Controller
         return response()->json([], 200);
     }
 
-    public function changeStatus(Request $request, Candidate $candidate)
-    {
-        if ($candidate->admission_status !== 1) {
-            return response()->json(['error' => 'Solo beneficiarios pueden cambiar estatus'], 400);
-        }
-
-        $request->validate([
-            'status'   => 'required|string|in:pendiente_ingresar,programar_ingreso,ingreso_programado,listo_ingresar,activo,inactivo,graduado,permiso_temporal,exenlac,fallecido,prueba_vida',
-            'comment'  => 'required|string',
-            'document' => 'nullable|file|max:4096',
-            'program_id' => 'nullable|integer',
-            'scheduled_entry_date' => 'nullable|date', // 👈 nuevo campo
-            'observations' => 'nullable|string'
-        ]);
-
-        $documentPath = null;
-        if ($request->hasFile('document')) {
-            $documentPath = $request->file('document')->store('beneficiary_documents', 'public');
-        }
-
-        // Cambio normal
-        $candidate->changeStatus($request->status, $request->comment, $documentPath);
-
-        // Notificación especial
-        /* if ($request->status === 'listo_ingresar') {
-            $users = User::role('coord_physical')->get();
-            foreach ($users as $user) {
-                $user->notify(new BeneficiaryReadyToEnter($candidate));
-            }
-        } */
-
-        if ($request->status === 'programar_ingreso') {
-            $candidate->changeStatus('ingreso_programado', $request->comment, $documentPath);
-
-            $programName = $candidate->program?->name ?? 'Sin programa';
-            $scheduledDate = $request->input('scheduled_entry_date', now()->toDateString());
-            $observations = $request->input('observations');
-
-            $candidate->scheduled_entry_date = $scheduledDate;
-            $candidate->save();
-
-            /* $users = User::role('coord_physical')->get();
-            foreach ($users as $user) {
-                $user->notify(new BeneficiaryScheduleEntry($candidate, $programName, $scheduledDate, $observations));
-            } */
-        }
-
-        return new BeneficiaryResource($candidate->load(['statusHistory', 'personal_groups', 'program']));
-    }
-
     public function reingreso(Candidate $candidate, Request $request)
     {
-        if ($candidate->status !== 'inactivo') {
-            return response()->json(['error' => 'El beneficiario no está inactivo'], 400);
-        }
-
         $comment = $request->input('comment', 'Reingreso desde reporte');
         $candidate->changeStatus('activo', $comment);
 
         return new BeneficiaryResource($candidate->load(['statusHistory', 'personal_groups', 'program']));
     }
 
+    public function reports(Request $request){
+
+        $beneficiaries = Candidate::whereIn('candidate_status_id', [7,8,9])
+            ->orderBy('first_name', 'ASC')
+            ->with(['program', 'candidateStatus'])
+            ->get();
+
+        $counts = $beneficiaries
+        ->groupBy('candidate_status_id')
+        ->map(fn ($group) => $group->count());
+
+        return new BeneficiaryReportsResource([
+            'beneficiaries' => $beneficiaries,
+            'counts' => $counts,
+        ]);
+    }
 }

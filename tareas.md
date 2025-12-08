@@ -1,7 +1,15 @@
-- ~~Agregar PlanCategories de primer nivel~~
-- ~~Crear tabla de Clasificacion de Actividades~~
-- ~~Plan: fecha_inicio, fecha_fin~~
-- ~~Actividad: meta_final (acumulado e incremental)~~
+## Probar Endpoints del chofer
+## CandidateStatusUpdateController
+- Enviar correo de [ingreso programado]
+## AuthStore
+Basado en el rol
+- loginRedirectoTo
+- logoutRedirectTo
+## CronJob
+- Actualizar estado a 6 para los candidatos con fecha de ingreso pasada y estado 5
+## Actividades
+- Revisar e importar catalogo de actividades
 
-Despues
-- Crear tabla con direcciones de transporte, hija de Candidato
+Vitamina C
+Hilo dental
+Listerine

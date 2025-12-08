@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Group extends Model
 {
     protected $guarded = [];
-    protected $appends = ['full_name'];
 
     public function candidates(){
         return $this->belongsToMany(Candidate::class);

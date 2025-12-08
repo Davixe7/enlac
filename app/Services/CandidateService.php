@@ -5,18 +5,11 @@ namespace App\Services;
 use App\Http\Requests\StoreCandidateRequest;
 use App\Models\Candidate;
 use App\Models\Contact;
-use App\Models\Address;
-use App\Models\EvaluationSchedule;
 use App\Models\Group;
 use App\Models\Medication;
-use App\Models\User;
 use App\Notifications\EvaluationScheduled;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class CandidateService
 {
@@ -25,7 +18,8 @@ class CandidateService
         // Iniciar transacción para asegurar la integridad de los datos
         return DB::transaction(function () use ($request) {
             // 1. Crear Candidato
-            $candidate = Candidate::create($request->validated()['candidate']);
+            $data = array_merge($request->validated()['candidate'], ['candidate_status_id'=>1]);
+            $candidate = Candidate::create($data);
 
             if ($request->hasFile('picture')) {
                 $candidate->addMediaFromRequest('picture')->toMediaCollection('profile_picture');

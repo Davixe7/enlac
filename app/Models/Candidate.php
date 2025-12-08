@@ -2,25 +2,31 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Scopes\BeneficiaryScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Candidate extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, BeneficiaryScopes;
     protected $guarded = [];
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:d/m/Y',
-        // ... otros casts
+        'entry_date' => 'datetime:d/m/Y',
     ];
+
+    public function candidateStatus(){
+        return $this->belongsTo(CandidateStatus::class);
+    }
+
+    public function program(){
+        return $this->belongsTo(Program::class)->withDefault(['name'=>'SIN PROGRAMA', 'price'=>0]);
+    }
 
     public function groups(){
         return $this->belongsToMany(Group::class);
@@ -34,13 +40,11 @@ class Candidate extends Model implements HasMedia
         return $this->hasManyThrough(MedicationLog::class, Medication::class);
     }
 
-    public function contacts()
-    {
+    public function contacts(){
         return $this->hasMany(Contact::class);
     }
 
-    public function evaluation()
-    {
+    public function evaluation(){
         return $this->hasOne(Evaluation::class);
     }
 
@@ -48,13 +52,7 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(BrainFunctionRank::class);
     }
 
-    public function program()
-    {
-        return $this->belongsTo(Program::class);
-    }
-
-    public function interviewee()
-    {
+    public function interviewee(){
         return $this->hasOne(Interviewee::class)->withDefault(fn()=>['name'=>'', 'relationship'=> '', 'legal_relationship'=> '']);
     }
 
@@ -74,63 +72,13 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(PaymentConfig::class);
     }
 
-    public function scopeBirthDate(Builder $query, $birthDate): Builder
-    {
-        return $birthDate ? $query->where('birth_date', $birthDate) : $query;
-    }
-
-    public function scopeName(Builder $query, $name): Builder
-    {
-        return $name ?
-            $query->where(function (Builder $q) use ($name) {
-            $q->where('first_name', 'like', '%' . $name . '%')
-              ->orWhere('middle_name', 'like', '%' . $name . '%')
-              ->orWhere('last_name', 'like', '%' . $name . '%');})
-            : $query;
-    }
-
-    public function scopeBeneficiaries(Builder $query){
-        return $query->whereAdmissionStatus(1)->whereNotNull('program_id');
-    }
-
-    public function scopeBeneficiariesEquinetherapyActivePlan($query)
-    {
-        return $query->whereHas('groups', function ($queryGroup) {
-            $queryGroup->whereHas('plans', function ($queryPlan) {
-                $queryPlan->where('category_id', 5);
-            });
-        });
-    }
-
-    public function scopeEvaluationBetween(Builder $query, $startDate, $endDate): Builder
-    {
-        if( !$startDate || !$endDate ){
-            return $query;
-        }
-
-        $endDate = Carbon::parse($endDate)->endOfDay();
-        // Subquery to find the most recent evaluation schedule ID for each candidate within the date range
-
-        $mostRecentScheduleIds = Appointment::query()
-            ->where('type_id', 0)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->select('candidate_id', DB::raw('MAX(id) as most_recent_id'))
-            ->groupBy('candidate_id');
-
-        return $query->joinSub($mostRecentScheduleIds, 'most_recent_schedules', function ($join) {
-                $join->on('candidates.id', '=', 'most_recent_schedules.candidate_id');
-            });
-    }
-
-    public function registerMediaConversions(?Media $media = null): void
-    {
+    public function registerMediaConversions(?Media $media = null): void {
             $this->addMediaConversion('thumb')
                 ->width(300)
                 ->height(300);
     }
 
-    public function registerMediaCollections(): void
-    {
+    public function registerMediaCollections(): void {
         $this->addMediaCollection('profile_picture')
             ->singleFile()
             ->useDisk('public');
@@ -144,47 +92,50 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(Payment::class);
     }
 
-    public function getEvaluationScheduleAttribute(){
-        return $this->appointments()
+    public function evaluationSchedule(){
+        return $this->hasOne(Appointment::class)
+        ->latestOfMany()
         ->where('type_id', 0)
         ->where('status', '!=', 'canceled')
         ->with('evaluator')
-        ->orderBy('created_at', 'desc')
-        ->first();
+        ->withDefault(["type_id" => 0]);
     }
 
-    public function getEvaluationSchedulesAttribute(){
-        return $this->appointments()
+    public function evaluationSchedules(){
+        return $this->hasMany(Appointment::class)
         ->where('type_id', 0)
         ->with('evaluator')
-        ->orderBy('created_at', 'desc')
-        ->get();
+        ->orderBy('created_at', 'desc');
+    }
+
+    public function locationDetail(){
+        return $this->hasOne(CandidateLocation::class)->withDefault([
+            'transport_address' => null,
+            'transport_location_link' => null,
+            'curp' => null
+        ]);
+    }
+
+    public function rides(){
+        return $this->hasMany(Ride::class);
+    }
+
+    public function todaysRide(){
+        $date = now()->format('Y-m-d');
+        return $this->hasOne(Ride::class)
+        ->where('date', $date)
+        ->where('type', 'rubio')
+        ->withDefault([
+            'date' => $date,
+            'departure_time' => null,
+            'return_time' => null,
+            'comments' => null,
+            'type' => 'rubio'
+        ]);
     }
 
     public function getFullNameAttribute(){
         $fullNameArray = array_filter([$this->first_name, $this->last_name, $this->middle_name]);
         return join(" ", $fullNameArray);
     }
-
-    public function statusHistory()
-    {
-        return $this->hasMany(CandidateStatusHistory::class);
-    }
-
-    public function changeStatus(string $newStatus, ?string $comment = null, ?string $documentPath = null): void
-    {
-        $this->update(['status' => $newStatus]);
-
-        $this->statusHistory()->create([
-            'status'        => $newStatus,
-            'comment'       => $comment,
-            'document_path' => $documentPath,
-            'changed_at'    => now(),
-        ]);
-    }
-
-    public function equinotherapy_schedules(){
-        return $this->hasMany(EquinotherapySchedule::class);
-    }
-
 }

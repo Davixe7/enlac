@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
+            $table->dateTime('signed_at')->nullable();
             $table->timestamps();
         });
     }

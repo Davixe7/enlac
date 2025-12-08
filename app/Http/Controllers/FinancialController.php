@@ -17,61 +17,61 @@ class FinancialController extends Controller
     {
         $month = request()->month ?: now()->month;
         $year  = request()->year ?: now()->year;
-        $yearStart = Carbon::create( $year, 8 );
-        $yearEnd   = Carbon::create( $year + 1, 8 );
+        $yearStart = Carbon::create($year, 8);
+        $yearEnd   = Carbon::create($year + 1, 8);
 
         $date = compact('month', 'year', 'yearStart', 'yearEnd');
 
         //Sumariza todos los patrocinios por tipo en un monto total
         //Sumariza todos los pagos por tipo en un monto total y ultima fecha de pago
         $candidates = Candidate::beneficiaries()
-        ->with([
-            'program',
-            'payment_configs',
-            'payment_confix' => fn ($q) => $q->groupBy(['candidate_id', 'type'])->selectRaw('candidate_id, type, SUM( ((12/frequency) * amount) / 12) as quota'),
-        ])
-        ->get();
+            ->with([
+                'program',
+                'payment_configs',
+                'payment_confix' => fn($q) => $q->groupBy(['candidate_id', 'type'])->selectRaw('candidate_id, type, SUM( ((12/frequency) * amount) / 12) as quota'),
+            ])
+            ->get();
 
-        $candidates = $candidates->map(function($candidate)use($date){
+        $candidates = $candidates->map(function ($candidate) use ($date) {
             $candidate->sponsr_amount = $candidate->payment_confix->where('type', 'sponsor')->first()?->quota ?: 0;
             $candidate->parent_amount = $candidate->payment_confix->where('type', 'parent')->first()?->quota ?: 0;
             $candidate->enlacs_amount = $candidate->program->price - $candidate->sponsr_amount - $candidate->parent_amount;
             $candidate->sponsr_paid = 0;
             $candidate->parent_paid = 0;
 
-            $candidate->payment_configs->where('type', 'parent')->map(function($paycfg) use (&$candidate, $date ) {
+            $candidate->payment_configs->where('type', 'parent')->map(function ($paycfg) use (&$candidate, $date) {
                 $payments = Payment::whereBetween('date', [$date['yearStart'], $date['yearEnd']])
-                ->where('candidate_id', $paycfg->candidate_id)
-                ->where('sponsor_id', null)
-                ->get();
+                    ->where('candidate_id', $paycfg->candidate_id)
+                    ->where('sponsor_id', null)
+                    ->get();
 
                 $candidate->last_parent_payment_date = $payments->max('date');
 
                 $carry = $payments->sum('amount');
 
-                for($i = 8; $i < 20; $i++){
+                for ($i = 8; $i < 20; $i++) {
                     $abono = $carry >= $paycfg->monthly_amount ? $paycfg->monthly_amount : $carry;
                     $carry = $carry - $abono;
-                    if( $i == $date['month'] ){
+                    if ($i == $date['month']) {
                         $candidate->parent_paid = $candidate->parent_paid + $abono;
                     }
                 }
             });
 
-            $candidate->payment_configs->map(function($paycfg) use (&$candidate, $date ) {
+            $candidate->payment_configs->map(function ($paycfg) use (&$candidate, $date) {
                 $payments = Payment::whereBetween('date', [$date['yearStart'], $date['yearEnd']])
-                ->where('candidate_id', $paycfg->candidate_id)
-                ->where('payment_type', 'sponsor')
-                ->where('sponsor_id', $paycfg->sponsor_id)
-                ->get();
+                    ->where('candidate_id', $paycfg->candidate_id)
+                    ->where('payment_type', 'sponsor')
+                    ->where('sponsor_id', $paycfg->sponsor_id)
+                    ->get();
 
                 $candidate->last_sponsr_payment_date = $payments->max('date');
                 $carry = $payments->sum('amount');
 
-                for($i = 8; $i < 20; $i++){
+                for ($i = 8; $i < 20; $i++) {
                     $abono = $carry >= $paycfg->monthly_amount ? $paycfg->monthly_amount : $carry;
                     $carry = $carry - $abono;
-                    if( $i == $date['month'] ){
+                    if ($i == $date['month']) {
                         $candidate->sponsr_paid = $candidate->sponsr_paid + $abono;
                     }
                 }
@@ -94,5 +94,60 @@ class FinancialController extends Controller
         }); */
 
         return BeneficiaryFinancialResource::collection($candidates);
+    }
+
+    public function semaforo(Request $request)
+    {
+        $candidate = Candidate::findOrFail($request->candidate_id);
+        $paymentsConfigs = $candidate->payment_configs;
+        $wallets = [];
+        $year = now()->month > 7 ? now()->year : now()->year - 1;
+
+        $paymentsConfigs->each(function ($paymentConfig) use (&$wallets, $year) {
+            $carry = 0;
+
+            for ($i = 8; $i < 20; $i += $paymentConfig->frequency) {
+                $start = $i;
+                $end = $i + $paymentConfig->frequency - 1;
+
+                $startDate = Carbon::create($year, $start);
+                $endDate   = Carbon::create($year, $end)->endOfMonth();
+
+                $balance = Payment::where('candidate_id', $paymentConfig->candidate_id)
+                    ->where('sponsor_id', $paymentConfig->sponsor_id)
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->groupBy('candidate_id')
+                    ->sum('amount');
+
+                $carry = $carry + $balance;
+
+                foreach (range($start, $end) as $month) {
+                    $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
+
+                    $date = Carbon::create($year, $month);
+                    $maxDate = Carbon::create($year, $end)->startOfMonth()->addDays(10);
+                    $status = null;
+
+                    if ($abono == $paymentConfig->monthly_amount) {
+                        $status = 'green';
+                    } elseif (now() > $maxDate) {
+                        $status = 'red';
+                    } else {
+                        $status = 'yellow';
+                    }
+
+                    $wallets[$paymentConfig->sponsor_id][] = [
+                        'date' => $date->format('Y-m-d'),
+                        'month' => $month,
+                        'monthName' => $date->format('F'),
+                        'abono' => number_format($abono, 2, '.', ''),
+                        'status' => $status
+                    ];
+                    $carry = $carry - $abono;
+                }
+            }
+        });
+
+        return $wallets;
     }
 }
