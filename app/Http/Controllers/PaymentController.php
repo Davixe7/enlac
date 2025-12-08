@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PaymentsResource;
+use App\Models\Candidate;
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class PaymentController extends Controller
 {
@@ -14,10 +16,10 @@ class PaymentController extends Controller
     public function index(Request $request)
     {
         $payments = Payment::whereCandidateId($request->candidate_id)
-        ->with([
-            'candidate' => fn($query)=>$query->select(['id', 'first_name', 'last_name']),
-            'user'      => fn($query)=>$query->select(['id', 'name', 'last_name']),
-        ])->get();
+            ->with([
+                'candidate' => fn($query) => $query->select(['id', 'first_name', 'last_name']),
+                'user'      => fn($query) => $query->select(['id', 'name', 'last_name']),
+            ])->get();
         return PaymentsResource::collection($payments);
     }
 
@@ -41,7 +43,7 @@ class PaymentController extends Controller
         $data['created_by_id'] = auth()->id();
 
         $payment = Payment::create($data);
-        return response()->json(['data'=>$payment]);
+        return response()->json(['data' => $payment]);
     }
 
     /**
@@ -66,5 +68,35 @@ class PaymentController extends Controller
     public function destroy(Payment $payment)
     {
         //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function export(Candidate $candidate, Request $request)
+    {
+        $data = Payment::whereCandidateId($candidate->id)
+        ->with([
+            'candidate' => fn($query) => $query->select(['id', 'first_name', 'last_name']),
+            'user'      => fn($query) => $query->select(['id', 'name', 'last_name', 'second_last_name'])
+        ])
+        ->get();
+
+        $payments = $data->map(function ($payment) {
+            return [
+                'Fecha'          => $payment->date,
+                'Registrado por' => $payment->user->full_name,
+                'Concepto'       => $payment->payment_type == 'parent' ? 'Cuota de padres' : 'Cuota de padrinos',
+                'Monto'          => $payment->amount,
+                'Cobertura'      => $payment->is_partial ? 'Parcial' : 'Total',
+                'Referencia'     => $payment->ref,
+                'Comentarios'    => $payment->comments,
+            ];
+        });
+
+        $filename = 'historial_pagos_' . $candidate->full_name . '_' . time() . '.xlsx';
+
+        return (new FastExcel($payments))
+        ->download($filename);
     }
 }

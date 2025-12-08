@@ -47,6 +47,7 @@ use App\Models\User;
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
 
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn () => new UserResource(auth()->user()));
     Route::get('test', [FinancialController::class, 'semaforo']);
@@ -88,6 +89,8 @@ Route::middleware('auth:sanctum')->group(function () {
         'plan_categories'      => PlanCategoryController::class,
         'candidate_statuses'   => CandidateStatusController::class,
     ]);
+
+    Route::get('payments/{candidate}/export', [PaymentController::class, 'export']);
 
     Route::put('candidatestatuses/{candidate}', [CandidateStatusUpdateController::class, 'update']);
 
