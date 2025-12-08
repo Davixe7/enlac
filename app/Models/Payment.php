@@ -13,6 +13,7 @@ class Payment extends Model
     }
 
     public function user(){
-        return $this->belongsTo(User::class, 'created_by_id');
+        return $this->belongsTo(User::class, 'created_by_id')
+        ->withDefault(['name'=>'--', 'last_name'=>'--']);
     }
 }
