@@ -14,7 +14,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = [
+        /* $roles = [
             ['name' => 'admin',          'label' => 'Administrador General'],
             ['name' => 'evaluator',      'label' => 'Evaluador'],
             ['name' => 'reception',      'label' => 'Recepción'],
@@ -26,6 +26,10 @@ class RoleSeeder extends Seeder
         foreach ($roles as $role) {
             $role['guard_name'] = 'sanctum';
             Role::create($role);
-        }
+        } */
+
+        $role = Role::create(['name'=>'driver', 'label'=>'Chofer', 'guard_name'=>'sanctum']);
+        $permission = \Spatie\Permission\Models\Permission::create(['name' => 'rides.index', 'guard_name'=>'sanctum']);
+        $role->permissions()->attach($permission);
     }
 }

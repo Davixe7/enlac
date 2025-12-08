@@ -21,6 +21,7 @@ class CandidateController extends Controller
 
     public function dashboard() {
         $candidates = Candidate::pending()
+        ->with(['evaluationSchedules', 'evaluationSchedule.evaluator'])
         ->orderBy('first_name', 'ASC')
         ->get();
 
@@ -69,7 +70,8 @@ class CandidateController extends Controller
             'program',
             'contacts.addresses',
             'interviewee',
-            'locationDetail'
+            'locationDetail',
+            'candidateStatus'
         ]));
     }
 

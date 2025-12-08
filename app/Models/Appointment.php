@@ -22,7 +22,7 @@ class Appointment extends Model
 
     public function evaluator()
     {
-        return $this->belongsTo(User::class, 'evaluator_id', 'id');
+        return $this->belongsTo(User::class, 'evaluator_id', 'id')->withDefault(['name'=>'SIN ASIGNAR']);
     }
 
     public function user()

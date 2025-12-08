@@ -25,7 +25,7 @@ class Candidate extends Model implements HasMedia
     }
 
     public function program(){
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(Program::class)->withDefault(['name'=>'SIN PROGRAMA', 'price'=>0]);
     }
 
     public function groups(){

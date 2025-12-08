@@ -11,9 +11,17 @@ class CandidateStatusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(['data'=>CandidateStatus::all()]);
+        $data = CandidateStatus::excludeByName($request->exclude)->get();
+        $data = $data->map(function($option){
+            $option['disable'] = $option['name'] == 'programado'
+            ? true
+            : false;
+
+            return $option;
+        });
+        return response()->json(compact('data'));
     }
 
     /**

@@ -19,7 +19,7 @@ class RideController extends Controller
 
         if( $request->type == 'rubio' ){
             $candidates = Candidate::whereRequiresTransport(1)
-            ->whereNotIn('status', ['graduado', 'fallecido', 'exenlac', 'inactivo'])
+            ->beneficiaries()
             ->basic(['requires_transport'])
             ->with(['todaysRide', 'locationDetail'])
             ->get();

@@ -20,12 +20,12 @@ class DatabaseSeeder extends Seeder
         //$this->call(BrainFunctionSeeder::class);
         //$this->call(InterviewQuestionSeeder::class);
         //$this->call(ProgramSeeder::class);
+        //$this->call(CandidateSeeder::class);
+        //$this->call(KardexSeeder::class);
+        //$this->call(PlanCategorySeeder::class);
+        //$this->call(ActivityCategorySeeder::class);
+        //$this->call(GroupSeeder::class);
         $this->call(CandidateStatusSeeder::class);
-        $this->call(CandidateSeeder::class);
-        $this->call(KardexSeeder::class);
-        $this->call(PlanCategorySeeder::class);
-        $this->call(ActivityCategorySeeder::class);
         $this->call(ActivitySeeder::class);
-        $this->call(GroupSeeder::class);
     }
 }

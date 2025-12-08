@@ -19,6 +19,7 @@ class CandidateResource extends JsonResource
 
         return array_merge($data, [
             'program'              => $this->whenLoaded('program'),
+            'status'               => $this->whenLoaded('candidateStatus', new CandidateStatusResource($this->candidateStatus)),
             'full_name'            => $this->full_name,
             'picture'              => $this->getFirstMediaUrl('profile_picture'),
             'contacts'             => $this->contacts,
