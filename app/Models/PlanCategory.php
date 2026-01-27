@@ -19,4 +19,9 @@ class PlanCategory extends Model
     public function scopeByParent($query, $parent_id){
         return $query->whereParentId($parent_id);
     }
+
+    public function scopeBaseOnly($query, $filter){
+        if(!$filter){ return $query; }
+        return $query->where('parent_id', null);
+    }
 }

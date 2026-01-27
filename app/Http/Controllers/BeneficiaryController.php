@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BeneficiaryReportsResource;
 use App\Http\Resources\BeneficiaryResource;
 use App\Models\Candidate;
+use App\Models\Activity;
+use App\Models\Plan;
+
 use App\Services\CandidateService;
 use Illuminate\Http\Request;
 
@@ -28,6 +31,20 @@ class BeneficiaryController extends Controller
 
         if( $request->equinetherapy == 1 ){
             $beneficiaries = $beneficiaries->equinetherapyActivePlan();
+        }
+
+        if( $request->activity_id  ||  $request->category_id ){
+
+            $groups = Plan::hasActivity($request->activity_id)
+            ->filterByCat($request->category_id)
+            ->where('start_date', '<=', now()->format('Y-m-d'))
+            ->where('end_date', '>=', now()->format('Y-m-d'))
+            ->pluck('group_id');
+
+            $data = Candidate::name($request->name)
+            ->whereHas('groups', fn($q)=>$q->whereIn('groups.id', $groups))->get();
+
+            return BeneficiaryResource::collection($data);
         }
 
         $beneficiaries = $beneficiaries->orderBy('first_name')->get();

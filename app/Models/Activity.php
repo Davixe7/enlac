@@ -12,4 +12,8 @@ class Activity extends Model
     public function plan_category(){
         return $this->belongsTo(PlanCategory::class);
     }
+
+    public function plans(){
+        return $this->belongsToMany(Plan::class);
+    }
 }

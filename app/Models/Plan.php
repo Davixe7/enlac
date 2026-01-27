@@ -24,4 +24,14 @@ class Plan extends Model
     public function subcategory(){
         return $this->belongsTo(PlanCategory::class, 'subcategory_id');
     }
+
+    public function scopeHasActivity($query, $activity_id){
+        if( !$activity_id ){ return $query; }
+        return $query->whereRelation('activities', 'activities.id', $activity_id);
+    }
+
+    public function scopeFilterByCat($query, $category_id){
+        if( !$category_id ){ return $query; }
+        return $query->where('category_id', '=', $category_id);
+    }
 }

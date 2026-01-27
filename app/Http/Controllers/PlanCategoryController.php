@@ -13,7 +13,7 @@ class PlanCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $data = PlanCategory::get();
+        $data = PlanCategory::baseOnly($request->base_only)->get();
         return response()->json(compact('data'));
     }
 

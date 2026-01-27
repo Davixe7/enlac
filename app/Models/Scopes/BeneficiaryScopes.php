@@ -16,13 +16,13 @@ trait BeneficiaryScopes
 
     public function scopeName(Builder $query, $name): Builder
     {
-        return $name ?
+        if( !$name ){ return $query; }
+        return
             $query->where(function (Builder $q) use ($name) {
                 $q->where('first_name', 'like', '%' . $name . '%')
                     ->orWhere('middle_name', 'like', '%' . $name . '%')
                     ->orWhere('last_name', 'like', '%' . $name . '%');
-            })
-            : $query;
+            });
     }
 
     public function scopePending(Builder $query)
@@ -69,5 +69,16 @@ trait BeneficiaryScopes
         $fields = array_merge($default, $fields);
         $query->select($fields);
         return $query;
+    }
+
+    public function scopeSearchByName($query, $search)
+    {
+        if (!$search) return $query;
+
+        return $query->where(function ($q) use ($search) {
+            // Opción A: Buscar palabra por palabra en las 3 columnas
+            $q->whereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) LIKE ?", ["%$search%"])
+              ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$search%"]);
+        });
     }
 }
