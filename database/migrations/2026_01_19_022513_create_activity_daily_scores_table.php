@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Candidate::class);
             $table->string('score');
             $table->date('date');
-            $table->boolean('closed');
+            $table->boolean('closed')->default(false);
             $table->timestamps();
         });
     }
