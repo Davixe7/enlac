@@ -14,7 +14,7 @@ class Plan extends Model
     }
 
     public function activities(){
-        return $this->belongsToMany(Activity::class)->withPivot('daily_goal');
+        return $this->belongsToMany(Activity::class)->withPivot(['daily_goal', 'final_goal']);
     }
 
     public function category(){

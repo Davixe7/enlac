@@ -22,8 +22,8 @@ class Issue extends Model implements HasMedia
             ->useDisk('public');
     }
 
-    public function workarea(){
-        return $this->belongsTo(WorkArea::class);
+    public function plan_category(){
+        return $this->belongsTo(PlanCategory::class);
     }
 
     public function user(){

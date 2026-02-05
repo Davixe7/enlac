@@ -91,7 +91,6 @@ Route::middleware('auth:sanctum')->group(function () {
         'activities'            => ActivityController::class,
         'plan_categories'       => PlanCategoryController::class,
         'candidate_statuses'    => CandidateStatusController::class,
-        'activity_daily_scores' => ActivityDailyScoreController::class,
         'issues'                => IssueController::class,
     ]);
 
@@ -141,4 +140,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('beneficiaries/{candidate}/status', [BeneficiaryController::class, 'changeStatus']);
     Route::post('beneficiaries/{candidate}/reingreso', [BeneficiaryController::class, 'reingreso']);
     Route::delete('media/{media}', [MediaController::class, 'destroy']);
+
+    Route::get('scores', [ActivityDailyScoreController::class, 'index']);
+    Route::get('scores2', [ActivityDailyScoreController::class, 'index2']);
+    Route::post('activity_daily_scores', [ActivityDailyScoreController::class, 'store']);
 });

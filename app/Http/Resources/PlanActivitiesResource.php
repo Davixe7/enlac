@@ -15,7 +15,8 @@ class PlanActivitiesResource extends JsonResource
     public function toArray(Request $request): array
     {
         return array_merge(parent::toArray($request), [
-            'daily_goal' => $this->pivot->daily_goal
+            'daily_goal' => $this->pivot->daily_goal,
+            'final_goal' => $this->pivot->final_goal,
         ]);
     }
 }
