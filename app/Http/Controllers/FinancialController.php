@@ -102,33 +102,43 @@ class FinancialController extends Controller
         $paymentsConfigs = $candidate->payment_configs;
         $wallets = [];
         $year = now()->month > 7 ? now()->year : now()->year - 1;
+        $startDate = Carbon::create($year, 8);
+        $endDate   = Carbon::create($year, 20)->endOfMonth();
 
-        $paymentsConfigs->each(function ($paymentConfig) use (&$wallets, $year) {
+        $paymentsConfigs->each(function ($paymentConfig) use (&$wallets, $year, $startDate, $endDate) {
             $carry = 0;
 
-            for ($i = 8; $i < 20; $i += $paymentConfig->frequency) {
-                $start = $i;
-                $end = $i + $paymentConfig->frequency - 1;
-
-                $startDate = Carbon::create($year, $start);
-                $endDate   = Carbon::create($year, $end)->endOfMonth();
-
-                $balance = Payment::where('candidate_id', $paymentConfig->candidate_id)
+            $balance = Payment::where('candidate_id', $paymentConfig->candidate_id)
                     ->where('sponsor_id', $paymentConfig->sponsor_id)
                     ->whereBetween('date', [$startDate, $endDate])
                     ->groupBy('candidate_id')
                     ->sum('amount');
 
-                $carry = $carry + $balance;
+            $carry = $carry + $balance;
 
+            for ($i = 8; $i < 20; $i += $paymentConfig->frequency) {
+                $start = $i;
+                $end = $i + $paymentConfig->frequency - 1;
+                $amountToPay = $paymentConfig->monthly_amount;
+                
+                if($paymentConfig->frequency == .5){
+                    $end = $i;
+                    $amountToPay = $paymentConfig->amount;
+                }
+                
                 foreach (range($start, $end) as $month) {
-                    $abono = $carry >= $paymentConfig->monthly_amount ? $paymentConfig->monthly_amount : $carry;
-
-                    $date = Carbon::create($year, $month);
-                    $maxDate = Carbon::create($year, $end)->startOfMonth()->addDays(10);
+                    $monthNumber = floor($month);
                     $status = null;
+                    $abono = $carry >= $amountToPay ? $amountToPay : $carry;
+                    $date = Carbon::create($year, $monthNumber);
+                    $maxDate = $date->copy()->startOfMonth()->addDays(10);
 
-                    if ($abono == $paymentConfig->monthly_amount) {
+                    if($paymentConfig->frequency == .5){
+                        $date = ($i == intval($i)) ? $date->copy() : $date->copy()->addDays(15);
+                        $maxDate = $date->copy()->addDays(5);
+                    }
+                    
+                    if ($abono == $amountToPay) {
                         $status = 'green';
                     } elseif (now() > $maxDate) {
                         $status = 'red';
@@ -136,9 +146,9 @@ class FinancialController extends Controller
                         $status = 'yellow';
                     }
 
-                    $wallets[$paymentConfig->sponsor_id][] = [
+                    $wallets[$paymentConfig->sponsor_id][$month][] = [
                         'date' => $date->format('Y-m-d'),
-                        'month' => $month,
+                        'month' => floor($month),
                         'monthName' => $date->format('F'),
                         'abono' => number_format($abono, 2, '.', ''),
                         'status' => $status

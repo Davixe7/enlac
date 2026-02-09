@@ -25,7 +25,7 @@ class StorePaymentConfigRequest extends FormRequest
             'candidate_id'             => 'required|exists:candidates,id',
             'sponsor_id'               => 'sometimes|exists:sponsors,id',
             'amount'                   => 'required|numeric|min:0',
-            'frequency'                => 'required|integer|min:1|max:255',
+            'frequency'                => 'required',
             'month_payday'             => 'required|integer|min:1|max:31',
             'address_type'             => 'required|in:home,office',
             'wants_pickup'             => 'nullable|boolean',
