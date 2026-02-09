@@ -46,6 +46,7 @@ use App\Models\User;
 use App\Http\Controllers\ActivityDailyScoreController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\IssueController;
+use App\Http\Controllers\ScoreReportController;
 
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
@@ -144,4 +145,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('scores', [ActivityDailyScoreController::class, 'index']);
     Route::get('scores2', [ActivityDailyScoreController::class, 'index2']);
     Route::post('activity_daily_scores', [ActivityDailyScoreController::class, 'store']);
+    Route::get('reports/scores', [ScoreReportController::class, 'index']);
 });
