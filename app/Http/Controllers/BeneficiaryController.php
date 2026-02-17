@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CandidateStatus;
 use App\Http\Resources\BeneficiaryReportsResource;
 use App\Http\Resources\BeneficiaryResource;
 use App\Models\Candidate;
@@ -73,13 +74,17 @@ class BeneficiaryController extends Controller
 
     public function reports(Request $request){
 
-        $beneficiaries = Candidate::whereIn('candidate_status_id', [7,8,9])
+        $beneficiaries = Candidate::whereIn('status', [
+                CandidateStatus::GRADUATED,
+                CandidateStatus::DECEASED,
+                CandidateStatus::EX_ENLAC,
+            ])
             ->orderBy('first_name', 'ASC')
-            ->with(['program', 'candidateStatus'])
+            ->with(['program'])
             ->get();
 
         $counts = $beneficiaries
-        ->groupBy('candidate_status_id')
+        ->groupBy('status')
         ->map(fn ($group) => $group->count());
 
         return new BeneficiaryReportsResource([

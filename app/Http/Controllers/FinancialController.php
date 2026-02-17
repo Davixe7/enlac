@@ -96,68 +96,69 @@ class FinancialController extends Controller
         return BeneficiaryFinancialResource::collection($candidates);
     }
 
+    function maxDateByFreq($monthNumber, $frequency, $start){
+        $periodLength  = max(1, (int) $frequency); // 1, 2, 3, 4, 6, 12...
+        $offset        = $monthNumber - $start;              // 0 = agosto, 1 = septiembre, etc.
+        $blockIndex    = intdiv($offset, $periodLength);
+        $blockEndMonth = $start + ($blockIndex + 1) * $periodLength - 1; // último mes del bloque
+        $blockEndMonth = min($blockEndMonth, 19);
+        return $blockEndMonth;
+    }
+
     public function semaforo(Request $request)
     {
         $candidate = Candidate::findOrFail($request->candidate_id);
         $paymentsConfigs = $candidate->payment_configs;
-        $wallets = [];
         $year = now()->month > 7 ? now()->year : now()->year - 1;
         $startDate = Carbon::create($year, 8);
         $endDate   = Carbon::create($year, 20)->endOfMonth();
+        
+        $wallets = [];
 
-        $paymentsConfigs->each(function ($paymentConfig) use (&$wallets, $year, $startDate, $endDate) {
-            $carry = 0;
+        $paymentsConfigs->each(function ($paymentConfig) use ($year, $startDate, $endDate, &$wallets) {
+            $balance    = $paymentConfig->periodBalance($startDate, $endDate);
+            $start      = 8;
+            $lastSnapId = null;
 
-            $balance = Payment::where('candidate_id', $paymentConfig->candidate_id)
-                    ->where('sponsor_id', $paymentConfig->sponsor_id)
-                    ->whereBetween('date', [$startDate, $endDate])
-                    ->groupBy('candidate_id')
-                    ->sum('amount');
+            for ($monthNumber = 8; $monthNumber < 20; $monthNumber++) {
+                $snapshot   = $paymentConfig->getSnapshotForPeriod($year, $monthNumber, 1) ?? $paymentConfig;
+                $start      = $snapshot->id != $lastSnapId ? $monthNumber : $start;
+                $lastSnapId = $snapshot->id;
+                $maxDateMonth = $this->maxDateByFreq($monthNumber, $snapshot->frequency, $start);
+                $steps        = $snapshot->frequency != .5 ? 1 : 2;
 
-            $carry = $carry + $balance;
+                $amountToPay = $snapshot->frequency == .5
+                ? $snapshot->amount
+                : $snapshot->monthly_amount;
 
-            for ($i = 8; $i < 20; $i += $paymentConfig->frequency) {
-                $start = $i;
-                $end = $i + $paymentConfig->frequency - 1;
-                $amountToPay = $paymentConfig->monthly_amount;
-                
-                if($paymentConfig->frequency == .5){
-                    $end = $i;
-                    $amountToPay = $paymentConfig->amount;
-                }
-                
-                foreach (range($start, $end) as $month) {
-                    $monthNumber = floor($month);
-                    $status = null;
-                    $abono = $carry >= $amountToPay ? $amountToPay : $carry;
-                    $date = Carbon::create($year, $monthNumber);
-                    $maxDate = $date->copy()->startOfMonth()->addDays(10);
-
-                    if($paymentConfig->frequency == .5){
-                        $date = ($i == intval($i)) ? $date->copy() : $date->copy()->addDays(15);
-                        $maxDate = $date->copy()->addDays(5);
-                    }
-                    
-                    if ($abono == $amountToPay) {
-                        $status = 'green';
-                    } elseif (now() > $maxDate) {
-                        $status = 'red';
-                    } else {
-                        $status = 'yellow';
-                    }
-
-                    $wallets[$paymentConfig->sponsor_id][$month][] = [
-                        'date' => $date->format('Y-m-d'),
-                        'month' => floor($month),
-                        'monthName' => $date->format('F'),
-                        'abono' => number_format($abono, 2, '.', ''),
-                        'status' => $status
-                    ];
-                    $carry = $carry - $abono;
+                for($step = 1; $step <= $steps; $step++){
+                    $this->applyToWallet($wallets, $balance, $amountToPay, $monthNumber, $maxDateMonth, $year, $paymentConfig->sponsor_id, $step);
                 }
             }
         });
 
         return $wallets;
+    }
+
+    function applyToWallet(&$wallets, &$balance, $amountToPay, $monthNumber, $maxDateMonth, $year, $sponsor_id, $step){
+        $abono = $balance >= $amountToPay
+        ? $amountToPay
+        : $balance;
+    
+        $maxDate = Carbon::create($year, $maxDateMonth);
+        $maxDate = $step == 1
+        ? $maxDate->copy()->addDays(10)
+        : $maxDate->copy()->addDays(21);
+    
+        $status = $abono == $amountToPay ? 'green' : (( now() > $maxDate ) ? 'red' : 'yellow');
+    
+        $wallets[$sponsor_id][$monthNumber][] = [
+            'month'     => $monthNumber,
+            'monthName' => Carbon::create($year, $monthNumber)->translatedFormat('F'),
+            'abono'     => $abono,
+            'status'    => $status
+        ];
+    
+        $balance -= $abono;
     }
 }

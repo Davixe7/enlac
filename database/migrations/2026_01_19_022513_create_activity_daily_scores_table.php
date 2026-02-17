@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Activity;
+use App\Models\ActivityPlan;
 use App\Models\Candidate;
 
 return new class extends Migration
@@ -15,10 +16,12 @@ return new class extends Migration
     {
         Schema::create('activity_daily_scores', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Activity::class);
-            $table->foreignIdFor(Candidate::class);
-            $table->string('score');
+            $table->foreignIdFor(ActivityPlan::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(Candidate::class)->constrained()->onDelete('cascade');
             $table->date('date');
+            $table->string('score');
+            $table->enum('color', ['negative', 'warning', 'positive', 'grey'])->default('grey');
+            $table->index('color');
             $table->boolean('closed')->default(false);
             $table->timestamps();
         });

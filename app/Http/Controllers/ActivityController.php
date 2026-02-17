@@ -41,8 +41,8 @@ class ActivityController extends Controller
             return response()->json(compact('data'));
         }
 
-        if( $request->category_id ){
-            $data = $data->wherePlanCategoryId($request->category_id);
+        if( $request->plan_category_id ){
+            $data = $data->wherePlanCategoryId($request->plan_category_id);
         }
 
         $data = $data->orderBy('name', 'ASC')->get();

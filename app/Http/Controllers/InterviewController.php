@@ -7,7 +7,6 @@ use App\Http\Resources\InterviewResource;
 use App\Http\Requests\StoreInterviewRequest;
 use App\Http\Requests\UpdateInterviewRequest;
 use App\Services\InterviewService;
-use Illuminate\Http\Request;
 
 class InterviewController extends Controller
 {

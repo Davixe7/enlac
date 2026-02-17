@@ -22,8 +22,8 @@ class StoreEvaluationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'candidate_id' => 'required|exists:candidates,id',
-            'admission_comment' => 'required_if:admission_status,false,0'
+            'candidate_id'      => 'required|exists:candidates,id',
+            'admission_comment' => 'required_if:status,rechazado,false,0'
         ];
     }
 

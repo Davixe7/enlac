@@ -42,6 +42,18 @@ class RideController extends Controller
         return RideResource::collection($data);
     }
 
+    public function report(Request $request){
+        $start = $request->start_date;
+        $end   = $request->end_date;
+
+        $data = Ride::whereBetween('date', [$start, $end])
+        ->where('type', $request->type)
+        ->with('candidate.locationDetail')
+        ->get();
+
+        return response()->json(compact('data'));
+    }
+
     /**
      * Store a newly created resource in storage.
      */

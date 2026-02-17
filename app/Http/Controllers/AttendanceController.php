@@ -6,7 +6,6 @@ use App\Http\Resources\BeneficiaryAttendanceResource;
 use App\Models\Activity;
 use App\Models\Attendance;
 use App\Models\Candidate;
-use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +13,7 @@ class AttendanceController extends Controller
 {
     public function candidates(Request $request)
     {
-        $categoryId = $request->work_area_id;
+        $categoryId = $request->plan_category_id;
         $targetDate = $request->date ?: now();
 
         $candidates = Candidate::query()
@@ -26,8 +25,8 @@ class AttendanceController extends Controller
             ])
             ->addSelect([
                 'total_activities' => Activity::selectRaw('count(*)')
-                    ->join('activity_plan', 'activities.id', '=', 'activity_plan.activity_id')
-                    ->join('plans', 'activity_plan.plan_id', '=', 'plans.id')
+                    ->join('activity_plan', 'activities.id',    '=', 'activity_plan.activity_id')
+                    ->join('plans', 'activity_plan.plan_id',    '=', 'plans.id')
                     ->join('candidate_group', 'plans.group_id', '=', 'candidate_group.group_id')
                     ->whereColumn('candidate_group.candidate_id', 'candidates.id')
                     ->where('plans.category_id', $categoryId)
@@ -62,7 +61,7 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         $date = $request->date ?: now();
-        $data = Attendance::where('date', $request->date)->whereWorkAreaId($request->work_area_id)->get();
+        $data = Attendance::where('date', $request->date)->wherePlanCategoryId($request->plan_category_id)->get();
         return response()->json(compact('data'));
     }
 
@@ -73,10 +72,10 @@ class AttendanceController extends Controller
     {
         // 1. Validación
         $validated = $request->validate([
-            'attendances'                => 'required|array|min:1',
-            'attendances.*.work_area_id' => 'required|exists:work_areas,id',
-            'attendances.*.candidate_id' => 'required|exists:candidates,id',
-            'attendances.*.status'       => 'required', // Ajusta según tu escala
+            'attendances'                    => 'required|array|min:1',
+            'attendances.*.plan_category_id' => 'required|exists:plan_categories,id',
+            'attendances.*.candidate_id'     => 'required|exists:candidates,id',
+            'attendances.*.status'           => 'required', // Ajusta según tu escala
         ]);
 
         $today = \Carbon\Carbon::now()->toDateString(); // '2026-01-18'
@@ -87,14 +86,20 @@ class AttendanceController extends Controller
             foreach ($validated['attendances'] as $item) {
                 Attendance::updateOrCreate(
                     [
-                        'candidate_id' => $item['candidate_id'],
-                        'work_area_id' => $item['work_area_id'],
-                        'date'         => $today,
+                        'candidate_id'     => $item['candidate_id'],
+                        'plan_category_id' => $item['plan_category_id'],
+                        'date'             => $today,
+                        'type'             => 'area',
                     ],
-                    [
-                        'status'       => $item['status']
-                    ]
+                    ['status' => $item['status']]
                 );
+
+                if( $item['status'] == 'present'){
+                    Attendance::updateOrCreate(
+                        ['candidate_id' => $item['candidate_id'], 'date' => $today, 'type'=>'daily'],
+                        ['status'       => 'present']
+                    );
+                }
             }
 
             DB::commit();
@@ -110,27 +115,13 @@ class AttendanceController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Attendance $attendance)
-    {
-        //
-    }
+    public function update(Request $request, Attendance $attendance){
+        $data = $request->validate([
+            'absence_justification_type' => 'required',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Attendance $attendance)
-    {
-        //
-    }
+        $attendance->update($data);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Attendance $attendance)
-    {
-        //
+        return response()->json(['data'=>$attendance], 200);
     }
 }

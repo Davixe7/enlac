@@ -34,4 +34,12 @@ class Plan extends Model
         if( !$category_id ){ return $query; }
         return $query->where('category_id', '=', $category_id);
     }
+
+    public function candidates(){
+        return $this->belongsToMany(Candidate::class, 'candidate_group', 'group_id', 'candidate_id', 'group_id', 'id');
+    }
+
+    public function activityPlans(){
+        return $this->hasMany(ActivityPlan::class);
+    }
 }

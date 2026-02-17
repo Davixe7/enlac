@@ -43,7 +43,7 @@ class InterviewService
         return DB::transaction(function () use ($interview, $request) {
 
             if( $request->filled('interviewee') ){
-                Interviewee::updateOrCreate(['candidate_id' => $interview->candidate_id],$request->interviewee);
+                Interviewee::updateOrCreate(['candidate_id' => $interview->candidate_id], $request->interviewee);
             }
 
             $data = $request->validated();

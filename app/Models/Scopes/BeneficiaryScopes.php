@@ -2,6 +2,7 @@
 
 namespace App\Models\Scopes;
 
+use App\Enums\CandidateStatus;
 use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,12 +28,19 @@ trait BeneficiaryScopes
 
     public function scopePending(Builder $query)
     {
-        return $query->where('candidate_status_id', 1);
+        return $query->where('status', CandidateStatus::PENDING);
     }
 
     public function scopeBeneficiaries(Builder $query)
     {
-        return $query->whereNotIn('candidate_status_id', [1, 2, 7, 8, 9]);
+        return $query->whereNotIn('status', [
+            CandidateStatus::PENDING,
+            CandidateStatus::REJECTED,
+            CandidateStatus::GRADUATED,
+            CandidateStatus::DECEASED,
+            CandidateStatus::EX_ENLAC,
+            CandidateStatus::INACTIVE
+        ]);
     }
 
     public function scopeEquinetherapyActivePlan($query)
@@ -65,7 +73,7 @@ trait BeneficiaryScopes
 
     public function scopeBasic(Builder $query, $fields = [])
     {
-        $default = ['id', 'first_name', 'middle_name', 'last_name', 'candidate_status_id'];
+        $default = ['id', 'first_name', 'middle_name', 'last_name', 'status'];
         $fields = array_merge($default, $fields);
         $query->select($fields);
         return $query;

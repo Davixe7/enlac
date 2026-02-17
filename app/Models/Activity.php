@@ -16,4 +16,12 @@ class Activity extends Model
     public function plans(){
         return $this->belongsToMany(Plan::class);
     }
+
+    public function activityPlan(){
+        return $this->hasMany(ActivityPlan::class);
+    }
+
+    public function scores(){
+        return $this->hasManyThrough(ActivityDailyScore::class, ActivityPlan::class);
+    }
 }

@@ -27,7 +27,7 @@ class ActivityDailyScoreController extends Controller
         ->join('activity_plan', 'activity_plan.plan_id', '=', 'plans.id')
         ->join('activities', 'activities.id', '=', 'activity_plan.activity_id')
         ->leftJoin('activity_daily_scores', function($join) use ($date) {
-            $join->on('activity_daily_scores.activity_id', '=', 'activity_plan.activity_id')
+            $join->on('activity_daily_scores.activity_plan_id', '=', 'activity_plan.id')
             ->on('activity_daily_scores.candidate_id', '=', 'candidates.id')
             ->whereDate('activity_daily_scores.date', '=', $date);
         })
@@ -42,7 +42,9 @@ class ActivityDailyScoreController extends Controller
             'activities.name as activity_name',
             'activities.goal_type as activity_goal_type',
 
+            'activity_plan.daily_goal as activity_daily_goal',
             'activity_plan.final_goal as activity_final_goal',
+            'activity_plan.id as activity_plan_id',
 
             'activity_daily_scores.score',
             'activity_daily_scores.closed',
@@ -60,18 +62,20 @@ class ActivityDailyScoreController extends Controller
                 'id'   => $items[0][ $mode == 'user' ? 'candidate_id' : 'activity_id'],
                 'scores' => $items->values()->map(function($score) use ($key, $request){
                     return [
-                        'id'           => $score->id,
-                        'activity_id'  => $score->activity_id,
-                        'candidate_id' => $score->candidate_id,
-                        'closed'       => $score->closed ?: false,
-                        'score'        => $score->score,
-                        'candidate' => [ 'id' => $score->candidate_id, 'name' => $score->candidate_name],
+                        'id'               => $score->id,
+                        'activity_plan_id' => $score->activity_plan_id,
+                        'activity_id'      => $score->activity_id,
+                        'candidate_id'     => $score->candidate_id,
+                        'closed'           => $score->closed ?: false,
+                        'score'            => $score->score,
+                        'candidate'        => [ 'id' => $score->candidate_id, 'name' => $score->candidate_name],
                         'activity' => [
                             'id'        => $score->activity_id,
                             'name'      => $score->activity_name,
                             'goal_type' => $score->activity_goal_type,
                             'plan_category_id' => $request->category_id,
-                            'final_goal' => $score->activity_final_goal
+                            'final_goal'       => $score->activity_final_goal,
+                            'daily_goal'       => $score->activity_daily_goal
                         ],
                     ];
                 })
@@ -101,22 +105,31 @@ class ActivityDailyScoreController extends Controller
     {
         // 1. Validación
         $validated = $request->validate([
-            'scores'                => 'required|array|min:1',
-            'scores.*.activity_id'  => 'required|exists:activities,id',
-            'scores.*.candidate_id' => 'required|exists:candidates,id',
-            'scores.*.score'        => 'required', // Ajusta según tu escala
-            'scores.*.closed'       => 'nullable|boolean',
+            'scores'                     => 'required|array|min:1',
+            'scores.*.activity_plan_id'  => 'required|exists:activity_plan,id',
+            'scores.*.candidate_id'      => 'required|exists:candidates,id',
+            'scores.*.score'             => 'required',
+            'scores.*.closed'            => 'nullable|boolean',
         ]);
 
-        $today = \Carbon\Carbon::now()->toDateString(); // '2026-01-18'
+        $today = \Carbon\Carbon::now()->toDateString();
 
         try {
             DB::beginTransaction();
 
             Attendance::updateOrCreate([
-                'candidate_id' => $request->scores[0]['candidate_id'],
-                'work_area_id' => $request->scores[0]['activity']['plan_category_id'],
-                'date'         => $today,
+                'candidate_id'     => $request->scores[0]['candidate_id'],
+                'plan_category_id' => $request->scores[0]['activity']['plan_category_id'],
+                'date'             => $today,
+                'type'             => 'area'
+            ],
+            ['status' => 'present']
+            );
+
+            Attendance::updateOrCreate([
+                'candidate_id'     => $request->scores[0]['candidate_id'],
+                'date'             => $today,
+                'type'             => 'daily'
             ],
             ['status' => 'present']
             );
@@ -124,13 +137,13 @@ class ActivityDailyScoreController extends Controller
             foreach ($validated['scores'] as $item) {
                 ActivityDailyScore::updateOrCreate(
                     [
-                        'candidate_id' => $item['candidate_id'],
-                        'activity_id'  => $item['activity_id'],
-                        'date'         => $today,
+                        'candidate_id'      => $item['candidate_id'],
+                        'activity_plan_id'  => $item['activity_plan_id'],
+                        'date'              => $today,
                     ],
                     [
-                        'score'       => $item['score'],
-                        'closed'      => $request->closed ?: $item['closed']
+                        'score'             => $item['score'],
+                        'closed'            => $request->closed ?: $item['closed']
                     ]
                 );
             }
@@ -148,27 +161,4 @@ class ActivityDailyScoreController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ActivityDailyScore $activityDailyScore)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ActivityDailyScore $activityDailyScore)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ActivityDailyScore $activityDailyScore)
-    {
-        //
-    }
 }

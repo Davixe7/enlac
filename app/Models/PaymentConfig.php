@@ -10,6 +10,10 @@ class PaymentConfig extends Model
     use SoftDeletes;
     protected $guarded = [];
 
+    public function snapshots(){
+        return $this->hasMany(PaymentConfigSnapshot::class);
+    }
+
     public function candidate(){
         return $this->belongsTo(Candidate::class);
     }
@@ -46,5 +50,25 @@ class PaymentConfig extends Model
         }
 
         return $query->whereCandidateId( $candidate_id );
+    }
+
+    public function periodBalance($startDate, $endDate){
+        return Payment::where('candidate_id', $this->candidate_id)
+                    ->where('sponsor_id', $this->sponsor_id)
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->groupBy('candidate_id')
+                    ->sum('amount');
+    }
+
+    public function getSnapshotForPeriod(int $year, int $month, int $day = 1): ?PaymentConfigSnapshot
+    {
+        $date = \Carbon\Carbon::create($year, $month, $day);
+        return $this->snapshots()
+            ->where('effective_since', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->whereNull('effective_until')->orWhere('effective_until', '>=', $date);
+            })
+            ->orderByDesc('effective_since')
+            ->first();
     }
 }

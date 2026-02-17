@@ -26,6 +26,10 @@ class Issue extends Model implements HasMedia
         return $this->belongsTo(PlanCategory::class);
     }
 
+    public function candidate(){
+        return $this->belongsTo(Candidate::class);
+    }
+
     public function user(){
         return $this->belongsTo(User::class);
     }
@@ -33,5 +37,21 @@ class Issue extends Model implements HasMedia
     public function scopeFilterByDate($query, $date){
         if( !$date ){ return $query; }
         return $query->where('date', $date);
+    }
+
+    public function scopeFilterByCandidate($query, $candidateId)
+    {
+        if (!$candidateId) {
+            return $query;
+        }
+        return $query->where('candidate_id', $candidateId);
+    }
+
+    public function scopeFilterByDates($query, $start, $end)
+    {
+        if (!$start || !$end) {
+            return $query;
+        }
+        return $query->whereBetween('date', [$start, $end]);
     }
 }

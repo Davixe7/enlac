@@ -38,6 +38,14 @@ class PaymentConfigController extends Controller
 
         $paymentConfig = PaymentConfig::create($data);
 
+        // Crea el primer snapshot cuando se genera un PaymentConfig
+        $paymentConfig->snapshots()->create([
+            'amount'          => $paymentConfig->amount,
+            'frequency'       => $paymentConfig->frequency,
+            'effective_since' => now()->toDateString(),
+            'effective_until' => null,
+        ]);
+
         $receiptData = $request->validated()['receipt'] ?? null;
         if( $receiptData ){
             $paymentConfig->deductible_receipt()->create($receiptData);
@@ -62,7 +70,32 @@ class PaymentConfigController extends Controller
         $data = $request->validated();
         unset($data['receipt']);
 
+        $originalAmount = $paymentConfig->amount;
+        $originalFrequency = $paymentConfig->frequency;
+
         $paymentConfig->update($data);
+
+        if ($originalAmount != $paymentConfig->amount || $originalFrequency != $paymentConfig->frequency) {
+            $today = now()->toDateString();
+
+            $currentSnapshot = $paymentConfig->snapshots()
+                ->whereNull('effective_until')
+                ->orderByDesc('effective_since')
+                ->first();
+
+            if ($currentSnapshot) {
+                $currentSnapshot->update([
+                    'effective_until' => $today,
+                ]);
+            }
+
+            $paymentConfig->snapshots()->create([
+                'amount'          => $paymentConfig->amount,
+                'frequency'       => $paymentConfig->frequency,
+                'effective_since' => $today,
+                'effective_until' => null,
+            ]);
+        }
         
         if( array_key_exists('receipt', $request->validated()) ){
             $data = $request->validated()['receipt'];

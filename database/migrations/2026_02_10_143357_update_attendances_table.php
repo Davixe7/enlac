@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Candidate;
 use App\Models\PlanCategory;
-use App\Models\WorkArea;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,16 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attendances', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(Candidate::class);
-            $table->foreignIdFor(PlanCategory::class)->nullable();
-            $table->date('date');
-            $table->enum('status', ['present', 'absent', 'late'])->default('absent');
+        Schema::table('attendances', function (Blueprint $table) {
+            $table->renameColumn('work_area_id', 'plan_category_id');
+            $table->foreign('plan_category_id')->references('id')->on('plan_categories');
+            $table->enum('type', ['area', 'daily'])->default('area');
             $table->string('absence_justification_type')->nullable();
             $table->string('absence_justification_comment')->nullable();
-            $table->enum('type', ['daily', 'area'])->default('area');
-            $table->timestamps();
         });
     }
 
@@ -32,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attendances');
+        Schema::table('attendances', function (Blueprint $table) {
+            $table->dropColumn('absence_justification_type');
+        });
     }
 };

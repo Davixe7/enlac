@@ -18,7 +18,7 @@ class BasicCandidateResource extends JsonResource
             'id'              => $this->id,
             'full_name'       => $this->full_name,
             'location_detail' => $this->locationDetail,
-            'status'          => $this->candidate_status_id,
+            'status'          => $this->status,
         ];
     }
 }

@@ -1,11 +1,9 @@
 <?php
 
 use App\Models\Candidate;
-use App\Models\PlanCategory;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Models\User;
 
 return new class extends Migration
 {
@@ -14,15 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('issues', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(PlanCategory::class);
+        Schema::table('issues', function (Blueprint $table) {
             $table->foreignIdFor(Candidate::class);
-            $table->foreignIdFor(User::class);
-            $table->string('type');
-            $table->date('date');
-            $table->text('comments');
-            $table->timestamps();
         });
     }
 
@@ -31,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('issues');
+        Schema::table('issues', function (Blueprint $table) {
+            $table->dropForeignIdFor(Candidate::class);
+        });
     }
 };

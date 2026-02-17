@@ -35,7 +35,6 @@ use App\Http\Controllers\WorkAreaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\UserController;
-use App\Http\Resources\BeneficiaryFinancialResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\EvaluationFields;
 use App\Http\Resources\EvaluatorResource;
@@ -48,9 +47,15 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\ScoreReportController;
 
+use App\Http\Controllers\reports\AttendanceReportController;
+use App\Http\Controllers\reports\BeneficiaryAttendanceReportController;
+use App\Http\Controllers\reports\BeneficiaryIndividualReportController;
+use App\Http\Controllers\reports\BeneficiaryScoreReportController;
+use App\Http\Controllers\reports\ExcecutiveReportController;
+use App\Http\Controllers\reports\GeneralReportController;
+
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
-
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn () => new UserResource(auth()->user()));
@@ -97,6 +102,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::post('attendances', [AttendanceController::class, 'store'])->name('attendances.store');
+    Route::put('attendances/{attendance}', [AttendanceController::class, 'update'])->name('attendances.update');
+
     Route::get('attendances/candidates', [AttendanceController::class, 'candidates'])->name('attendances.candidates');
     Route::get('payments/{candidate}/export', [PaymentController::class, 'export']);
 
@@ -142,8 +149,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('beneficiaries/{candidate}/reingreso', [BeneficiaryController::class, 'reingreso']);
     Route::delete('media/{media}', [MediaController::class, 'destroy']);
 
-    Route::get('scores', [ActivityDailyScoreController::class, 'index']);
-    Route::get('scores2', [ActivityDailyScoreController::class, 'index2']);
-    Route::post('activity_daily_scores', [ActivityDailyScoreController::class, 'store']);
+    Route::apiResource('activity_daily_scores', ActivityDailyScoreController::class)->only('index', 'store');
+
+    Route::get('beneficiaries/{candidate}/reports/daily', [BeneficiaryScoreReportController::class, 'daily']);
+    Route::get('beneficiaries/{candidate}/reports/monthly', [BeneficiaryScoreReportController::class, 'monthly']);
+    Route::get('beneficiaries/{candidate}/individual', [BeneficiaryIndividualReportController::class, 'index']);
+    Route::get('beneficiaries/{candidate}/scores', [BeneficiaryIndividualReportController::class, 'scores']);
+
+    Route::get('reports/attendances', [AttendanceReportController::class, 'index']);
+    Route::get('reports/general', [GeneralReportController::class, 'index']);
+    Route::get('reports/excecutive', [ExcecutiveReportController::class, 'index']);
+    Route::get('reports/rides', [RideController::class, 'index']);
+
     Route::get('reports/scores', [ScoreReportController::class, 'index']);
+    Route::get('reports/attendances/daily', [BeneficiaryAttendanceReportController::class, 'daily']);
 });

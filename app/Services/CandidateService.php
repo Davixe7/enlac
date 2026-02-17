@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CandidateStatus;
 use App\Http\Requests\StoreCandidateRequest;
 use App\Models\Candidate;
 use App\Models\Contact;
@@ -18,7 +19,7 @@ class CandidateService
         // Iniciar transacción para asegurar la integridad de los datos
         return DB::transaction(function () use ($request) {
             // 1. Crear Candidato
-            $data = array_merge($request->validated()['candidate'], ['candidate_status_id'=>1]);
+            $data = array_merge($request->validated()['candidate'], ['status'=> CandidateStatus::PENDING]);
             $candidate = Candidate::create($data);
 
             if ($request->hasFile('picture')) {

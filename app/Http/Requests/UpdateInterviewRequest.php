@@ -22,17 +22,17 @@ class UpdateInterviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'candidate_id'       => 'nullable|exists:candidates,id',
-            'content'            => 'nullable|string',
-            'observation'        => 'nullable|string',
-            'apgar_rank'         => 'nullable|numeric',
-            'sphincters_control' => 'nullable',
-            'signed_at'          => 'nullable|date',
-            'answers'            => 'nullable|array',
+            'candidate_id'                   => 'nullable|exists:candidates,id',
+            'content'                        => 'nullable|string',
+            'observation'                    => 'nullable|string',
+            'apgar_rank'                     => 'nullable|numeric',
+            'sphincters_control'             => 'nullable',
+            'signed_at'                      => 'nullable|date',
+            'answers'                        => 'nullable|array',
 
-            'interviewee.name'               => 'nullable',
-            'interviewee.relationship'       => 'nullable',
-            'interviewee.legal_relationship' => 'nullable',
+            'interviewee.name'               => 'required',
+            'interviewee.relationship'       => 'required',
+            'interviewee.legal_relationship' => 'required',
         ];
     }
 

@@ -2,57 +2,76 @@
 
 namespace Database\Seeders;
 
+use App\Models\Activity;
+use App\Models\Candidate;
+use App\Models\Plan;
+use App\Models\PlanCategory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
 class CandidateScoresSeeder extends Seeder
 {
     public function run(): void
     {
-        $candidateId = 55;
-        $planId = 33;
+        $candidate     = Candidate::find(55);
+        $candidate->attendances()->delete();
+        $groupId       = $candidate->groups()->first()->id;
+        $planCategory  = PlanCategory::find(1);
+        $activities    = Activity::where('plan_category_id', $planCategory->id)->where('goal_type', 'Normal')->limit(5)->get();
+        $end           = now()->endOfMonth();
+        $start         = now()->startOfYear();
+        
+        Plan::where('group_id', $groupId)
+        ->where('category_id', $planCategory->id)
+        ->delete();
 
-        // 1. Obtener las actividades vinculadas al plan 32
-        $activityIds = DB::table('activity_plan')
-            ->where('plan_id', $planId)
-            ->pluck('activity_id');
+        $plan          = Plan::create([
+            'category_id'    => $planCategory->id,
+            'subcategory_id' => $planCategory->id,
+            'group_id'       => $groupId,
+            'name'           => 'Plan Seed 01',
+            'status'         => 1,
+            'start_date'     => $start,
+            'end_date'       => $end
+        ]);
 
-        if ($activityIds->isEmpty()) {
-            $this->command->warn("El plan {$planId} no tiene actividades asociadas.");
-            return;
+        foreach( $activities as $activity ){
+            $plan->activityPlans()->create([
+                'activity_id' => $activity->id,
+                'daily_goal'  => rand(10, 100),
+                'final_goal'  => null
+            ]);
         }
 
-        // 2. Definir el periodo: del 1 al 28 de febrero de 2026
-        $period = CarbonPeriod::create('2026-02-01', '2026-02-28');
+        $activityPlans = $plan->activityPlans()->get();
 
-        $dataToInsert = [];
+        $period = CarbonPeriod::create($start, $end);
 
         foreach ($period as $date) {
-            foreach ($activityIds as $activityId) {
-                $dataToInsert[] = [
-                    'candidate_id' => $candidateId,
-                    'activity_id'  => $activityId,
-                    'score'        => rand(70, 100), // Score aleatorio entre 70 y 100
+            if( $date->isWeekend() ){ continue; }
+            $candidate->attendances()->create([
+                'type'             => 'area',
+                'plan_category_id' => $planCategory->id,
+                'date'             => $date,
+                'status'           => 'present'
+            ]);
+
+            $candidate->attendances()->create([
+                'type'             => 'daily',
+                'plan_category_id' => null,
+                'date'             => $date,
+                'status'           => 'present'
+            ]);
+
+            foreach ($activityPlans as $activityPlan) {
+                $activityPlan->scores()->create([
+                    'candidate_id' => $candidate->id,
+                    'score'        => rand(1, 100),
                     'date'         => $date->format('Y-m-d'),
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ];
-            }
-
-            // Insertamos en bloques de 100 para no saturar la memoria si hay muchas actividades
-            if (count($dataToInsert) >= 100) {
-                DB::table('activity_daily_scores')->insert($dataToInsert);
-                $dataToInsert = [];
+                ]);
             }
         }
 
-        // Insertar el remanente
-        if (!empty($dataToInsert)) {
-            DB::table('activity_daily_scores')->insert($dataToInsert);
-        }
-
-        $this->command->info("Seeder completado: Scores generados para el candidato {$candidateId} en el plan {$planId}.");
+        $this->command->info("Seeder completado: Scores generados para el candidato {$candidate->id} en el plan {$plan->id}.");
     }
 }

@@ -14,9 +14,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('activity_plan', function (Blueprint $table) {
-            $table->foreignIdFor(Activity::class);
+            $table->id();
+            $table->foreignIdFor(Activity::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(Plan::class)->constrained()->onDelete('cascade');
-            $table->string('daily_goal');
+            $table->string('daily_goal')->nullable();
             $table->string('final_goal')->nullable();
         });
     }

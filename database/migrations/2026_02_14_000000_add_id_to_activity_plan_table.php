@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('candidate_statuses', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('label');
+        Schema::table('activity_plan', function (Blueprint $table) {
+            $table->id()->first();
             $table->timestamps();
+            $table->string('daily_goal')->nullable()->change();
         });
     }
 
@@ -24,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('candidate_statuses');
+        Schema::table('activity_plan', function (Blueprint $table) {
+            //
+        });
     }
 };

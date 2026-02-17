@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CandidateStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,7 +28,7 @@ class CandidateFactory extends Factory
             'diagnosis'    => $this->faker->sentence(),
             'sheet'        => $this->faker->unique()->randomNumber(5), // Genera un número de hoja único
             'info_channel' => $this->faker->randomElement(['Redes Sociales', 'Referencia', 'Publicidad', 'Otro']),
-            'admission_status' => $this->faker->randomElement([null, true, false]),
+            'status' => $this->faker->randomElement(['pendiente', 'aceptado', 'rechazado']),
             'admission_comment' => $this->faker->optional()->sentence(),
             'entry_date' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
             'program_id' => 1, // Asocia un programa existente o crea uno nuevo
@@ -45,8 +46,7 @@ class CandidateFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'candidate_status_id' => 1,
-                'admission_status'    => true,
+                'status'              => CandidateStatus::ACCEPTED,
                 'admission_comment'   => null,
                 'entry_date'          => $this->faker->randomElement([$this->faker->dateTimeBetween('-1 year', 'now'), null]),
             ];
@@ -62,8 +62,7 @@ class CandidateFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'candidate_status_id' => 2,
-                'admission_status'    => false,
+                'status'              => CandidateStatus::REJECTED,
                 'admission_comment'   => $this->faker->sentence(),
                 'entry_date'          => null,
                 'program_id'          => null,
@@ -81,8 +80,7 @@ class CandidateFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'candidate_status_id' => 3,
-                'admission_status'    => null,
+                'status'              => CandidateStatus::PENDING,
                 'admission_comment'   => null,
                 'entry_date'          => null,
             ];

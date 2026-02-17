@@ -12,7 +12,16 @@ class IssueController extends Controller
      */
     public function index(Request $request)
     {
-        $data = Issue::filterByDate($request->date)->with(['user', 'plan_category'])->get();
+        if( $request->candidate_id ){
+            $data = Issue::filterByDate($request->date)
+            ->filterByCandidate($request->candidate_id)
+            ->filterByDates($request->start_date, $request->end_date)
+            ->with(['user', 'plan_category', 'candidate'])->get();
+
+            return response()->json(compact('data'));
+        }
+
+        $data = Issue::filterByDate($request->date)->with(['user', 'plan_category', 'candidate'])->get();
         return response()->json(compact('data'));
     }
 
@@ -22,6 +31,7 @@ class IssueController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'candidate_id'     => 'required|exists:candidates,id',
             'plan_category_id' => 'required|exists:plan_categories,id',
             'user_id'          => 'required|exists:users,id',
             'type'             => 'required|string',

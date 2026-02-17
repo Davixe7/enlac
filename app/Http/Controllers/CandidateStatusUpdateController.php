@@ -37,16 +37,17 @@ class CandidateStatusUpdateController extends Controller
     public function update(Request $request, Candidate $candidate)
     {
         $data = $request->validate([
-            'candidate_status_id' => 'required',
-            'entry_date'          => 'required_if:candidate_status_id,5',
-            'program_id'          => 'required_if:candidate_status_id,5'
+            'status'              => 'required',
+            'entry_date'          => 'required_if:status,programado',
+            'program_id'          => 'required_if:status,programado'
         ]);
 
         if( $request->filled('entry_date') ){
             //Notificar ingreso programado
         }
 
-        $candidate->update($data);
+        $candidate->updateStatus($request->status);
+        $candidate->update($request->only(['entry_date', 'program_id']));
 
         return response()->json([], 200);
     }
