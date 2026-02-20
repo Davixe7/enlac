@@ -1,17 +1,9 @@
 <?php
-
-use App\Enums\CandidateStatus;
-use App\Http\Controllers\BeneficiaryScoreReportController;
-use App\Models\Candidate;
+use App\Http\Controllers\BeneficiaryController;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('clear', function () {
-    DB::table('activity_daily_scores')->delete();
-    DB::table('attendances')->delete();
-});
+Route::get('search', [BeneficiaryController::class, 'index']);
 
 Route::get('seasons', function () {
     //App\Models\PaymentConfig::create(['candidate_id' => 1, 'sponsor_id' => null, 'frequency' => 1, 'amount' => 500, 'month_payday'=>1]);

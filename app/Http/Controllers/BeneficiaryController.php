@@ -11,6 +11,7 @@ use App\Models\Plan;
 
 use App\Services\CandidateService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BeneficiaryController extends Controller
 {
@@ -26,6 +27,15 @@ class BeneficiaryController extends Controller
      */
     public function index(Request $request)
     {
+        if( $request->type == 'search' ){
+            $data = DB::table('candidates')
+            ->whereIn('status', [CandidateStatus::ACCEPTED, CandidateStatus::SCHEDULED, CandidateStatus::READY, CandidateStatus::ACTIVE])
+            ->select('id as value')
+            ->selectRaw("CONCAT_WS(' ', first_name, middle_name, last_name) as label")
+            ->get();
+            return response()->json(compact('data'), 200);
+        }
+
         $beneficiaries = Candidate::name($request->name)
             ->with(['program'])
             ->beneficiaries();

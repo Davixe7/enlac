@@ -25,17 +25,25 @@ class ExcecutiveReportController extends Controller
             ELSE 0 END) as rubio
         ")
         ->whereYear('date', $year)
-        ->groupBy('candidates.id')
-        ->get()
-        ->keyBy('id');
+        ->groupBy('candidates.id');
+
+        if ($request->filled('candidate_id')) {
+            $rides = $rides->where('candidates.id', $request->candidate_id);
+        }
+
+        $rides = $rides->get()->keyBy('id');
 
         $issues = Candidate::select('candidates.id')
             ->join('issues', 'issues.candidate_id', '=', 'candidates.id')
             ->selectRaw("COUNT(*) as total")
             ->whereYear('issues.date', $year)
-            ->groupBy('candidates.id')
-            ->get()
-            ->keyBy('id');
+                ->groupBy('candidates.id');
+
+            if ($request->filled('candidate_id')) {
+                $issues = $issues->where('candidates.id', $request->candidate_id);
+            }
+
+            $issues = $issues->get()->keyBy('id');
 
         $attendances = Candidate::select('candidates.id')
             ->join('attendances', 'attendances.candidate_id', '=', 'candidates.id')
@@ -46,9 +54,13 @@ class ExcecutiveReportController extends Controller
         ")
             ->where('attendances.type', 'daily')
             ->whereYear('attendances.date', $year)
-            ->groupBy('candidates.id')
-            ->get()
-            ->keyBy('id');
+            ->groupBy('candidates.id');
+
+        if ($request->filled('candidate_id')) {
+            $attendances = $attendances->where('attendances.candidate_id', $request->candidate_id);
+        }
+
+        $attendances = $attendances->get()->keyBy('id');
 
         $scores = Candidate::select('candidates.id', 'candidates.first_name', 'candidates.middle_name', 'candidates.last_name')
             ->join('activity_daily_scores as ads', 'candidates.id', '=', 'ads.candidate_id')
@@ -60,9 +72,13 @@ class ExcecutiveReportController extends Controller
                 SUM(CASE WHEN ads.color = 'warning' THEN 1 ELSE 0 END) as warning,
                 SUM(CASE WHEN ads.color = 'negative' THEN 1 ELSE 0 END) as negative
             ")
-            ->groupBy('candidates.id', 'candidates.first_name', 'full_name', 'month')
-            ->get()
-            ->groupBy('id');
+            ->groupBy('candidates.id', 'candidates.first_name', 'full_name', 'month');
+
+        if ($request->filled('candidate_id')) {
+            $scores = $scores->where('ads.candidate_id', $request->candidate_id);
+        }
+
+        $scores = $scores->get()->groupBy('id');
 
         $data = $scores->map(function ($candidateGroup, $id) use ($attendances, $issues, $rides) {
             $att = $attendances->get($id);

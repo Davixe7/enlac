@@ -33,8 +33,13 @@ class AttendanceReportController extends Controller
             SUM( IF(attendances.status = 'absent' AND (absence_justification_comment IS NULL OR absence_justification_comment = ''), 1, 0)) as unjustified
         ")
         ->selectRaw("ROUND((SUM(IF(attendances.status = 'present', 1, 0)) / ?) * 100) as percentage", [$daysCount])
-        ->groupBy('candidate_id', 'candidates.first_name', 'candidates.middle_name', 'candidates.last_name')
-        ->get();
+        ->groupBy('candidate_id', 'candidates.first_name', 'candidates.middle_name', 'candidates.last_name');
+
+        if ($request->filled('candidate_id')) {
+            $data = $data->where('attendances.candidate_id', $request->candidate_id);
+        }
+
+        $data = $data->get();
 
         $averagePercentage = round($data->avg('percentage'), 2);
 

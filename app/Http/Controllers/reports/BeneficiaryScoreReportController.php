@@ -92,7 +92,7 @@ class BeneficiaryScoreReportController extends Controller
             $q->whereId($candidate->id);
         })
         ->where('start_date', '>=', $request->start_date)
-        ->where('end_date', '<=', $request->end_date)
+        /* ->where('end_date', '<=', $request->end_date) */
         ->where('status', 1)
         ->with('category')
         ->with('activities.scores', function ($q) use ($candidate, $request) {
