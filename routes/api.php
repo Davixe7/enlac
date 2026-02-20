@@ -161,6 +161,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('reports/excecutive', [ExcecutiveReportController::class, 'index']);
     Route::get('reports/rides', [RideController::class, 'index']);
 
+    // Export routes for reports
+    Route::get('reports/general/export', [GeneralReportController::class, 'export']);
+    Route::get('reports/attendances/export', [AttendanceReportController::class, 'export']);
+    Route::get('reports/excecutive/export', [ExcecutiveReportController::class, 'export']);
+    Route::get('reports/attendances/daily/export', [BeneficiaryAttendanceReportController::class, 'export']);
+    Route::get('beneficiaries/{candidate}/individual/export', [BeneficiaryIndividualReportController::class, 'export']);
+
     Route::get('reports/scores', [ScoreReportController::class, 'index']);
     Route::get('reports/attendances/daily', [BeneficiaryAttendanceReportController::class, 'daily']);
+
+    Route::get('beneficiaries/{candidate}/reports/export', [BeneficiaryScoreReportController::class, 'export']);
+    Route::get('beneficiaries/{candidate}/reports/exportMonthly', [BeneficiaryScoreReportController::class, 'exportMonthly']);
 });

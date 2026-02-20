@@ -7,6 +7,11 @@ use App\Models\Candidate;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\ActivityDailyScore;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class BeneficiaryScoreReportController extends Controller
 {
@@ -113,6 +118,103 @@ class BeneficiaryScoreReportController extends Controller
 
         return response()->json(compact('data'));
     }
+
+    public function export(Candidate $candidate, Request $request)
+    {
+        $date = $request->input('date', now()->toDateString());
+
+        $data = ActivityDailyScore::whereCandidateId($candidate->id)
+            ->where('date', $date)
+            ->with(['activityPlan.activity', 'activityPlan.plan.category', 'candidate'])
+            ->get();
+
+        $rows = $data->map(function ($item) {
+            $plan = $item->activityPlan->plan ?? null;
+            $activity = $item->activityPlan->activity ?? null;
+
+            return [
+                'Fecha'            => $item->date,
+                'Beneficiario'     => $item->candidate->full_name ?? '',
+                'Plan'             => $plan->name ?? '',
+                'Categoria'        => $plan->category->label ?? '',
+                'Actividad'        => $activity->name ?? '',
+                'Tipo de meta'     => $activity->goal_type ?? '',
+                'Unidad'           => $activity->measurement_unit ?? '',
+                'Meta diaria'      => $item->activityPlan->daily_goal ?? '',
+                'Puntaje'          => $item->score,
+                'Color'            => $item->color,
+                'Cerrado'          => $item->closed ? 'Si' : 'No',
+            ];
+        })->toArray();
+
+        $export = new class($rows) implements FromArray, WithHeadings, ShouldAutoSize {
+            private $rows;
+            public function __construct(array $rows){ $this->rows = $rows; }
+            public function array(): array { return $this->rows; }
+            public function headings(): array { return array_keys($this->rows[0] ?? []); }
+        };
+
+        $filename = 'dailyscore_report_' . $candidate->full_name . '_' . $date . '_' . time() . '.xlsx';
+
+        return Excel::download($export, $filename);
+    }
+    
+    public function exportMonthly(Candidate $candidate, Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date',
+        ]);
+
+        $data = Plan::whereHas('candidates', function ($q) use ($candidate) {
+            $q->whereId($candidate->id);
+        })
+        ->where('start_date', '>=', $request->start_date)
+        ->where('status', 1)
+        ->with('category')
+        ->with('activities.scores', function ($q) use ($candidate, $request) {
+            $q->whereCandidateId($candidate->id)
+                ->where('date', '>=', $request->start_date)
+                ->where('date', '<=', $request->end_date);
+        })
+        ->get();
+
+        $rows = [];
+
+        $data->each(function ($plan) use (&$rows) {
+            $plan->activities = $plan->activities->map(function ($activity) {
+                $activity->total  = trim($activity->goal_type) == 'Dominio'
+                ? $activity->scores->mode('score')
+                : $activity->scores->sum('score');
+                return $activity;
+            });
+
+            foreach ($plan->activities as $activity) {
+                $rows[] = [
+                    'Plan' => $plan->name ?? '',
+                    'Categoria' => $plan->category->label ?? '',
+                    'Actividad' => $activity->name ?? '',
+                    'Tipo de meta' => $activity->goal_type ?? '',
+                    'Unidad' => $activity->measurement_unit ?? '',
+                    'Total' => $activity->total ?? '',
+                ];
+            }
+        });
+
+        $rows = collect($rows)->toArray();
+
+        $export = new class($rows) implements FromArray, WithHeadings, ShouldAutoSize {
+            private $rows;
+            public function __construct(array $rows){ $this->rows = $rows; }
+            public function array(): array { return $this->rows; }
+            public function headings(): array { return array_keys($this->rows[0] ?? []); }
+        };
+
+        $filename = 'monthly_dailyscore_' . $candidate->full_name . '_' . $request->start_date . '_' . $request->end_date . '_' . time() . '.xlsx';
+
+        return Excel::download($export, $filename);
+    }
+    
 
     public function getColorAttribute($activity, $item, $prevValue)
     {
