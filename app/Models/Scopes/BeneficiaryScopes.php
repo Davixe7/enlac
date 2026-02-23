@@ -89,4 +89,10 @@ trait BeneficiaryScopes
               ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%$search%"]);
         });
     }
+
+    public function scopeFullName($query){
+        return $query
+        ->select(['candidates.id', 'candidates.first_name', 'candidates.last_name', 'candidates.middle_name'])
+        ->selectRaw("CONCAT_WS(' ', candidates.first_name, candidates.middle_name, candidates.last_name) as full_name");
+    }
 }

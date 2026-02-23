@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\ActivityDailyScoreController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\DailyAttendanceController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\ScoreReportController;
 
@@ -53,6 +54,7 @@ use App\Http\Controllers\reports\BeneficiaryIndividualReportController;
 use App\Http\Controllers\reports\BeneficiaryScoreReportController;
 use App\Http\Controllers\reports\ExcecutiveReportController;
 use App\Http\Controllers\reports\GeneralReportController;
+use App\Models\CandidateStatusLog;
 
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
@@ -173,4 +175,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('beneficiaries/{candidate}/reports/export', [BeneficiaryScoreReportController::class, 'export']);
     Route::get('beneficiaries/{candidate}/reports/exportMonthly', [BeneficiaryScoreReportController::class, 'exportMonthly']);
+
+    Route::post('attendances/daily', [DailyAttendanceController::class, 'store']);
+
+    Route::get('candidate_status_logs', function(Request $request){
+        $start = $request->start_date;
+        $end   = $request->end_date;
+        $candidateId = $request->candidate_id;
+
+        $data = CandidateStatusLog::with([
+            'candidate' => fn($q)=>$q->fullName(),
+        ])
+        ->with('author')
+        ->byBeneficiary($candidateId)
+        ->whereBetween('created_at', [$start, $end])
+        ->get();
+
+        return response()->json(compact('data'));
+    });
 });
