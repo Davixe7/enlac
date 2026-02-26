@@ -27,9 +27,9 @@ class AttendanceReportController extends Controller
         ->whereRaw('WEEKDAY(date) < 5')
         ->selectRaw("
             candidate_id,
-            CONCAT_WS(' ', 
-                candidates.first_name, 
-                NULLIF(candidates.middle_name, ''), 
+            CONCAT_WS(' ',
+                candidates.first_name,
+                NULLIF(candidates.middle_name, ''),
                 NULLIF(candidates.last_name, '')
             ) as full_name,
             SUM( IF(attendances.status = 'present', 1, 0) ) as present,
@@ -63,6 +63,9 @@ class AttendanceReportController extends Controller
             return !$date->isWeekend();
         }, Carbon::parse($end)->addDay());
 
+        // Aseguramos que no haya división por cero si el rango de fechas es inválido
+        $daysCount = $daysCount ?: 1;
+
         $data = Attendance::join('candidates', 'attendances.candidate_id', '=', 'candidates.id')
         ->where('type', 'daily')
         ->whereBetween('date', [$start, $end])
@@ -81,31 +84,49 @@ class AttendanceReportController extends Controller
             $data = $data->where('attendances.candidate_id', $request->candidate_id);
         }
 
-        $data = $data->get();
-        $averagePercentage = round($data->avg('percentage'), 2);
+        $results = $data->get();
+        $averagePercentage = round($results->avg('percentage'), 2);
 
-        $rows = $data->map(function($item){
+        $rows = $results->map(function($item){
             return [
-                'candidate_id' => $item->candidate_id,
-                'full_name' => $item->full_name,
-                'present' => $item->present,
-                'justified' => $item->justified,
-                'unjustified' => $item->unjustified,
-                'percentage' => $item->percentage,
+                'ID'          => $item->candidate_id,
+                'Nombre'      => $item->full_name,
+                'Presentes'   => $item->present,
+                'Justificados'=> $item->justified,
+                'Injustificados' => $item->unjustified,
+                'Porcentaje'  => $item->percentage . '%',
             ];
         })->toArray();
 
-        // add summary row
-        $rows[] = ['candidate_id' => 'AVERAGE', 'full_name' => '', 'present' => '', 'justified' => '', 'unjustified' => '', 'percentage' => $averagePercentage];
+        // Fila de resumen en español
+        $rows[] = [
+            'ID'          => 'PROMEDIO GENERAL',
+            'Nombre'      => '',
+            'Presentes'   => '',
+            'Justificados'=> '',
+            'Injustificados' => '',
+            'Porcentaje'  => $averagePercentage . '%'
+        ];
 
         $export = new class($rows) implements FromArray, WithHeadings, ShouldAutoSize {
             private $rows;
             public function __construct(array $rows){ $this->rows = $rows; }
             public function array(): array { return $this->rows; }
-            public function headings(): array { return ['candidate_id','full_name','present','justified','unjustified','percentage']; }
+
+            // Encabezados en español para el cliente
+            public function headings(): array {
+                return [
+                    'Folio',
+                    'Nombre Completo',
+                    'Días Presente',
+                    'Faltas Justificadas',
+                    'Faltas Injustificadas',
+                    '% Asistencia'
+                ];
+            }
         };
 
-        $filename = 'attendance_report_' . $start . '_' . $end . '_' . time() . '.xlsx';
+        $filename = 'reporte_asistencia_' . $start . '_a_' . $end . '.xlsx';
         return Excel::download($export, $filename);
     }
 }

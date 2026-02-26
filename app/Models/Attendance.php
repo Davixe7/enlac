@@ -12,7 +12,7 @@ class Attendance extends Model
         return $this->belongsTo(Candidate::class);
     }
 
-    public function workarea(){
-        return $this->belongsTo(WorkArea::class);
+    public function planCategory(){
+        return $this->belongsTo(PlanCategory::class);
     }
 }

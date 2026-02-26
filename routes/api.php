@@ -60,7 +60,7 @@ Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', fn () => new UserResource(auth()->user()));
+    Route::get('/user', fn () => new UserResource(auth()->user()))->name('user');
     Route::get('test', [FinancialController::class, 'semaforo']);
 
     Route::get('notifications', [NotificationController::class, 'index']);
@@ -132,7 +132,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('dashboard-slides/reorder', [DashboardSlideController::class, 'reorder']);
-    
+
     Route::put('candidates/{candidate}/admission', [CandidateController::class, 'admission']);
     Route::put('candidates/{candidate}/review', [CandidateController::class, 'review']);
     Route::get('beneficiaries', [BeneficiaryController::class, 'index']);

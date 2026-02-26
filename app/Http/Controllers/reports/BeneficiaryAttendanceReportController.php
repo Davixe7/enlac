@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\reports;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -16,20 +17,17 @@ class BeneficiaryAttendanceReportController extends Controller
         $request->validate(['candidate_id'=>'required']);
         $date = $request->date ?: now();
 
-        $rows = DB::table('candidates')
-        ->join('candidate_group', 'candidates.id', '=', 'candidate_group.candidate_id')
-        ->join('groups', 'groups.id', '=', 'candidate_group.group_id')
-        ->join('plans', 'plans.group_id', '=', 'groups.id')
-        ->join('plan_categories', 'plan_categories.id', '=', 'plans.category_id')
-        ->leftJoin('attendances', 'attendances.plan_category_id', '=', 'plan_categories.id')
-        ->where('candidates.id', $request->candidate_id)
-        ->where('date', $date)
+        $rows = DB::table('attendances')
+        ->whereCandidateId($request->candidate_id)
+        ->where('date', '=', $date)
+        ->where('type', '=', 'area')
+        ->join('plan_categories', 'plan_categories.id', '=', 'attendances.plan_category_id')
         ->select([
+            'attendances.plan_category_id',
             'plan_categories.label as area_name',
-            'attendances.date as attendance_date',
             'attendances.status as attendance_status',
-            'attendances.id as attendance_id',
-            'attendances.absence_justification_type',
+            'attendances.date as attendance_date',
+            'absence_justification_type',
         ])
         ->get();
 
