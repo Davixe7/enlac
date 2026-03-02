@@ -7,9 +7,7 @@ use App\Models\Attendance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use App\Exports\AttendanceReportExport;
 
 class AttendanceReportController extends Controller
 {
@@ -56,77 +54,48 @@ class AttendanceReportController extends Controller
 
     public function export(Request $request)
     {
+        // 1. Validar y capturar las fechas
         $start = $request->start_date;
         $end   = $request->end_date;
 
-        $daysCount = Carbon::parse($start)->diffInDaysFiltered(function($date){
-            return !$date->isWeekend();
-        }, Carbon::parse($end)->addDay());
-
-        // Aseguramos que no haya división por cero si el rango de fechas es inválido
-        $daysCount = $daysCount ?: 1;
-
-        $data = Attendance::join('candidates', 'attendances.candidate_id', '=', 'candidates.id')
-        ->where('type', 'daily')
-        ->whereBetween('date', [$start, $end])
-        ->whereRaw('WEEKDAY(date) < 5')
-        ->selectRaw("
-            candidate_id,
-            CONCAT_WS(' ', candidates.first_name, NULLIF(candidates.middle_name, ''), NULLIF(candidates.last_name, '')) as full_name,
-            SUM( IF(attendances.status = 'present', 1, 0) ) as present,
-            SUM( IF(attendances.status = 'absent' AND (absence_justification_comment IS NOT NULL AND absence_justification_comment != ''), 1, 0)) as justified,
-            SUM( IF(attendances.status = 'absent' AND (absence_justification_comment IS NULL OR absence_justification_comment = ''), 1, 0)) as unjustified
-        ")
-        ->selectRaw("ROUND((SUM(IF(attendances.status = 'present', 1, 0)) / ?) * 100) as percentage", [$daysCount])
-        ->groupBy('candidate_id', 'candidates.first_name', 'candidates.middle_name', 'candidates.last_name');
-
-        if ($request->filled('candidate_id')) {
-            $data = $data->where('attendances.candidate_id', $request->candidate_id);
+        if (!$start || !$end) {
+            return response()->json(['error' => 'Las fechas son obligatorias'], 422);
         }
 
-        $results = $data->get();
-        $averagePercentage = round($results->avg('percentage'), 2);
+        // 2. Calcular los días hábiles (misma lógica que tu index)
+        $daysCount = \Carbon\Carbon::parse($start)->diffInDaysFiltered(function($date){
+            return !$date->isWeekend();
+        }, \Carbon\Carbon::parse($end)->addDay()) ?: 1;
 
-        $rows = $results->map(function($item){
-            return [
-                'ID'          => $item->candidate_id,
-                'Nombre'      => $item->full_name,
-                'Presentes'   => $item->present,
-                'Justificados'=> $item->justified,
-                'Injustificados' => $item->unjustified,
-                'Porcentaje'  => $item->percentage . '%',
-            ];
-        })->toArray();
+        // 3. Ejecutar la consulta con los cálculos de agregación
+        $query = Attendance::join('candidates', 'attendances.candidate_id', '=', 'candidates.id')
+            ->where('type', 'daily')
+            ->whereBetween('date', [$start, $end])
+            ->whereRaw('WEEKDAY(date) < 5')
+            ->selectRaw("
+                candidate_id,
+                CONCAT_WS(' ',
+                    candidates.first_name,
+                    NULLIF(candidates.middle_name, ''),
+                    NULLIF(candidates.last_name, '')
+                ) as full_name,
+                SUM( IF(attendances.status = 'present', 1, 0) ) as present,
+                SUM( IF(attendances.status = 'absent' AND (absence_justification_comment IS NOT NULL AND absence_justification_comment != ''), 1, 0)) as justified,
+                SUM( IF(attendances.status = 'absent' AND (absence_justification_comment IS NULL OR absence_justification_comment = ''), 1, 0)) as unjustified
+            ")
+            ->selectRaw("ROUND((SUM(IF(attendances.status = 'present', 1, 0)) / ?) * 100) as percentage", [$daysCount])
+            ->groupBy('candidate_id', 'candidates.first_name', 'candidates.middle_name', 'candidates.last_name');
 
-        // Fila de resumen en español
-        $rows[] = [
-            'ID'          => 'PROMEDIO GENERAL',
-            'Nombre'      => '',
-            'Presentes'   => '',
-            'Justificados'=> '',
-            'Injustificados' => '',
-            'Porcentaje'  => $averagePercentage . '%'
-        ];
+        // 4. Aplicar filtro de candidato si existe
+        if ($request->filled('candidate_id')) {
+            $query->where('attendances.candidate_id', $request->candidate_id);
+        }
 
-        $export = new class($rows) implements FromArray, WithHeadings, ShouldAutoSize {
-            private $rows;
-            public function __construct(array $rows){ $this->rows = $rows; }
-            public function array(): array { return $this->rows; }
+        $data = $query->get();
 
-            // Encabezados en español para el cliente
-            public function headings(): array {
-                return [
-                    'Folio',
-                    'Nombre Completo',
-                    'Días Presente',
-                    'Faltas Justificadas',
-                    'Faltas Injustificadas',
-                    '% Asistencia'
-                ];
-            }
-        };
+        // 5. Definir nombre del archivo y disparar la descarga
+        $fileName = 'Reporte_Asistencia_' . \Carbon\Carbon::parse($start)->format('d-m-Y') . '_al_' . \Carbon\Carbon::parse($end)->format('d-m-Y') . '.xlsx';
 
-        $filename = 'reporte_asistencia_' . $start . '_a_' . $end . '.xlsx';
-        return Excel::download($export, $filename);
+        return Excel::download(new \App\Exports\AttendanceReportExport($data, $start, $end), $fileName);
     }
 }
