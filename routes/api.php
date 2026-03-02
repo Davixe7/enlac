@@ -58,6 +58,8 @@ use App\Models\CandidateStatusLog;
 
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
+Route::get('issues/export', [IssueController::class, 'export']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn () => new UserResource(auth()->user()))->name('user');
@@ -169,6 +171,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('reports/excecutive/export', [ExcecutiveReportController::class, 'export']);
     Route::get('reports/attendances/daily/export', [BeneficiaryAttendanceReportController::class, 'export']);
     Route::get('beneficiaries/{candidate}/individual/export', [BeneficiaryIndividualReportController::class, 'export']);
+    Route::get('rides/export', [RideController::class, 'export']);
 
     Route::get('reports/scores', [ScoreReportController::class, 'index']);
     Route::get('reports/attendances/daily', [BeneficiaryAttendanceReportController::class, 'daily']);

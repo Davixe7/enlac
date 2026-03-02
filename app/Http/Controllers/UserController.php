@@ -16,8 +16,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with(['work_area', 'leader', 'roles'])->orderBy('name')->get();
-        $data = UserResource::collection($users);
-        return response()->json(compact('data'));
+        return UserResource::collection($users);
     }
 
     /**
@@ -70,25 +69,24 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'employee_number' => 'nullable|string',
-            'name' => 'required|string',
-            'last_name' => 'required|string',
+            'employee_number'  => 'nullable|string',
+            'name'             => 'required|string',
+            'last_name'        => 'required|string',
             'second_last_name' => 'required|string',
-            'phone' => 'nullable|string',
-            'email' => ['required', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8',
-            'leader_id' => 'required|exists:users,id',
-            'role_id' => 'required|exists:roles,id',
-            'work_area_id' => 'required|exists:work_areas,id',
-            'entry_date' => 'required|date',
-            'status' => 'required',
+            'phone'            => 'nullable|string',
+            'email'            => ['required', Rule::unique('users')->ignore($user->id)],
+            'password'         => 'nullable|string|min:8',
+            'leader_id'        => 'required|exists:users,id',
+            'role_id'          => 'required|exists:roles,id',
+            'work_area_id'     => 'required|exists:work_areas,id',
+            'entry_date'       => 'required|date',
+            'status'           => 'required',
         ]);
 
         unset($data['role_id']);
         $data['password'] = $request->password ? bcrypt( $request->password ) : $user->password;
 
         $user->update($data);
-        $user->load('roles');
 
         if( $request->filled('role_id') ){
             $role = Role::find( $request->role_id );
@@ -111,13 +109,5 @@ class UserController extends Controller
 
         $user->load(['work_area', 'leader', 'roles']);
         return new UserResource( $user );
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

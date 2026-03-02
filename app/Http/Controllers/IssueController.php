@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Issue;
 use Illuminate\Http\Request;
+use App\Exports\IssuesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class IssueController extends Controller
 {
@@ -55,27 +57,26 @@ class IssueController extends Controller
         return response()->json(['data'=>$issue]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Issue $issues)
+    public function export(Request $request)
     {
-        //
-    }
+        $query = Issue::query();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Issue $issues)
-    {
-        //
-    }
+        if ($request->candidate_id) {
+            $query->filterByCandidate($request->candidate_id);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Issue $issues)
-    {
-        //
+        if ($request->start_date && $request->end_date) {
+            $query->filterByDates($request->start_date, $request->end_date);
+        }
+
+        if ($request->date && !$request->start_date) {
+            $query->filterByDate($request->date);
+        }
+
+        $fileName = 'reporte-incidencias-' . now()->format('Y-m-d_His') . '.xlsx';
+
+        return Excel::download(new IssuesExport($query), $fileName);
     }
 }
+
+

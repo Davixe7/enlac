@@ -21,16 +21,16 @@ class UserResource extends JsonResource
         $actualRole = $actualRole ?? $this->roles()->first();
 
         return array_merge($data, [
-            'is_admin' => $this->hasRole('admin') ? 1 : 0,
-            'is_evaluator' => $this->hasRole('evaluator') ? 1 : 0,
-            'full_name' => $this->full_name,
-            'leader' => $this->whenLoaded('leader'),
-            'work_area' => $this->whenLoaded('work_area'),
-            'roles'   => $this->whenLoaded('roles'),
-            'role_id' => $actualRole ? $actualRole->id : null,
-            'role'    => $actualRole,
+            'is_admin'      => $this->hasRole('admin') ? 1 : 0,
+            'is_evaluator'  => $this->hasRole('evaluator') ? 1 : 0,
+            'full_name'     => $this->full_name,
+            'leader'        => $this->whenLoaded('leader'),
+            'work_area'     => $this->whenLoaded('work_area'),
+            'roles'         => $this->whenLoaded('roles'),
+            'role_id'       => $actualRole ? $actualRole->id : null,
+            'role'          => $actualRole,
             'notifications' => $this->notifications,
-            'permissions' => auth()->user()->getAllPermissions()->pluck('name')
+            'permissions'   => auth()->user()->getAllPermissions()->pluck('name')
         ]);
     }
 }

@@ -7,12 +7,11 @@ use App\Models\Candidate;
 use App\Models\Ride;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\RidesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RideController extends Controller
 {
-    /**
-     * Lista de beneficiarios que requieren transporte
-     */
     public function index(Request $request)
     {
         $date = $request->date ?: now()->format('Y-m-d');
@@ -54,9 +53,6 @@ class RideController extends Controller
         return response()->json(compact('data'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -77,17 +73,11 @@ class RideController extends Controller
         return new RideResource($ride);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Ride $ride)
     {
         return response()->json($ride);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Ride $ride)
     {
         $validated = $request->validate([
@@ -104,12 +94,28 @@ class RideController extends Controller
         return new RideResource($ride);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Ride $ride)
     {
         $ride->delete();
         return response()->json([], 204);
+    }
+
+    public function export(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date',
+            'type'       => 'nullable|in:equine,rubio'
+        ]);
+
+        $query = Ride::whereBetween('date', [$request->start_date, $request->end_date]);
+
+        if ($request->type) {
+            $query->where('type', $request->type);
+        }
+
+        $fileName = 'reporte-traslados-' . $request->type . '-' . now()->format('d-m-Y') . '.xlsx';
+
+        return Excel::download(new RidesExport($query), $fileName);
     }
 }
