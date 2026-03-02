@@ -37,7 +37,7 @@ class GeneralReportExport implements WithEvents, ShouldAutoSize
 
                 // --- ENCABEZADO PRINCIPAL ---
                 $sheet->mergeCells('A1:E1');
-                $sheet->setCellValue('A1', 'REPORTE GENERAL DE INDICADORES');
+                $sheet->setCellValue('A1', 'REPORTE GENERAL DE INDICADORES ');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
 
                 $sheet->setCellValue('A2', 'PERIODO: ' . Carbon::parse($this->start)->format('d/m/Y') . ' al ' . Carbon::parse($this->end)->format('d/m/Y'));
