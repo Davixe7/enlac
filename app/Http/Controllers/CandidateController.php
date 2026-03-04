@@ -7,6 +7,7 @@ use App\Models\Candidate;
 use App\Http\Resources\CandidateResource;
 use App\Services\CandidateService;
 use App\Http\Requests\StoreCandidateRequest;
+use App\Http\Requests\UpdateCandidateRequest;
 use App\Models\Evaluation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +53,7 @@ class CandidateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreCandidateRequest $request, Candidate $candidate)
+    public function update(UpdateCandidateRequest $request, Candidate $candidate)
     {
         $this->candidateService->updateCandidate($candidate, $request);
         return new CandidateResource($candidate);
