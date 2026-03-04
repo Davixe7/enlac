@@ -91,9 +91,12 @@ class CandidateService
             /*
             Si cambian evaluador o fecha de cita
             cancelar cita actual, generar nueva cita. */
-            if($request->filled('evaluation_schedule')){
-                $evaluator_changed = $candidate->evaluation_schedule->evaluator_id != $request->evaluation_schedule['evaluator_id'];
-                $date_changed      = $candidate->evaluation_schedule->date != $request->evaluation_schedule['date'];
+            if($candidate->status == 'pending' && $request->filled('evaluation_schedule')){
+                $newEvaluatorId    = $request->filled('evaluation_schedule.evaluator_id') ? $request->evaluation_schedule['evaluator_id'] : null;
+                $newEvaluationDate = $request->filled('evaluation_schedule.date')         ? $request->evaluation_schedule['evaluadatetor_id'] : null;
+
+                $evaluator_changed = $newEvaluatorId    && $candidate->evaluation_schedule->evaluator_id != $newEvaluatorId;
+                $date_changed      = $newEvaluationDate && $candidate->evaluation_schedule->date != $newEvaluationDate;
 
                 if (!$evaluator_changed && !$date_changed) { return; }
 
