@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\CandidateStatus;
 use App\Http\Requests\StoreCandidateRequest;
+use App\Http\Requests\UpdateCandidateRequest;
 use App\Models\Candidate;
 use App\Models\Contact;
 use App\Models\Group;
@@ -54,7 +55,7 @@ class CandidateService
         });
     }
 
-    public function updateCandidate(Candidate $candidate, Request $request)
+    public function updateCandidate(Candidate $candidate, UpdateCandidateRequest $request)
     {
         return DB::transaction(function () use ($candidate, $request) {
             $candidateData = $request->candidate;
@@ -68,7 +69,8 @@ class CandidateService
 
             // 2. Contactos
             if($request->filled('contacts')){
-                foreach( $request->contacts as $contactData ){
+                $contacts = $request->validated()['contacts'];
+                foreach( $contacts as $contactData ){
                     $id = array_key_exists('id', $contactData) ? $contactData['id'] : null;
                     Contact::updateOrCreate(['id' => $id, 'candidate_id' => $candidate->id], $contactData);
                 }
@@ -108,6 +110,6 @@ class CandidateService
         });
     }
 
-    
+
 
 }
