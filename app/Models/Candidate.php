@@ -213,7 +213,7 @@ class Candidate extends Model implements HasMedia
 
             $this->statusLogs()->create([
                 'status'     => $newStatus->value,
-                'user_id'    => Auth::id(),       
+                'user_id'    => Auth::id(),
                 'comments'   => $comments,
                 'created_at' => $date ?: now(),
             ]);
@@ -222,5 +222,17 @@ class Candidate extends Model implements HasMedia
 
     public function statusLogs(){
         return $this->hasMany(CandidateStatusLog::class);
+    }
+
+    public function legalGuardian(){
+        return $this->hasOne(Contact::class)
+        ->ofMany([], function($query){
+            $query->where('legal_guardian', 1);
+        })
+        ->withDefault([
+            'name' => 'SIN DEFINIR',
+            'whatsapp'   => 'N/A',
+            'home_phone' => 'N/A'
+        ]);
     }
 }

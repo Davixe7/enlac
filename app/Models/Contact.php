@@ -9,7 +9,7 @@ class Contact extends Model
 {
     use HasFactory;
     protected $guarded = [];
-    public $appends = ['full_name'];
+    public $appends = ['full_name', 'phones'];
 
     public function candidate()
     {
@@ -24,5 +24,10 @@ class Contact extends Model
     public function getFullNameAttribute(){
         $fullNameArray = array_filter([$this->first_name, $this->last_name, $this->middle_name]);
         return join(" ", $fullNameArray);
+    }
+
+    public function getPhonesAttribute(){
+        $phones = array_filter([$this->whatsapp, $this->home_phone]);
+        return join(", ", $phones);
     }
 }

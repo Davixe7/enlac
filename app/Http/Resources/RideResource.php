@@ -14,10 +14,15 @@ class RideResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $this->candidate['location_detail'] = $this->candidate['locationDetail'];
+        $phones = $this->candidate['legalGuardian']['phones'];
+        unset($this->candidate['legalGuardian']);
+
         $data = parent::toArray($request);
         return array_merge($data, [
             'schedule'  => join(" ", array_filter([$this->start_time, $this->end_time])),
-            'candidate' => new BasicCandidateResource($this->candidate)
+            'candidate' => $this->candidate,
+            'phones'    => $phones
         ]);
     }
 }

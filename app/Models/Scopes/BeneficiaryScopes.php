@@ -58,7 +58,7 @@ trait BeneficiaryScopes
 
         $endDate = Carbon::parse($endDate)->endOfDay();
 
-        // Subquery to find most recent evaluation schedule ID 
+        // Subquery to find most recent evaluation schedule ID
         // for each candidate within the date range
         $mostRecentScheduleIds = Appointment::query()
             ->where('type_id', 0)
@@ -92,7 +92,7 @@ trait BeneficiaryScopes
 
     public function scopeFullName($query){
         return $query
-        ->select(['candidates.id', 'candidates.first_name', 'candidates.last_name', 'candidates.middle_name'])
+        ->select(['candidates.id', 'candidates.first_name', 'candidates.last_name', 'candidates.middle_name', 'candidates.diagnosis'])
         ->selectRaw("CONCAT_WS(' ', candidates.first_name, candidates.middle_name, candidates.last_name) as full_name");
     }
 }

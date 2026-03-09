@@ -54,6 +54,7 @@ use App\Http\Controllers\reports\BeneficiaryIndividualReportController;
 use App\Http\Controllers\reports\BeneficiaryScoreReportController;
 use App\Http\Controllers\reports\ExcecutiveReportController;
 use App\Http\Controllers\reports\GeneralReportController;
+use App\Http\Controllers\reports\RideReportController;
 use App\Models\CandidateStatusLog;
 
 Route::get('financial', [FinancialController::class, 'index']);
@@ -163,7 +164,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('reports/attendances', [AttendanceReportController::class, 'index']);
     Route::get('reports/general', [GeneralReportController::class, 'index']);
     Route::get('reports/excecutive', [ExcecutiveReportController::class, 'index']);
-    Route::get('reports/rides', [RideController::class, 'index']);
+    Route::get('reports/rides', [RideReportController::class, 'rubio']);
 
     // Export routes for reports
     Route::get('reports/general/export', [GeneralReportController::class, 'export']);
@@ -171,7 +172,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('reports/excecutive/export', [ExcecutiveReportController::class, 'export']);
     Route::get('reports/attendances/daily/export', [BeneficiaryAttendanceReportController::class, 'export']);
     Route::get('beneficiaries/{candidate}/individual/export', [BeneficiaryIndividualReportController::class, 'export']);
-    Route::get('rides/export', [RideController::class, 'export']);
+    Route::get('reports/rides/export', [RideReportController::class, 'export']);
 
     Route::get('reports/scores', [ScoreReportController::class, 'index']);
     Route::get('reports/attendances/daily', [BeneficiaryAttendanceReportController::class, 'daily']);

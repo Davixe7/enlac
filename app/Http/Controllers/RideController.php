@@ -5,10 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\RideResource;
 use App\Models\Candidate;
 use App\Models\Ride;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Exports\RidesExport;
-use Maatwebsite\Excel\Facades\Excel;
 
 class RideController extends Controller
 {
@@ -20,7 +17,7 @@ class RideController extends Controller
             $candidates = Candidate::whereRequiresTransport(1)
             ->beneficiaries()
             ->basic(['requires_transport'])
-            ->with(['todaysRide', 'locationDetail'])
+            ->with(['todaysRide', 'locationDetail', 'legalGuardian'])
             ->get();
 
             $rides = $candidates->map(function($candidate){
@@ -35,22 +32,10 @@ class RideController extends Controller
 
         $data = Ride::whereType($request->type)
         ->where('date', $date)
-        ->with(['candidate.locationDetail'])
+        ->with(['candidate.locationDetail', 'candidate.legalGuardian'])
         ->get();
 
         return RideResource::collection($data);
-    }
-
-    public function report(Request $request){
-        $start = $request->start_date;
-        $end   = $request->end_date;
-
-        $data = Ride::whereBetween('date', [$start, $end])
-        ->where('type', $request->type)
-        ->with('candidate.locationDetail')
-        ->get();
-
-        return response()->json(compact('data'));
     }
 
     public function store(Request $request)
@@ -98,24 +83,5 @@ class RideController extends Controller
     {
         $ride->delete();
         return response()->json([], 204);
-    }
-
-    public function export(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date'   => 'required|date',
-            'type'       => 'nullable|in:equine,rubio'
-        ]);
-
-        $query = Ride::whereBetween('date', [$request->start_date, $request->end_date]);
-
-        if ($request->type) {
-            $query->where('type', $request->type);
-        }
-
-        $fileName = 'reporte-traslados-' . $request->type . '-' . now()->format('d-m-Y') . '.xlsx';
-
-        return Excel::download(new RidesExport($query), $fileName);
     }
 }
