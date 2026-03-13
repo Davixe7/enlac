@@ -39,7 +39,7 @@ class UpdatePaymentConfigRequest extends FormRequest
             'receipt.cfdi'             => 'required_if_accepted:wants_deductible_receipt',
             'receipt.email'            => 'required_if_accepted:wants_deductible_receipt',
             'receipt.observations'     => 'required_if_accepted:wants_deductible_receipt',
-            'receipt.fiscalStatus'     => 'required_if_accepted:wants_deductible_receipt',
+            'receipt.fiscalStatusFile' => 'required_if_accepted:wants_deductible_receipt',
             'receipt.street'           => 'required_if_accepted:wants_deductible_receipt',
             'receipt.external_number'  => 'required_if_accepted:wants_deductible_receipt',
             'receipt.neighborhood'     => 'required_if_accepted:wants_deductible_receipt',

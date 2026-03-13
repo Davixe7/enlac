@@ -73,7 +73,12 @@ class Candidate extends Model implements HasMedia
 
     public function interviewee()
     {
-        return $this->hasOne(Interviewee::class)->withDefault(fn() => ['name' => '', 'relationship' => '', 'legal_relationship' => '']);
+        return $this->hasOne(Interviewee::class)
+        ->withDefault(fn() => [
+            'name'               => '',
+            'relationship'       => '',
+            'legal_relationship' => 'biologico'
+        ]);
     }
 
     public function medications()
@@ -127,7 +132,7 @@ class Candidate extends Model implements HasMedia
             ->where('type_id', 0)
             ->where('status', '!=', 'canceled')
             ->with('evaluator')
-            ->withDefault(["type_id" => 0]);
+            ->withDefault(["type_id" => 0, "date" => now()]);
     }
 
     public function evaluationSchedules()

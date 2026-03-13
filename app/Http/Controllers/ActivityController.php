@@ -18,7 +18,7 @@ class ActivityController extends Controller
         //$data = Activity::wherePlanCategoryId($request->plan_category_id)->get();
         //return response()->json(compact('data'));
 
-        $data = Activity::with(['plan_category']);
+        $data = Activity::with(['plan_category', 'activityCategory']);
 
         if( $request->candidate_id ){
 

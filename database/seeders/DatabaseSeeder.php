@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Candidate;
+use App\Models\Kardex;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
@@ -14,19 +16,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RoleSeeder::class);
+        /* $this->call(RoleSeeder::class);
         $this->call(WorkAreaSeeder::class);
-        //$this->call(UserSeeder::class);
+        $this->call(UserSeeder::class);
         $this->call(BrainLevelSeeder::class);
         $this->call(BrainFunctionSeeder::class);
         $this->call(InterviewQuestionSeeder::class);
         $this->call(ProgramSeeder::class);
-        //$this->call(CandidateSeeder::class);
-        //$this->call(KardexSeeder::class);
+        $this->call(CandidateSeeder::class);
+        $this->call(KardexSeeder::class);
         $this->call(PlanCategorySeeder::class);
-        //$this->call(ActivityCategorySeeder::class);
-        //$this->call(GroupSeeder::class);
-        //$this->call(CandidateStatusSeeder::class);
+        $this->call(ActivityCategorySeeder::class);
+        $this->call(GroupSeeder::class);
+        $this->call(CandidateStatusSeeder::class);
         $this->call(ActivitySeeder::class);
 
         $evaluatorRole = Role::whereName('evaluator')->first();
@@ -38,6 +40,13 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt(123456),
             'work_area_id' => 1
         ]);
-        $user->roles()->attach( $evaluatorRole );
+        $user->roles()->attach( $evaluatorRole ); */
+
+        Kardex::create([
+            'name'     => 'Esquema de Vacunación',
+            'slug'     => Str::slug('Esquema de Vacunación'),
+            'category' => 'default',
+            'index'    => 4
+        ]);
     }
 }

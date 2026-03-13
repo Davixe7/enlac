@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\PlanCategory;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('label');
-            $table->foreignIdFor(PlanCategory::class, 'parent_id');
-            $table->timestamps();
+        Schema::table('sponsor_addresses', function (Blueprint $table) {
+            $table->string('postal_code')->nullable();
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activity_categories');
+        Schema::table('sponsor_addresses', function (Blueprint $table) {
+            $table->dropColumn('postal_code');
+        });
     }
 };

@@ -30,6 +30,7 @@ class UpdateSponsorRequest extends FormRequest
             'gender'           => 'nullable|string|in:male,female,entity',
             'birthdate'        => 'required|date',
             'contact_by'       => 'required',
+            'type'             => 'required'
         ];
     }
 }

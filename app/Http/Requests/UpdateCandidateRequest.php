@@ -33,11 +33,13 @@ class UpdateCandidateRequest extends FormRequest
             'candidate.info_channel'           => 'required',
 
             'contacts'                         => 'required|array',
+            'contacts.*.id'                    => 'nullable',
             'contacts.*.first_name'            => 'required|string|max:255',
             'contacts.*.middle_name'           => 'nullable|string|max:255',
             'contacts.*.last_name'             => 'required|string|max:255',
             'contacts.*.relationship'          => 'required|string|max:255',
             'contacts.*.enlac_responsible'     => 'nullable|boolean',
+            'contacts.*.is_emergency_contact'  => 'boolean',
             'contacts.*.legal_guardian'        => 'nullable|boolean',
             'contacts.*.email'                 => 'nullable|email',
             'contacts.*.whatsapp'              => 'nullable',
@@ -49,6 +51,19 @@ class UpdateCandidateRequest extends FormRequest
             'contacts.*.exterior_number'       => 'nullable',
             'contacts.*.city'                  => 'nullable',
             'contacts.*.country'               => 'nullable',
+            'contacts.*.rfc'                   => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $normalized = strtoupper(trim($value));
+                    // Regex for 12 chars (Company) or 13 chars (Individual)
+                    $regex = '/^([A-ZÑ&]{3,4})([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])([A-Z0-9]{3})$/';
+
+                    if (!preg_match($regex, $normalized)) {
+                        $fail('The ' . $attribute . ' is not a valid RFC format.');
+                    }
+                }
+            ],
 
             'medications.*.name'               => 'required',
             'medications.*.dose'               => 'required',

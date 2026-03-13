@@ -24,7 +24,7 @@ class FinancialController extends Controller
 
         //Sumariza todos los patrocinios por tipo en un monto total
         //Sumariza todos los pagos por tipo en un monto total y ultima fecha de pago
-        $candidates = Candidate::beneficiaries()
+        $candidates = Candidate::whereStatus('activo')
             ->with([
                 'program',
                 'payment_configs',
@@ -83,7 +83,8 @@ class FinancialController extends Controller
         return BeneficiaryFinancialResource::collection($candidates);
     }
 
-    function maxDateByFreq($monthNumber, $frequency, $start){
+    function maxDateByFreq($monthNumber, $frequency, $start)
+    {
         $periodLength  = max(1, (int) $frequency); // 1, 2, 3, 4, 6, 12...
         $offset        = $monthNumber - $start;              // 0 = agosto, 1 = septiembre, etc.
         $blockIndex    = intdiv($offset, $periodLength);
@@ -99,7 +100,7 @@ class FinancialController extends Controller
         $year = now()->month > 7 ? now()->year : now()->year - 1;
         $startDate = Carbon::create($year, 8);
         $endDate   = Carbon::create($year, 20)->endOfMonth();
-        
+
         $wallets = [];
 
         $paymentsConfigs->each(function ($paymentConfig) use ($year, $startDate, $endDate, &$wallets) {
@@ -115,10 +116,10 @@ class FinancialController extends Controller
                 $steps        = $snapshot->frequency != .5 ? 1 : 2;
 
                 $amountToPay = $snapshot->frequency == .5
-                ? $snapshot->amount
-                : $snapshot->monthly_amount;
+                    ? $snapshot->amount
+                    : $snapshot->monthly_amount;
 
-                for($step = 1; $step <= $steps; $step++){
+                for ($step = 1; $step <= $steps; $step++) {
                     $this->applyToWallet($wallets, $balance, $amountToPay, $monthNumber, $maxDateMonth, $year, $paymentConfig->sponsor_id, $step);
                 }
             }
@@ -127,25 +128,26 @@ class FinancialController extends Controller
         return $wallets;
     }
 
-    function applyToWallet(&$wallets, &$balance, $amountToPay, $monthNumber, $maxDateMonth, $year, $sponsor_id, $step){
+    function applyToWallet(&$wallets, &$balance, $amountToPay, $monthNumber, $maxDateMonth, $year, $sponsor_id, $step)
+    {
         $abono = $balance >= $amountToPay
-        ? $amountToPay
-        : $balance;
-    
+            ? $amountToPay
+            : $balance;
+
         $maxDate = Carbon::create($year, $maxDateMonth);
         $maxDate = $step == 1
-        ? $maxDate->copy()->addDays(10)
-        : $maxDate->copy()->addDays(21);
-    
-        $status = $abono == $amountToPay ? 'green' : (( now() > $maxDate ) ? 'red' : 'yellow');
-    
+            ? $maxDate->copy()->addDays(10)
+            : $maxDate->copy()->addDays(21);
+
+        $status = $abono == $amountToPay ? 'green' : ((now() > $maxDate) ? 'red' : 'yellow');
+
         $wallets[$sponsor_id][$monthNumber][] = [
             'month'     => $monthNumber,
             'monthName' => Carbon::create($year, $monthNumber)->translatedFormat('F'),
             'abono'     => $abono,
             'status'    => $status
         ];
-    
+
         $balance -= $abono;
     }
 }

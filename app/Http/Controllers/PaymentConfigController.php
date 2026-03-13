@@ -48,9 +48,12 @@ class PaymentConfigController extends Controller
 
         $receiptData = $request->validated()['receipt'] ?? null;
         if( $receiptData ){
-            $paymentConfig->deductible_receipt()->create($receiptData);
+            unset($receiptData['fiscalStatusFile']);
+            $fiscalStatusFile = $request->file('receipt.fiscalStatusFile');
+            $receipt          = $paymentConfig->deductible_receipt()->create($receiptData);
+            $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
         }
-        
+
         return new PaymentConfigResource($paymentConfig);
     }
 
@@ -96,10 +99,13 @@ class PaymentConfigController extends Controller
                 'effective_until' => null,
             ]);
         }
-        
-        if( array_key_exists('receipt', $request->validated()) ){
-            $data = $request->validated()['receipt'];
-            DeductibleReceipt::updateOrCreate(['payment_config_id'=>$paymentConfig->id], $data);
+
+        $receiptData = $request->validated()['receipt'] ?? null;
+        if( $receiptData ){
+            unset($receiptData['fiscalStatusFile']);
+            $fiscalStatusFile = $request->file('receipt.fiscalStatusFile');
+            $receipt = DeductibleReceipt::updateOrCreate(['payment_config_id' => $paymentConfig->id], $receiptData);
+            $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
         }
 
         return new PaymentConfigResource($paymentConfig);

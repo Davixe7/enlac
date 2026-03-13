@@ -22,16 +22,17 @@ class UpdateContactRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'candidate_id' => 'exists:candidates,id',
-            'first_name' => 'string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'string|max:255',
-            'relationship' => 'string|max:255',
-            'enlac_responsible' => 'boolean',
-            'legal_guardian' => 'boolean',
-            'email' => 'email|max:255',
-            'whatsapp' => 'nullable|string|max:255',
-            'home_phone' => 'nullable|string|max:255',
+            'candidate_id'         => 'exists:candidates,id',
+            'first_name'           => 'string|max:255',
+            'middle_name'          => 'nullable|string|max:255',
+            'last_name'            => 'string|max:255',
+            'relationship'         => 'string|max:255',
+            'is_emergency_contact' => 'boolean',
+            'enlac_responsible'    => 'boolean',
+            'legal_guardian'       => 'boolean',
+            'email'                => 'email|max:255',
+            'whatsapp'             => 'nullable|string|max:255',
+            'home_phone'           => 'nullable|string|max:255',
         ];
     }
 

@@ -2,7 +2,6 @@
 
 use App\Models\Candidate;
 use App\Models\PlanCategory;
-use App\Models\WorkArea;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +20,13 @@ class Contact extends Model
     public function addresses()
     {
         return $this->hasMany(Address::class);
+    }
+
+    protected function rfc(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => strtoupper(str_replace(' ', '', $value)),
+        );
     }
 
     public function getFullNameAttribute(){

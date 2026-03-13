@@ -6,6 +6,7 @@ use App\Http\Requests\StoreSponsorRequest;
 use App\Http\Requests\UpdateSponsorRequest;
 use App\Http\Resources\SponsorResource;
 use App\Models\Sponsor;
+use App\Models\SponsorAddress;
 use Illuminate\Http\Request;
 
 class SponsorController extends Controller
@@ -32,7 +33,7 @@ class SponsorController extends Controller
         if( $request->hasFile('profilePicture') ){
             $sponsor->addMediaFromRequest('profilePicture')->toMediaCollection('profile_picture');
         }
-        
+
         if( $request->addresses ){
             foreach( $request->addresses as $address ){
                 $sponsor->addresses()->create($address);
@@ -55,9 +56,17 @@ class SponsorController extends Controller
     public function update(UpdateSponsorRequest $request, Sponsor $sponsor)
     {
         $sponsor->update($request->validated());
+
         if( $request->hasFile('profilePicture') ){
             $sponsor->addMediaFromRequest('profilePicture')->toMediaCollection('profile_picture');
         }
+
+        if( $request->addresses ){
+            foreach( $request->addresses as $address ){
+                SponsorAddress::updateOrCreate(['sponsor_id'=>$sponsor->id, 'type'=>$address['type']], $address);
+            }
+        }
+
         return new SponsorResource($sponsor);
     }
 

@@ -15,10 +15,10 @@ class KardexController extends Controller
      */
     public function index()
     {
-        $kardexes = Kardex::with(['media'])->get();
-        $data = $kardexes->groupBy('category')->map(function($kardex){
-            return KardexResource::collection($kardex);
-        });
+        $kardexes = Kardex::with(['media'])->orderBy('index')->get();
+        $data = $kardexes
+        ->groupBy('category')
+        ->map(fn($kdx) => KardexResource::collection($kdx));
         return response()->json(compact('data'));
     }
 
