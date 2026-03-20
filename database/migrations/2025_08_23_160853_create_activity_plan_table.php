@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('activity_plan', function (Blueprint $table) {
             $table->id();
+            $table->timestamps();
             $table->foreignIdFor(Activity::class)->constrained()->onDelete('cascade');
             $table->foreignIdFor(Plan::class)->constrained()->onDelete('cascade');
             $table->string('daily_goal')->nullable();

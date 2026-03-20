@@ -23,8 +23,8 @@ return new class extends Migration
             $table->unsignedBigInteger('sheet');
             $table->string('info_channel');
             $table->boolean('requires_transport')->default(false);
- 
-            $table->string('status')->default(CandidateStatus::PENDING);
+
+            $table->string('status')->default(CandidateStatus::PENDING)->nullable();
             $table->string('admission_comment')->default(null)->nullable();
             $table->boolean('equinetherapy_permission_medical')->default(false);
             $table->boolean('equinetherapy_permission_legal_guardian')->default(false);

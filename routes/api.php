@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityCategoryController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ContactController;
@@ -57,10 +58,15 @@ use App\Http\Controllers\reports\GeneralReportController;
 use App\Http\Controllers\reports\RideReportController;
 use App\Models\CandidateStatusLog;
 
+Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
+Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
+Route::patch('payment_configs/{id}/restore', [PaymentConfigController::class, 'restore']);
+Route::get('payment_configs/has-history', [PaymentConfigController::class, 'hasHistory']);
+Route::get('payment_configs/{id}/history-logs', [PaymentConfigController::class, 'getHistoryLogs']);
+
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
 Route::get('issues/export', [IssueController::class, 'export']);
-
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn () => new UserResource(auth()->user()))->name('user');
@@ -101,6 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'equinetherapy_rides'   => EquineRidesController::class,
         'activities'            => ActivityController::class,
         'plan_categories'       => PlanCategoryController::class,
+        'activity_categories'   => ActivityCategoryController::class,
         'candidate_statuses'    => CandidateStatusController::class,
         'issues'                => IssueController::class,
     ]);

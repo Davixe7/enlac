@@ -7,6 +7,8 @@ use App\Http\Requests\UpdatePaymentConfigRequest;
 use App\Http\Resources\PaymentConfigResource;
 use App\Models\DeductibleReceipt;
 use App\Models\PaymentConfig;
+use App\Models\PaymentConfigLog;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PaymentConfigController extends Controller
@@ -111,19 +113,105 @@ class PaymentConfigController extends Controller
         return new PaymentConfigResource($paymentConfig);
     }
 
-    public function destroy(PaymentConfig $paymentConfig)
-    {
-        if ($paymentConfig->type !== 'sponsor') {
-            return response()->json([
-                'error' => 'Solo se pueden desligar configuraciones de tipo sponsor'
-            ], 400);
-        }
+    public function destroy($id, Request $request) {
+        $config = PaymentConfig::findOrFail($id);
 
-        $paymentConfig->delete();
-
-        return response()->json([
-            'message' => 'Patrocinio cancelado correctamente. Recuerda hablar con los padres de familia para reponer la Aportación de Padrinos.'
+        PaymentConfigLog::create([
+            'payment_config_id' => $id,
+            'action' => 'cancelled',
+            'reason' => $request->cancellation_reason,
+            'created_at' => now()
         ]);
+
+        // Borrar (Soft Delete)
+        $config->update(['cancellation_reason' => $request->cancellation_reason]);
+        $config->delete();
     }
 
+    public function restore($id) {
+        $config = PaymentConfig::onlyTrashed()->findOrFail($id);
+
+        PaymentConfigLog::create([
+            'payment_config_id' => $id,
+            'action' => 'restored',
+            'created_at' => now()
+        ]);
+
+        // Restaurar
+        $config->restore();
+        $config->update(['cancellation_reason' => null]);
+    }
+
+    public function trashed(Request $request)
+    {
+        $query = PaymentConfig::onlyTrashed()->with(['candidate', 'sponsor']);
+
+        if ($request->has('candidate_id')) {
+            $query->where('candidate_id', $request->candidate_id);
+        }
+
+        $trashed = $query->get()->map(function ($config) {
+            return [
+                'id' => $config->id,
+                'sponsor' => $config->sponsor,
+                'cancellation_reason' => $config->cancellation_reason,
+                'deleted_at_formatted' => Carbon::parse($config->deleted_at)->format('d/m/Y h:ia')
+            ];
+        });
+
+        return response()->json(['data' => $trashed]);
+    }
+
+    public function allHistory(Request $request)
+    {
+        $configs = PaymentConfig::onlyTrashed()
+            ->where('candidate_id', $request->candidate_id)
+            ->with(['sponsor'])->get();
+
+        $data = $configs->map(function ($config) {
+            return [
+                'id' => $config->id,
+                'sponsor' => $config->sponsor,
+                'amount' => (float) $config->amount,
+                'cancellation_reason' => $config->cancellation_reason,
+                'is_active' => false,
+                'deleted_at_formatted' => $config->deleted_at
+                    ? \Carbon\Carbon::parse($config->deleted_at)->format('d/m/Y h:ia')
+                    : 'Activo'
+            ];
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
+    public function hasHistory(Request $request)
+    {
+        $exists = PaymentConfig::onlyTrashed()
+            ->where('candidate_id', $request->candidate_id)
+            ->exists();
+
+        return response()->json(['has_history' => $exists]);
+    }
+
+    public function getHistoryLogs($id)
+    {
+        $logs = \App\Models\PaymentConfigLog::where('payment_config_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($log) {
+                $action = match ($log->action) {
+                    'restored' => 'Restaurado el:',
+                    'cancelled' => 'Cancelado el:',
+                    default => ucfirst($log->action),
+                };
+
+                return [
+                    'action' => $action,
+                    'reason' => $log->reason ?? 'Sin motivo',
+                    'date'   => \Carbon\Carbon::parse($log->created_at)->format('d/m/Y h:ia')
+                ];
+            });
+
+        return response()->json(['data' => $logs]);
+    }
 }

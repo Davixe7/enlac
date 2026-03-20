@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
-
             $table->foreignIdFor(PlanCategory::class, 'category_id');
             $table->foreignIdFor(PlanCategory::class, 'subcategory_id');
             $table->foreignIdFor(Group::class);

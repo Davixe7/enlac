@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('activity_plan', function (Blueprint $table) {
-            $table->id()->first();
-            $table->timestamps();
-            $table->string('daily_goal')->nullable()->change();
+        Schema::table('payment_configs', function (Blueprint $table) {
+            $table->text('cancellation_reason')->after('wants_deductible_receipt')->nullable();
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('activity_plan', function (Blueprint $table) {
-            //
+        Schema::table('payment_configs', function (Blueprint $table) {
+            $table->dropColumn('cancellation_reason');
         });
     }
 };

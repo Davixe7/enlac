@@ -21,7 +21,7 @@ return new class extends Migration
         });
 
         // 2. Añadir la nueva columna de status (string) a la tabla candidates
-        Schema::table('candidates', function (Blueprint $table) {
+        /* Schema::table('candidates', function (Blueprint $table) {
             $table->string('status')->after('candidate_status_id')->nullable();
         });
 
@@ -57,12 +57,12 @@ return new class extends Migration
             if ($candidate->candidate_status_id == 1) {
                 $candidate->update(['status' => CandidateStatus::PENDING]);
             }
-        }
+        } */
     }
 
     public function down(): void
     {
-        // El proceso inverso es complejo, usualmente en estas migraciones 
+        // El proceso inverso es complejo, usualmente en estas migraciones
         // estructurales se recomienda hacer backup antes de ejecutar.
     }
 };
