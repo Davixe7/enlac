@@ -16,10 +16,15 @@ class PlanController extends Controller
     public function index(Request $request)
     {
         $data = Plan::whereGroupId($request->group_id)
-        ->with(['category', 'subcategory'])
+        ->with(['category', 'planType'])
         ->orderBy('created_at', 'desc')
         ->get();
-        
+
+        $data = $data->map(function($plan){
+            $plan->date = $plan->created_at->format('d/m/Y');
+            return $plan->toArray();
+        });
+
         return response()->json(compact('data'));
     }
 
@@ -31,16 +36,16 @@ class PlanController extends Controller
         $data = $request->validate([
             'candidate_id'     => 'required_without:group_id',
             'category_id'      => 'required|exists:plan_categories,id',
-            'subcategory_id'   => 'required|exists:plan_categories,id',
+            'plan_type_id'     => 'required|exists:plan_types,id',
             'group_id'         => 'nullable|exists:groups,id',
             'name'             => 'required',
             'activities'       => 'required|array',
             'status'           => 'nullable',
-            'start_date'       => 'required|date_format:d/m/Y',
-            'end_date'         => 'required|date_format:d/m/Y',
+            'start_date'       => 'required',
+            'end_date'         => 'required',
         ], [], [
             'category_id'      => 'Plan',
-            'subcategory_id'   => 'Tipo de plan',
+            'plan_type_id'     => 'Tipo de plan',
             'group_id'         => 'ID del grupo',
             'name'             => 'Nombre del plan',
             'activities'       => 'Actividades',
@@ -55,12 +60,10 @@ class PlanController extends Controller
             ->first()
             ->id;
         }
-        
+
         unset($data['activities']);
         unset($data['candidate_id']);
 
-        $data['start_date'] = Carbon::createFromFormat('d/m/Y', $data['start_date']);
-        $data['end_date'] = Carbon::createFromFormat('d/m/Y', $data['end_date']);
         $data = Plan::create($data);
 
         $data->activities()->attach($request->activities);
@@ -84,16 +87,16 @@ class PlanController extends Controller
     {
         $data = $request->validate([
             'category_id'             => 'required|exists:plan_categories,id',
-            'subcategory_id'          => 'required|exists:plan_categories,id',
+            'plan_type_id'            => 'required|exists:plan_types,id',
             'group_id'                => 'required|exists:groups,id',
             'name'                    => 'required',
             'activities'              => 'required|array',
             'status'                  => 'nullable',
-            'start_date'              => 'required|date_format:d/m/Y',
-            'end_date'                => 'required|date_format:d/m/Y',
+            'start_date'              => 'required',
+            'end_date'                => 'required',
         ], [], [
             'category_id'      => 'Plan',
-            'subcategory_id'   => 'Tipo de plan',
+            'plan_type_id'     => 'Tipo de plan',
             'group_id'         => 'ID del grupo',
             'name'             => 'Nombre del plan',
             'activities'       => 'Actividades',
@@ -101,10 +104,8 @@ class PlanController extends Controller
             'start_date'       => 'Fecha de inicio',
             'end_date'         => 'Fecha de cierre',
         ]);
-        
+
         unset($data['activities']);
-        $data['start_date'] = Carbon::createFromFormat('d/m/Y', $data['start_date']);
-        $data['end_date'] = Carbon::createFromFormat('d/m/Y', $data['end_date']);
         $plan->update($data);
 
         $plan->activities()->sync($request->activities);

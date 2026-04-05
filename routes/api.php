@@ -46,7 +46,9 @@ use App\Models\User;
 use App\Http\Controllers\ActivityDailyScoreController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DailyAttendanceController;
+use App\Http\Controllers\FamilyMemberController;
 use App\Http\Controllers\IssueController;
+use App\Http\Controllers\PlanTypeController;
 use App\Http\Controllers\ScoreReportController;
 
 use App\Http\Controllers\reports\AttendanceReportController;
@@ -56,7 +58,13 @@ use App\Http\Controllers\reports\BeneficiaryScoreReportController;
 use App\Http\Controllers\reports\ExcecutiveReportController;
 use App\Http\Controllers\reports\GeneralReportController;
 use App\Http\Controllers\reports\RideReportController;
+use App\Http\Controllers\SocioeconomicProfileController;
+use App\Models\Candidate;
 use App\Models\CandidateStatusLog;
+use App\Models\SocioeconomicProfile;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
 Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
@@ -81,36 +89,41 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('candidates/{candidate}/kardexes', [CandidateKardexController::class, 'destroy']);
 
     Route::apiResources([
-        'candidates'            => CandidateController::class,
-        'candidate_locations'   => CandidateLocationController::class,
-        'medications'           => MedicationController::class,
-        'contacts'              => ContactController::class,
-        'addresses'             => AddressController::class,
-        'programs'              => ProgramController::class,
-        'appointments'          => AppointmentController::class,
-        'interviews'            => InterviewController::class,
-        'brain_levels'          => BrainLevelController::class,
-        'brain_functions'       => BrainFunctionController::class,
-        'brain_function_ranks'  => BrainFunctionRankController::class,
-        'interview_questions'   => InterviewQuestionController::class,
-        'work_areas'            => WorkAreaController::class,
-        'roles'                 => RoleController::class,
-        'users'                 => UserController::class,
-        'sponsors'              => SponsorController::class,
-        'payment_configs'       => PaymentConfigController::class,
-        'kardexes'              => KardexController::class,
-        'dashboard-slides'      => DashboardSlideController::class,
-        'payments'              => PaymentController::class,
-        'groups'                => GroupController::class,
-        'plans'                 => PlanController::class,
-        'rides'                 => RideController::class,
-        'equinetherapy_rides'   => EquineRidesController::class,
-        'activities'            => ActivityController::class,
-        'plan_categories'       => PlanCategoryController::class,
-        'activity_categories'   => ActivityCategoryController::class,
-        'candidate_statuses'    => CandidateStatusController::class,
-        'issues'                => IssueController::class,
+        'candidates'             => CandidateController::class,
+        'candidate_locations'    => CandidateLocationController::class,
+        'medications'            => MedicationController::class,
+        'contacts'               => ContactController::class,
+        'addresses'              => AddressController::class,
+        'programs'               => ProgramController::class,
+        'appointments'           => AppointmentController::class,
+        'interviews'             => InterviewController::class,
+        'brain_levels'           => BrainLevelController::class,
+        'brain_functions'        => BrainFunctionController::class,
+        'brain_function_ranks'   => BrainFunctionRankController::class,
+        'interview_questions'    => InterviewQuestionController::class,
+        'work_areas'             => WorkAreaController::class,
+        'roles'                  => RoleController::class,
+        'users'                  => UserController::class,
+        'sponsors'               => SponsorController::class,
+        'payment_configs'        => PaymentConfigController::class,
+        'kardexes'               => KardexController::class,
+        'dashboard-slides'       => DashboardSlideController::class,
+        'payments'               => PaymentController::class,
+        'groups'                 => GroupController::class,
+        'plans'                  => PlanController::class,
+        'rides'                  => RideController::class,
+        'equinetherapy_rides'    => EquineRidesController::class,
+        'activities'             => ActivityController::class,
+        'plan_categories'        => PlanCategoryController::class,
+        'activity_categories'    => ActivityCategoryController::class,
+        'plan_types'             => PlanTypeController::class,
+        'candidate_statuses'     => CandidateStatusController::class,
+        'issues'                 => IssueController::class,
+        'family_members'         => FamilyMemberController::class,
+        'socioeconomic_profiles' => SocioeconomicProfileController::class,
     ]);
+
+    Route::get('groups/options', [GroupController::class, 'options']);
 
     Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::post('attendances', [AttendanceController::class, 'store'])->name('attendances.store');
@@ -203,5 +216,45 @@ Route::middleware('auth:sanctum')->group(function () {
         ->get();
 
         return response()->json(compact('data'));
+    });
+
+    Route::get('brain_function_specs', function(Request $request){
+        $data = DB::table('brain_function_specs')
+        ->where('brain_function_id', $request->brain_function_id)
+        ->where('brain_level_id', $request->brain_level_id)
+        ->first();
+
+        return response()->json(compact('data'));
+    });
+
+    Route::get('beneficiaries/{candidate}/carta', function(Candidate $candidate){
+        $program_price = $candidate->program->price;
+        $cuota_padrinos             = $candidate->getQuotaAmount('sponsor');
+        $cuota_padres               = $candidate->getQuotaAmount('parent');
+        $cuota_enlac                = $program_price - $cuota_padres - $cuota_padrinos;
+        $cuota_padres_porcentaje    = number_format(($cuota_padres   / $program_price) * 100, 2);
+        $cuota_enlac_porcentaje     = number_format(($cuota_enlac    / $program_price) * 100, 2);
+        $cuota_padrinos_porcentaje  = number_format(($cuota_padrinos / $program_price) * 100, 2);
+
+        $data = [
+            'fecha'                         => Carbon::now()->translatedFormat('d \d\e F \d\e Y'),
+            'destinatario'                  => $candidate->contacts->first()->full_name,
+            'beneficiario'                  => $candidate->full_name,
+            'periodo'                       => 'septiembre 2025 a febrero 2026',
+            'programa'                      => $candidate->program->name,
+            'costo_mensual'                 => $candidate->program->price,
+            'cuota_enlac'                   => $cuota_enlac,
+            'cuota_enlac_porcentaje'        => $cuota_enlac_porcentaje,
+            'cuota_padres'                  => $cuota_padres,
+            'cuota_padres_porcentaje'       => $cuota_padres_porcentaje,
+            'cuota_padrinos'                => $cuota_padrinos,
+            'cuota_padrinos_porcentaje'     => $cuota_padrinos_porcentaje
+        ];
+
+        $pdf = Pdf::loadView('pdf.carta', $data);
+        //$pdf->setPaper('letter', 'portrait');
+
+        // Descarga el archivo con un nombre descriptivo
+        return $pdf->download('carta.pdf');
     });
 });

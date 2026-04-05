@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('programs', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedTinyInteger('order')->nullable();
-            $table->string('name');
-            $table->decimal('price');
-            $table->timestamps();
+        Schema::table('payment_configs', function (Blueprint $table) {
+            $table->enum('currency', ['mxn', 'usd'])->default('mxn');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('programs');
+        Schema::table('payment_configs', function (Blueprint $table) {
+            $table->dropColumn('currency');
+        });
     }
 };

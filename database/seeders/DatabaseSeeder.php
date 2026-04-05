@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Candidate;
 use App\Models\Kardex;
-use App\Models\User;
+use App\Models\PlanCategory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -46,7 +45,20 @@ class DatabaseSeeder extends Seeder
             'name'     => 'Esquema de Vacunación',
             'slug'     => Str::slug('Esquema de Vacunación'),
             'category' => 'default',
-            'index'    => 4
+            'order'    => 4
         ]);
+
+
+        DB::statement("ALTER TABLE plan_categories AUTO_INCREMENT = 1;");
+
+        PlanCategory::create([
+            'id'        => 7,
+            'label'     => 'Programa de Escucha',
+            'name'      => Str::slug('Programa de Escucha', '_'),
+            'parent_id' => null,
+        ]);
+
+        $this->call(PlanTypeSeeder::class);
+        $this->call(ActivitySeeder::class);
     }
 }

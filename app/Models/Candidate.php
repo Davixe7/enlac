@@ -240,4 +240,20 @@ class Candidate extends Model implements HasMedia
             'home_phone' => 'N/A'
         ]);
     }
+
+    public function paymentConfigSnapshots()
+    {
+        return $this->hasManyThrough(PaymentConfigSnapshot::class, PaymentConfig::class);
+    }
+
+    public function getQuotaAmount($type = 'parent'){
+        return $this->paymentConfigSnapshots()
+        ->where('payment_configs.type', $type)
+        ->whereIn('payment_config_snapshots.id', function($query){
+            $query->selectRaw('MAX(id)')
+            ->from('payment_config_snapshots')
+            ->groupBy('payment_config_id');
+        })
+        ->sum('payment_config_snapshots.amount');
+    }
 }

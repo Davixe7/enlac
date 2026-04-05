@@ -32,6 +32,7 @@ class StorePaymentConfigRequest extends FormRequest
             'wants_reminder'           => 'nullable|boolean',
             'wants_deductible_receipt' => 'nullable|boolean',
             'type'                     => 'nullable',
+            'currency'                 => 'required',
 
             'receipt.rfc'              => 'required_if_accepted:wants_deductible_receipt',
             'receipt.company_name'     => 'required_if_accepted:wants_deductible_receipt',

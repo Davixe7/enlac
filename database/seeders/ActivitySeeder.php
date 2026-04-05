@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Activity;
 use App\Models\ActivityCategory;
 use App\Models\Attendance;
 use App\Models\Plan;
@@ -21,8 +22,11 @@ class ActivitySeeder extends Seeder
     {
         Attendance::all()->each(function($item){$item->delete();});
         Plan::all()->each(function($item){$item->delete();});
-        PlanCategory::all()->each(function($item){$item->delete();});
         ActivityCategory::all()->each(function($item){$item->delete();});
+        Activity::all()->each(function($item){$item->delete();});
+
+        DB::statement("ALTER TABLE activity_categories AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE activities AUTO_INCREMENT = 1;");
 
         // 1. Definir la ruta del archivo XLSX
         $filePath = storage_path('app/private/activities_full.xlsx');

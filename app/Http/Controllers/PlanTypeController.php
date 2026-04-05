@@ -10,41 +10,15 @@ class PlanTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = PlanType::all();
+        if( $request->plan_category_id ){
+            $data = PlanType::where('plan_category_id', $request->plan_category_id)->get();
+            return response()->json(compact('data'));
+        }
+
+        $data = PlanType::get();
         return response()->json(compact('data'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(PlanType $planType)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PlanType $planType)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PlanType $planType)
-    {
-        //
-    }
 }

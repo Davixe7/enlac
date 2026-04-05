@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
+    public function options(){
+        $data = Group::whereIsIndividual(false)->get(['name', 'is_individual']);
+        return response()->json(compact('data'));
+    }
     /**
      * Display a listing of the resource.
      */

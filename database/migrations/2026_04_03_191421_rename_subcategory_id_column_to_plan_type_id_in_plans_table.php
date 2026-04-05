@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('programs', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedTinyInteger('order')->nullable();
-            $table->string('name');
-            $table->decimal('price');
-            $table->timestamps();
+        Schema::table('plans', function (Blueprint $table) {
+            $table->renameColumn('subcategory_id', 'plan_type_id');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('programs');
+        Schema::table('plans', function (Blueprint $table) {
+            $table->renameColumn('plan_type_id', 'subcategory_id');
+        });
     }
 };

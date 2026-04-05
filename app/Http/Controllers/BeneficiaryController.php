@@ -27,6 +27,20 @@ class BeneficiaryController extends Controller
      */
     public function index(Request $request)
     {
+        if( $request->plan_type_id ){
+            $data = Candidate::whereHas('groups.plans', function($query) use ($request) {
+                $query->where('plan_type_id', $request->plan_type_id);
+            })->get();
+            return BeneficiaryResource::collection($data);
+        }
+
+        if( $request->group_id ){
+            $data = Candidate::whereHas('groups', function($query) use ($request) {
+                $query->where('id', $request->group_id);
+            })->get();
+            return BeneficiaryResource::collection($data);
+        }
+
         if( $request->type == 'search' ){
             $data = DB::table('candidates')
             ->whereIn('status', [CandidateStatus::ACCEPTED, CandidateStatus::SCHEDULED, CandidateStatus::READY, CandidateStatus::ACTIVE])
@@ -62,7 +76,7 @@ class BeneficiaryController extends Controller
 
         return BeneficiaryResource::collection($beneficiaries);
     }
- 
+
     public function show(Candidate $candidate)
     {
         return new BeneficiaryResource($candidate->load(['program','personal_groups', 'locationDetail']));

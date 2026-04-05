@@ -37,7 +37,7 @@ class AttendanceController extends Controller
                     ->join('plans', 'activity_plan.plan_id', '=', 'plans.id')
                     ->join('candidate_group', 'plans.group_id', '=', 'candidate_group.group_id')
                     ->join('activity_daily_scores', function($join) use ($targetDate) {
-                        $join->on('activities.id', '=', 'activity_daily_scores.activity_id')
+                        $join->on('activity_plan.id', '=', 'activity_daily_scores.activity_plan_id')
                             ->on('candidate_group.candidate_id', '=', 'activity_daily_scores.candidate_id')
                             ->whereDate('activity_daily_scores.date', $targetDate);
                     })

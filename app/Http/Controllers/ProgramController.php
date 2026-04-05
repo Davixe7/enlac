@@ -10,7 +10,7 @@ class ProgramController extends Controller
 {
     public function index()
     {
-        $programs = Program::all();
+        $programs = Program::orderBy('order')->get();
         return ProgramResource::collection($programs);
     }
 

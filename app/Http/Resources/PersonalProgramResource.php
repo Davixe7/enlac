@@ -25,8 +25,8 @@ class PersonalProgramResource extends JsonResource
             'date'          => $this->created_at,
             'group'         => $this->group,
             'candidate'     => $this->group ? new BeneficiaryResource($this->group->candidates()->first()) : null,
-            'start_date'    => Carbon::parse($this->start_date)->format('d/m/Y'),
-            'end_date'      => Carbon::parse($this->end_date)->format('d/m/Y'),
+            'start_date'    => $this->start_date,
+            'end_date'      => $this->end_date,
         ]);
     }
 }

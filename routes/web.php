@@ -1,7 +1,21 @@
 <?php
 use App\Http\Controllers\BeneficiaryController;
+use App\Models\Candidate;
+use App\Models\PaymentConfig;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
+
+Route::get('kiut', function(){
+    PaymentConfig::whereDoesntHave('snapshots')
+    ->each(function($paymentConfig){
+        $paymentConfig->snapshots()->create([
+            'amount'          => $paymentConfig->amount,
+            'frequency'       => $paymentConfig->frequency,
+            'effective_since' => $paymentConfig->created_at,
+        ]);
+    });
+});
 
 Route::get('search', [BeneficiaryController::class, 'index']);
 

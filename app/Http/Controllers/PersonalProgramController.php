@@ -44,7 +44,7 @@ class PersonalProgramController extends Controller
             'group_id'       => $request->group_id,
             'name'           => $request->name,
             'category_id'    => $plan->category_id,
-            'subcategory_id' => $plan->subcategory_id,
+            'plan_type_id'   => $plan->plan_type_id,
             'start_date'     => $plan->start_date,
             'end_date'       => $plan->end_date,
             'status'         => $plan->status,
@@ -60,7 +60,7 @@ class PersonalProgramController extends Controller
 
         $newPlan->activities()->attach($newAssociations);
 
-        return response()->json(['data'=>$newPlan->load(['category', 'subcategory'])]);
+        return response()->json(['data'=>$newPlan->load(['category', 'planType'])]);
     }
 
     /**
@@ -68,7 +68,7 @@ class PersonalProgramController extends Controller
      */
     public function show(Plan $plan)
     {
-        return new PersonalProgramResource($plan->load(['subcategory.parent', 'group']));
+        return new PersonalProgramResource($plan->load(['planType', 'group']));
     }
 
     /**

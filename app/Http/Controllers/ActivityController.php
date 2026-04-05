@@ -55,10 +55,11 @@ class ActivityController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'             => 'required',
-            'plan_category_id' => 'required|exists:plan_categories,id',
-            'measurement_unit' => 'required',
-            'goal_type'        => 'required'
+            'name'                 => 'required',
+            'plan_category_id'     => 'required|exists:plan_categories,id',
+            'activity_category_id' => 'required|exists:activity_categories,id',
+            'measurement_unit'     => 'required',
+            'goal_type'            => 'required'
         ]);
 
         $data = Activity::create($data);

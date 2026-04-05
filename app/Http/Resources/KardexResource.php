@@ -15,6 +15,7 @@ class KardexResource extends JsonResource
     public function toArray(Request $request): array
     {
         return  [
+            'order'        => $this->order,
             'template'     => $this->getFirstMediaUrl('template'),
             "id"           => $this->id,
             "name"         => $this->name,

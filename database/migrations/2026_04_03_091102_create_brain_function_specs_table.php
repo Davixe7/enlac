@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\BrainFunction;
+use App\Models\BrainLevel;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,11 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('programs', function (Blueprint $table) {
+        Schema::create('brain_function_specs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedTinyInteger('order')->nullable();
-            $table->string('name');
-            $table->decimal('price');
+            $table->foreignIdFor(BrainLevel::class)->constrained()->onDelete('cascade');
+            $table->foreignIdFor(BrainFunction::class)->constrained()->onDelete('cascade');
+            $table->text('content');
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('programs');
+        Schema::dropIfExists('brain_function_specs');
     }
 };
