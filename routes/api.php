@@ -75,6 +75,7 @@ Route::get('payment_configs/{id}/history-logs', [PaymentConfigController::class,
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
 Route::get('issues/export', [IssueController::class, 'export']);
+Route::get('sponsors/export', [SponsorController::class, 'export']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', fn () => new UserResource(auth()->user()))->name('user');

@@ -8,6 +8,8 @@ use App\Http\Resources\SponsorResource;
 use App\Models\Sponsor;
 use App\Models\SponsorAddress;
 use Illuminate\Http\Request;
+    use App\Exports\SponsorExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SponsorController extends Controller
 {
@@ -76,5 +78,18 @@ class SponsorController extends Controller
     public function destroy(Sponsor $sponsor)
     {
         //
+    }
+
+    public function export()
+    {
+        $query = Sponsor::query();
+
+        $fileName = 'reporte_general_padrinos_' . now()->format('d-m-Y_His') . '.xlsx';
+
+        $response = Excel::download(new SponsorExport($query), $fileName);
+
+        //El header Access-Control-Expose-Headers le da Permiso a Axios para leer el archivo
+        $response->headers->set('Access-Control-Expose-Headers', 'Content-Disposition');
+        return $response;
     }
 }

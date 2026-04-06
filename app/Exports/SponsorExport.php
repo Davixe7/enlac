@@ -27,7 +27,7 @@ class SponsorExport implements FromCollection, WithHeadings, WithMapping, Should
         return [
             'Folio',
             'Nombre Completo',
-            'Empresa',
+            'Razón o Denominación Social',
             'Cant. Beneficiarios',
             'Lista de Beneficiarios',
             '¿Es Anónimo?',
@@ -48,14 +48,16 @@ class SponsorExport implements FromCollection, WithHeadings, WithMapping, Should
             $sponsor->second_last_name
         ]));
 
+        $contacto = ($sponsor->contact_by === 'parent') ? 'Los Padres' : 'ENLAC';
+
         return [
-            str_pad($sponsor->id, 4, '0', STR_PAD_LEFT), // Folio formateado
+            str_pad($sponsor->id, 4, '0', STR_PAD_LEFT),
             $fullName,
             $sponsor->company_name ?? 'N/A',
             $sponsor->payment_configs->count(),
             $beneficiarios ?: 'Sin beneficiarios asignados',
             $sponsor->is_anonymous ? 'Sí' : 'No',
-            $contacto = ($sponsor->contact_by === 'parent') ? 'Los Padres' : 'ENLAC',
+            $contacto,
             $sponsor->created_at->format('d/m/Y')
         ];
     }
