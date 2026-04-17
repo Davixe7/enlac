@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $user->roles()->attach( $evaluatorRole ); */
 
-        Kardex::create([
+        /* Kardex::create([
             'name'     => 'Esquema de Vacunación',
             'slug'     => Str::slug('Esquema de Vacunación'),
             'category' => 'default',
@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
             'label'     => 'Programa de Escucha',
             'name'      => Str::slug('Programa de Escucha', '_'),
             'parent_id' => null,
-        ]);
+        ]); */
 
         $this->call(PlanTypeSeeder::class);
         $this->call(ActivitySeeder::class);

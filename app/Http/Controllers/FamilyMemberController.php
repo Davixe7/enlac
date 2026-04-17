@@ -60,7 +60,24 @@ class FamilyMemberController extends Controller
      */
     public function update(Request $request, FamilyMember $familyMember)
     {
-        //
+        $validated = $request->validate([
+            'name'                 => 'required|string|max:255',
+            'age'                  => 'nullable|integer|min:0|max:120',
+            'relationship'         => 'required|string|max:100',
+            'marital_status'       => 'nullable|string|max:50',
+            'scolarship'           => 'nullable|string|max:100',
+            'ocupation'            => 'nullable|string|max:150',
+            'monthly_income'       => 'required|numeric|min:0',
+            'monthly_contribution' => 'required|numeric|min:0|max:' . $request->monthly_income,
+        ], [
+            'name.required' => 'El nombre completo es obligatorio.',
+            'monthly_contribution.max' => 'La aportación no puede ser mayor al ingreso mensual.',
+        ]);
+
+        $familyMember->update($validated);
+        $data = $familyMember;
+
+        return response()->json(compact('data'), 200);
     }
 
     /**

@@ -38,7 +38,7 @@ class EvaluationFields extends JsonResource
             $level->ranks = $level->ranks->map(function ($rank) use ($request, $level) {
                 $rank->evaluation_id = intval($this->id);
                 $rank->brain_level_id = $level->id;
-                $rank->laterality_impact = $level->laterality_impact ?: 'l';
+                $rank->laterality_impact = $rank->laterality_impact;
                 $rank->candidate_id = $this->candidate_id;
                 return $rank;
             });

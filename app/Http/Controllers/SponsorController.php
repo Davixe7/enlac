@@ -18,7 +18,7 @@ class SponsorController extends Controller
      */
     public function index(Request $request)
     {
-        $sponsors = Sponsor::byCandidate( $request->candidate_id )->get();
+        $sponsors = Sponsor::byCandidate( $request->candidate_id )->orderBy('name')->get();
         return SponsorResource::collection( $sponsors );
     }
 

@@ -15,7 +15,7 @@ class KardexController extends Controller
      */
     public function index()
     {
-        $kardexes = Kardex::with(['media'])->get();
+        $kardexes = Kardex::with(['media'])->orderBy('order')->get();
         $data = $kardexes
         ->groupBy('category')
         ->map(fn($kdx) => KardexResource::collection($kdx));

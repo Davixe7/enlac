@@ -24,7 +24,7 @@ class PaymentConfigResource extends JsonResource
             'receipt'        => $this->deductible_receipt ? new DeductibleReceiptResource($this->deductible_receipt) : [],
             'created_at'     => Carbon::parse($this->created_at)->format('d/m/Y'),
             'updated_at'     => Carbon::parse($this->updated_at)->format('d/m/Y'),
-            'currency'       => $this->currency
+            'amount_usd'     => $this->amount_usd
         ]);
     }
 }

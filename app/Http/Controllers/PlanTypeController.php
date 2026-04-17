@@ -17,7 +17,7 @@ class PlanTypeController extends Controller
             return response()->json(compact('data'));
         }
 
-        $data = PlanType::get();
+        $data = PlanType::with('plan_category')->get();
         return response()->json(compact('data'));
     }
 

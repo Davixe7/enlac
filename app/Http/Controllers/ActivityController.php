@@ -63,7 +63,7 @@ class ActivityController extends Controller
         ]);
 
         $data = Activity::create($data);
-        $data->load('plan_category');
+        $data->load(['plan_category', 'activityCategory']);
         return response()->json(compact('data'), 201);
     }
 
@@ -81,14 +81,15 @@ class ActivityController extends Controller
     public function update(Request $request, Activity $activity)
     {
         $data = $request->validate([
-            'name'             => 'required',
-            'plan_category_id' => 'required|exists:plan_categories,id',
-            'measurement_unit' => 'required',
-            'goal_type'        => 'required'
+            'name'                 => 'required',
+            'plan_category_id'     => 'required|exists:plan_categories,id',
+            'activity_category_id' => 'required|exists:activity_categories,id',
+            'measurement_unit'     => 'required',
+            'goal_type'            => 'required'
         ]);
 
         $activity->update($data);
-        $data = $activity->load('plan_category');
+        $data = $activity->load(['plan_category', 'activityCategory']);
         return response()->json(compact('data'), 200);
     }
 
