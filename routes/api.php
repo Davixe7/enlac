@@ -64,6 +64,7 @@ use App\Models\CandidateStatusLog;
 use App\Models\SocioeconomicProfile;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 
 Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
@@ -252,7 +253,8 @@ Route::middleware('auth:sanctum')->group(function () {
             'cuota_padrinos_porcentaje'     => $cuota_padrinos_porcentaje
         ];
 
-        $pdf = Pdf::loadView('pdf.carta', $data);
+        $pdf = App::make('dompdf.wrapper');
+        $pdf = $pdf->loadView('pdf.carta', $data);
         //$pdf->setPaper('letter', 'portrait');
 
         // Descarga el archivo con un nombre descriptivo
