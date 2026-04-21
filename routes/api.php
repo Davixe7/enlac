@@ -61,6 +61,7 @@ use App\Http\Controllers\reports\RideReportController;
 use App\Http\Controllers\SocioeconomicProfileController;
 use App\Models\Candidate;
 use App\Models\CandidateStatusLog;
+use App\Models\Contact;
 use App\Models\SocioeconomicProfile;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -229,7 +230,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(compact('data'));
     });
 
-    Route::get('beneficiaries/{candidate}/carta', function(Candidate $candidate){
+    Route::post('beneficiaries/{candidate}/carta', function(Candidate $candidate, Request $request){
         $program_price = $candidate->program->price;
         $cuota_padrinos             = $candidate->getQuotaAmount('sponsor');
         $cuota_padres               = $candidate->getQuotaAmount('parent');
@@ -237,12 +238,14 @@ Route::middleware('auth:sanctum')->group(function () {
         $cuota_padres_porcentaje    = number_format(($cuota_padres   / $program_price) * 100, 2);
         $cuota_enlac_porcentaje     = number_format(($cuota_enlac    / $program_price) * 100, 2);
         $cuota_padrinos_porcentaje  = number_format(($cuota_padrinos / $program_price) * 100, 2);
+        $destinatario               = Contact::findOrFail($request->contact_id);
+        $destinatario               = $destinatario->full_name;
 
         $data = [
             'fecha'                         => Carbon::now()->translatedFormat('d \d\e F \d\e Y'),
-            'destinatario'                  => $candidate->contacts->first()->full_name,
+            'destinatario'                  => $destinatario ,
+            'periodo'                       => $request->periodo ,
             'beneficiario'                  => $candidate->full_name,
-            'periodo'                       => 'septiembre 2025 a febrero 2026',
             'programa'                      => $candidate->program->name,
             'costo_mensual'                 => $candidate->program->price,
             'cuota_enlac'                   => $cuota_enlac,
