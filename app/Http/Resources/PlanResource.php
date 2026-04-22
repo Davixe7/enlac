@@ -14,6 +14,8 @@ class PlanResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return array_merge(parent::toArray($request), []);
+        return array_merge(parent::toArray($request), [
+            'status' => intval($this->status)
+        ]);
     }
 }

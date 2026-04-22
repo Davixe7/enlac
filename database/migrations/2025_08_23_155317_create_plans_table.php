@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(PlanType::class, 'plan_type_id');
             $table->foreignIdFor(Group::class);
             $table->string('name');
-            $table->string('status');
+            $table->boolean('status');
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();

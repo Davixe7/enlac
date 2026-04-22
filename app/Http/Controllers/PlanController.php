@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PersonalProgramResource;
+use App\Http\Resources\PlanResource;
 use App\Models\Group;
 use App\Models\Plan;
 use Carbon\Carbon;
@@ -22,6 +23,7 @@ class PlanController extends Controller
 
         $data = $data->map(function($plan){
             $plan->date = $plan->created_at->format('d/m/Y');
+            $plan->status = intval($plan->status);
             return $plan->toArray();
         });
 
