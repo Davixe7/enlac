@@ -10,6 +10,12 @@ class ProgramController extends Controller
 {
     public function index()
     {
+        $programs = Program::where('is_active', true)->orderBy('order')->get();
+        return ProgramResource::collection($programs);
+    }
+
+    public function adminIndex()
+    {
         $programs = Program::orderBy('order')->get();
         return ProgramResource::collection($programs);
     }
@@ -26,7 +32,16 @@ class ProgramController extends Controller
 
     public function update(Request $request, Program $program)
     {
-        $program->update($request->all());
+        $validated = $request->validate([
+            'name'        => 'sometimes|string',
+            'price'       => 'sometimes|numeric',
+            'is_active'   => 'sometimes|boolean',
+            'order'       => 'sometimes|integer',
+            'valid_since' => 'sometimes|date_format:Y-m-d', // Cambiado a valid_since
+        ]);
+
+        $program->update($request->except('valid_since'));
+
         return new ProgramResource($program);
     }
 

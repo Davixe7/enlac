@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('price');
             $table->date('valid_since');
             $table->date('valid_until')->nullable();
+            $table->boolean('is_active')->nullable();
             $table->timestamps();
         });
     }

@@ -58,7 +58,13 @@ class DatabaseSeeder extends Seeder
             'parent_id' => null,
         ]); */
 
-        $this->call(PlanTypeSeeder::class);
-        $this->call(ActivitySeeder::class);
+        //$this->call(PlanTypeSeeder::class);
+        //$this->call(ActivitySeeder::class);
+
+        $this->call(RoleSeeder::class);
+        $this->call(WorkAreaSeeder::class);
+        $this->call(UserSeeder::class);
+        $this->call(ProgramSeeder::class);
+        //$this->call(RadiomarathonKeySeeder::class);
     }
 }

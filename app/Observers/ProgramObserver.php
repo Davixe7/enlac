@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Program;
+use App\Models\ProgramSnapshot;
+use Carbon\Carbon;
 
 class ProgramObserver
 {
@@ -11,30 +13,43 @@ class ProgramObserver
      */
     public function created(Program $program): void
     {
-        //
+        $startDate = request()->input('effective_date', now()->format('Y-m-d'));
+
+        $program->snapshots()->create([
+            'price' => $program->price,
+            'valid_since' => $startDate,
+            'valid_until' => null, // Vigente indefinidamente hasta que cambie
+        ]);
     }
 
     /**
      * Handle the Program "updated" event.
      */
-    public function updating(Program $program): void
+    public function updated(Program $program): void
     {
+
         if ($program->isDirty(['price', 'is_active'])) {
 
-            $precioAnterior = $program->getOriginal('price');
-            $activoAnterior = $program->getOriginal('is_active');
-            $fechaUltimaActualizacion = $program->getOriginal('updated_at') ?? $program->created_at;
+            // 1. Capturamos la fecha en la que el usuario quiere que el NUEVO precio sea vigente
+            // Si no viene en el request, asumimos que es inmediatamente (hoy)
+            $fechaVigenciaNueva = request()->input('valid_since', now()->format('Y-m-d'));
 
-            // Cerrar el snapshot que estaba vigente hasta este segundo
+            // Convertimos a Carbon para restar 1 día de forma segura si es necesario
+            $carbonVigenciaNueva = Carbon::parse($fechaVigenciaNueva);
+
+            // 2. Cerramos el snapshot actual (el que tiene valid_until en NULL)
+            // Su vigencia termina justo un día antes de que empiece el nuevo precio
             $program->snapshots()
                 ->whereNull('valid_until')
-                ->update(['valid_until' => now()]);
+                ->update([
+                    'valid_until' => $carbonVigenciaNueva->copy()->subDay()->format('Y-m-d')
+                ]);
 
-            // Historico
+            // 3. Creamos el NUEVO snapshot con el NUEVO precio que se mantendrá vigente de forma indefinida
             $program->snapshots()->create([
-                'price'       => $precioAnterior,
-                'valid_since'  => $fechaUltimaActualizacion,
-                'valid_until' => now(),
+                'price'       => $program->price, // El nuevo precio modificado
+                'valid_since' => $fechaVigenciaNueva, // Inicia en la fecha que le indicamos
+                'valid_until' => null, // Vigente indefinidamente hacia el futuro
             ]);
         }
     }

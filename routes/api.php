@@ -50,6 +50,9 @@ use App\Http\Controllers\FamilyMemberController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\PlanTypeController;
 use App\Http\Controllers\ScoreReportController;
+use App\Http\Controllers\DonorController;
+use App\Http\Controllers\DonorFiscalRecordController;
+use App\Http\Controllers\RadiomarathonKeyController;
 
 use App\Http\Controllers\reports\AttendanceReportController;
 use App\Http\Controllers\reports\BeneficiaryAttendanceReportController;
@@ -80,6 +83,7 @@ Route::get('issues/export', [IssueController::class, 'export']);
 Route::get('sponsors/export', [SponsorController::class, 'export']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('admin/programs', [ProgramController::class, 'adminIndex']);
     Route::get('/user', fn () => new UserResource(auth()->user()))->name('user');
     Route::get('test', [FinancialController::class, 'semaforo']);
 
@@ -263,4 +267,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // Descarga el archivo con un nombre descriptivo
         return $pdf->download('carta.pdf');
     });
+
+    Route::apiResource('donors', DonorController::class);
+    Route::apiResource('fiscal-records', DonorFiscalRecordController::class);
+    Route::apiResource('radiomarathon-keys', RadiomarathonKeyController::class);
 });
