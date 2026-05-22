@@ -19,4 +19,18 @@ class DonorFiscalRecord extends Model
     {
         return $this->belongsTo(Donor::class);
     }
+
+    protected static function booted(): void
+    {
+        static::saving(function (DonorFiscalRecord $record) {
+            // Lista de columnas string de la migración que no aceptan NULL
+            $stringFields = ['street', 'exterior_number', 'neighborhood', 'city', 'state'];
+
+            foreach ($stringFields as $field) {
+                if (is_null($record->getAttribute($field))) {
+                    $record->setAttribute($field, '');
+                }
+            }
+        });
+    }
 }

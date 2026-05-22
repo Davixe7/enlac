@@ -44,6 +44,16 @@ class BeneficiaryController extends Controller
         if( $request->type == 'search' ){
             $data = DB::table('candidates')
             ->whereIn('status', [CandidateStatus::ACCEPTED, CandidateStatus::SCHEDULED, CandidateStatus::READY, CandidateStatus::ACTIVE])
+            ->when($request->name, function($query) use ($request) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('first_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('middle_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->name . '%');
+                });
+            })
+            ->select('id as value')
+            ->selectRaw("CONCAT_WS(' ', first_name, middle_name, last_name) as label")
+            ->limit(15)
             ->select('id as value')
             ->selectRaw("CONCAT_WS(' ', first_name, middle_name, last_name) as label")
             ->get();

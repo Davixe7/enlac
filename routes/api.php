@@ -70,6 +70,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\ProcurationActivityController;
+use App\Http\Controllers\DonationController;
 
 Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
 Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
@@ -271,4 +273,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('donors', DonorController::class);
     Route::apiResource('fiscal-records', DonorFiscalRecordController::class);
     Route::apiResource('radiomarathon-keys', RadiomarathonKeyController::class);
+
+    Route::get('/procuration-activities', [ProcurationActivityController::class, 'index']);
+    Route::post('/procuration-activities', [ProcurationActivityController::class, 'store']);
+    Route::put('/procuration-activities/{id}', [ProcurationActivityController::class, 'update']);
+    Route::post('/donations', [DonationController::class, 'store']);
 });

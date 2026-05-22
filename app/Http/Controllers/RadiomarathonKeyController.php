@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\RadiomarathonKey;
 use App\Http\Requests\StoreRadiomarathonKeyRequest;
+use App\Http\Requests\UpdateRadiomarathonKeyRequest;
 use App\Http\Resources\RadiomarathonKeyResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -41,7 +42,7 @@ class RadiomarathonKeyController extends Controller
     /**
      * Actualiza una clave existente.
      */
-    public function update(StoreRadiomarathonKeyRequest $request, $id): RadiomarathonKeyResource
+    public function update(UpdateRadiomarathonKeyRequest $request, $id): RadiomarathonKeyResource
     {
         $key = RadiomarathonKey::findOrFail($id);
         $key->update($request->validated());

@@ -29,7 +29,37 @@ class StoreDonorRequest extends FormRequest
             'sector' => 'required|string',
             'contact_restrictions' => 'required|string',
             'is_active' => 'boolean',
-            // Todos los demás campos pueden ser opcionales (nullable)
-        ];
+
+            // Validaciones para los datos fiscales que vienen del modal hijo (DonorFiscalRecordModal.vue)
+            'fiscal_records'                             => 'nullable|array',
+            'fiscal_records.*.id'                        => 'nullable',
+            'fiscal_records.*.commercial_name'           => 'required|string',
+            'fiscal_records.*.tax_name'                  => 'required|string',
+            'fiscal_records.*.rfc'                       => 'required|string',
+            'fiscal_records.*.tax_regimen'               => 'required|string',
+            'fiscal_records.*.cfdi_use'                  => 'required|string',
+            'fiscal_records.*.email'                     => 'required|email',
+            'fiscal_records.*.company_anniversary'       => 'nullable|date_format:Y-m-d',
+            'fiscal_records.*.street'                    => 'nullable|string',
+            'fiscal_records.*.exterior_number'           => 'nullable|string',
+            'fiscal_records.*.neighborhood'              => 'nullable|string',
+            'fiscal_records.*.postal_code'               => 'required|string',
+            'fiscal_records.*.city'                      => 'nullable|string',
+            'fiscal_records.*.state'                     => 'nullable|string',
+
+            // Campos de cobranza
+            'fiscal_records.*.billing_contact_name'      => 'required|string',
+            'fiscal_records.*.billing_job_title'         => 'nullable|string',
+            'fiscal_records.*.billing_landline'          => 'nullable|string',
+            'fiscal_records.*.billing_cellphone'         => 'nullable|string',
+            'fiscal_records.*.billing_email'             => 'nullable|email',
+            'fiscal_records.*.billing_birth_date'        => 'nullable|date_format:Y-m-d',
+            'fiscal_records.*.home_collection'           => 'nullable|boolean',
+            'fiscal_records.*.payment_day'               => 'nullable|string',
+            'fiscal_records.*.billing_street'            => 'nullable|string',
+            'fiscal_records.*.billing_exterior_number'   => 'nullable|string',
+            'fiscal_records.*.billing_neighborhood'      => 'nullable|string',
+            'fiscal_records.*.billing_postal_code'       => 'nullable|string',
+            ];
     }
 }

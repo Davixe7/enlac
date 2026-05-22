@@ -9,13 +9,13 @@ class Donor extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'prospect_for' => 'array',
-        'birth_date' => 'date:Y-m-d',
-        'spouse_birth_date' => 'date:Y-m-d',
-        'knows_facilities' => 'boolean',
-        'is_private_contact' => 'boolean',
-        'is_active' => 'boolean',
-        'status_changed_at' => 'datetime',
+        'prospect_for'            => 'array',
+        'birth_date'              => 'date:Y-m-d',
+        'spouse_birth_date'       => 'date:Y-m-d',
+        'knows_facilities'        => 'boolean',
+        'is_private_contact'      => 'boolean',
+        'is_active'               => 'boolean',
+        'status_changed_at'       => 'datetime',
     ];
 
     protected static function booted()
@@ -30,5 +30,10 @@ class Donor extends Model
     public function getFullNameAttribute()
     {
         return "{$this->first_name} {$this->last_name} {$this->second_last_name}";
+    }
+
+    public function fiscalRecords()
+    {
+        return $this->hasMany(DonorFiscalRecord::class);
     }
 }
