@@ -47,9 +47,9 @@ class DonorFiscalRecordController extends Controller
     /**
      * Actualiza un registro fiscal existente.
      */
-    public function update(StoreDonorFiscalRecordRequest $request, $id): DonorFiscalRecordResource
+    public function update(StoreDonorFiscalRecordRequest $request, DonorFiscalRecord $donorFiscalRecord): DonorFiscalRecordResource
     {
-        $fiscalRecord = DonorFiscalRecord::findOrFail($id);
+        $fiscalRecord = DonorFiscalRecord::findOrFail($donorFiscalRecord);
         $fiscalRecord->update($request->validated());
 
         return new DonorFiscalRecordResource($fiscalRecord);

@@ -73,6 +73,9 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ProcurationActivityController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\CapacitationController;
+use App\Http\Controllers\DonorGratitudeController;
+use App\Http\Controllers\DonorShipmentController;
+use App\Http\Controllers\DonorVisitController;
 
 Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
 Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
@@ -280,4 +283,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/procuration-activities/{id}', [ProcurationActivityController::class, 'update']);
     Route::post('/donations', [DonationController::class, 'store']);
     Route::apiResource('capacitations', CapacitationController::class);
+
+    Route::apiResource('donor-gratitudes', DonorGratitudeController::class);
+    Route::apiResource('donor-visits', DonorVisitController::class);
+
+    Route::apiResource('donor-shipments', DonorShipmentController::class);
+
+    Route::get('/donors/{id}/donations', [DonationController::class, 'getLinesByDonor']);
+    Route::get('/reports/donations', [DonationController::class, 'report']);
+    Route::get('/reports/visits', [DonorVisitController::class, 'report']);
 });

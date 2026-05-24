@@ -57,6 +57,22 @@ class DonorController extends Controller
         return response()->json($donor->load('fiscalRecords')->append('full_name'), 201);
     }
 
+    public function show(Donor $donor): JsonResponse
+    {
+        $donor->load([
+            'fiscalRecords',
+            'visits.responsible:id,name,last_name,second_last_name',
+            'gratitudes',
+            'shipments',
+            'donations'
+        ]);
+
+        // Aseguramos que el atributo full_name se calcule y se envíe
+        $donor->append('full_name');
+
+        return response()->json($donor);
+    }
+
     public function update(StoreDonorRequest $request, Donor $donor)
     {
         $validatedData = $request->validated();

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Donor extends Model
 {
@@ -35,5 +36,26 @@ class Donor extends Model
     public function fiscalRecords()
     {
         return $this->hasMany(DonorFiscalRecord::class);
+    }
+
+    public function gratitudes()
+    {
+        return $this->hasMany(DonorGratitude::class)->orderBy('date', 'desc');
+    }
+
+    public function visits()
+    {
+        return $this->hasMany(DonorVisit::class)->orderBy('visit_date', 'desc');
+    }
+
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(DonorShipment::class);
+    }
+
+    public function donations(): HasMany
+    {
+        // Se ordena del más reciente al más antiguo por defecto
+        return $this->hasMany(Donation::class, 'donor_id')->orderBy('payment_date', 'desc');
     }
 }

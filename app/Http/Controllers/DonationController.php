@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Donation;
 use App\Http\Requests\StoreDonationRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DonationController extends Controller
@@ -50,5 +51,54 @@ class DonationController extends Controller
             'message' => 'Donativo aplicado con éxito',
             'data' => $donation
         ], 201);
+    }
+
+    public function getLinesByDonor($donorId): JsonResponse
+    {
+        // Buscamos los donativos ordenados del más reciente al más antiguo
+        $donations = Donation::where('donor_id', $donorId)
+            ->orderBy('payment_date', 'desc')
+            ->get();
+
+        return response()->json([
+            'data' => $donations
+        ], 200);
+    }
+
+    /**
+     * Reporte avanzado de donativos con filtros
+     */
+    public function report(Request $request): JsonResponse
+    {
+        // Iniciamos la consulta cargando la relación del donante
+        $query = Donation::with(['donor:id,first_name,last_name,second_last_name']);
+
+        // Filtro: Fecha Desde (Rango de pago)
+        if ($request->filled('date_from')) {
+            $query->whereDate('payment_date', '>=', $request->date_from);
+        }
+
+        // Filtro: Fecha Hasta
+        if ($request->filled('date_to')) {
+            $query->whereDate('payment_date', '<=', $request->date_to);
+        }
+
+        // Filtro: Nombre del Donante (Buscando en la relación)
+        if ($request->filled('search_donor')) {
+            $search = $request->search_donor;
+
+            $query->whereHas('donor', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('second_last_name', 'like', "%{$search}%");
+            });
+        }
+
+        // Obtenemos los donativos ordenados de forma descendente por fecha de pago
+        $donations = $query->orderBy('payment_date', 'desc')->get();
+
+        return response()->json([
+            'data' => $donations
+        ], 200);
     }
 }
