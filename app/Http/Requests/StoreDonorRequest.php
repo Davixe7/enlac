@@ -6,60 +6,63 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDonorRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    protected function prepareForValidation()
+    {
+        // Interceptamos el string del Front antes de validar y lo normalizamos
+        $this->merge([
+            'knows_facilities' => $this->knows_facilities === 'SÍ',
+        ]);
+    }
+
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'second_last_name' => 'nullable|string|max:255',
-            'cellphone' => 'required|string|size:10',
-            'sector' => 'required|string',
-            'contact_restrictions' => 'required|string',
-            'is_active' => 'boolean',
+            'donor_type'           => 'required|string',
+            'first_name'           => 'required|string|max:255',
+            'last_name'            => 'required|string|max:255',
+            'second_last_name'     => 'nullable|string|max:255',
+            'preferred_name'       => 'nullable|string|max:255',
+            'marital_status'       => 'nullable|string',
+            'gender'               => 'nullable|string',
+            'cellphone'            => 'required|string|max:20',
+            'landline'             => 'nullable|string|max:20',
+            'personal_email'       => 'nullable|email|max:255',
 
-            // Validaciones para los datos fiscales que vienen del modal hijo (DonorFiscalRecordModal.vue)
-            'fiscal_records'                             => 'nullable|array',
-            'fiscal_records.*.id'                        => 'nullable',
-            'fiscal_records.*.commercial_name'           => 'required|string',
-            'fiscal_records.*.tax_name'                  => 'required|string',
-            'fiscal_records.*.rfc'                       => 'required|string',
-            'fiscal_records.*.tax_regimen'               => 'required|string',
-            'fiscal_records.*.cfdi_use'                  => 'required|string',
-            'fiscal_records.*.email'                     => 'required|email',
-            'fiscal_records.*.company_anniversary'       => 'nullable|date_format:Y-m-d',
-            'fiscal_records.*.street'                    => 'nullable|string',
-            'fiscal_records.*.exterior_number'           => 'nullable|string',
-            'fiscal_records.*.neighborhood'              => 'nullable|string',
-            'fiscal_records.*.postal_code'               => 'required|string',
-            'fiscal_records.*.city'                      => 'nullable|string',
-            'fiscal_records.*.state'                     => 'nullable|string',
+            // 👈 Cambiado a boolean para hacer match perfecto con lo que inyectó prepareForValidation
+            'knows_facilities'     => 'nullable|boolean',
 
-            // Campos de cobranza
-            'fiscal_records.*.billing_contact_name'      => 'required|string',
-            'fiscal_records.*.billing_job_title'         => 'nullable|string',
-            'fiscal_records.*.billing_landline'          => 'nullable|string',
-            'fiscal_records.*.billing_cellphone'         => 'nullable|string',
-            'fiscal_records.*.billing_email'             => 'nullable|email',
-            'fiscal_records.*.billing_birth_date'        => 'nullable|date_format:Y-m-d',
-            'fiscal_records.*.home_collection'           => 'nullable|boolean',
-            'fiscal_records.*.payment_day'               => 'nullable|string',
-            'fiscal_records.*.billing_street'            => 'nullable|string',
-            'fiscal_records.*.billing_exterior_number'   => 'nullable|string',
-            'fiscal_records.*.billing_neighborhood'      => 'nullable|string',
-            'fiscal_records.*.billing_postal_code'       => 'nullable|string',
-            ];
+            'sector'               => 'required|string',
+            'street'               => 'nullable|string',
+            'exterior_number'      => 'nullable|string',
+            'neighborhood'         => 'nullable|string',
+            'postal_code'          => 'nullable|string',
+            'city'                 => 'nullable|string',
+            'state'                => 'nullable|string',
+            'country'              => 'nullable|string',
+            'is_private_contact'   => 'nullable|integer',
+            'notes'                => 'nullable|string',
+            'contact_restrictions' => 'nullable|string',
+            'prospect_for'         => 'nullable|array',
+
+            // Los campos que ya corregimos
+            'company_name'         => 'nullable|string|max:255',
+            'job_title'            => 'nullable|string|max:255',
+            'birth_date'           => 'nullable|date_format:Y-m-d',
+
+            // Datos del Cónyuge
+            'spouse_first_name'       => 'nullable|string|max:255',
+            'spouse_last_name'        => 'nullable|string|max:255',
+            'spouse_second_last_name' => 'nullable|string|max:255',
+            'spouse_birth_date'       => 'nullable|date_format:Y-m-d',
+            'wedding_anniversary'     => 'nullable|string',
+
+            // Registros fiscales anidados
+            'fiscal_records'          => 'nullable|array',
+        ];
     }
 }
