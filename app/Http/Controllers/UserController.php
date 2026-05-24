@@ -13,8 +13,16 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->type === 'select') {
+        return response()->json([
+            'data' => User::query()
+                ->orderBy('name', 'ASC')
+                ->select('id as value', 'name as label')
+                ->get()
+        ]);
+    }
         $users = User::with(['work_area', 'leader', 'roles'])->orderBy('name')->get();
         return UserResource::collection($users);
     }

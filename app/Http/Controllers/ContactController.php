@@ -13,6 +13,18 @@ class ContactController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->type === 'select') {
+            return response()->json([
+                'data' => Contact::query()
+                    ->orderBy('first_name', 'ASC')
+                    ->orderBy('last_name', 'ASC')
+                    // Seleccionamos la estructura id => value, y concatenamos el label
+                    ->select('id as value')
+                    ->selectRaw("CONCAT_WS(' ', first_name, middle_name, last_name) as label")
+                    ->get()
+            ]);
+        }
+
         $contacts = Contact::whereCandidateId($request->candidate_id)->get();
         return ContactResource::collection($contacts);
     }

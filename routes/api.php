@@ -72,6 +72,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ProcurationActivityController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\CapacitationController;
 
 Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
 Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
@@ -278,4 +279,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/procuration-activities', [ProcurationActivityController::class, 'store']);
     Route::put('/procuration-activities/{id}', [ProcurationActivityController::class, 'update']);
     Route::post('/donations', [DonationController::class, 'store']);
+    Route::apiResource('capacitations', CapacitationController::class);
 });
