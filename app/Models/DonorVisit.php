@@ -28,7 +28,7 @@ class DonorVisit extends Model
     }
 
     public function responsible(): BelongsTo
-{
-    return $this->belongsTo(User::class, 'enlac_user_id');
-}
+    {
+        return $this->belongsTo(User::class, 'enlac_user_id');
+    }
 }

@@ -21,9 +21,25 @@ class Donor extends Model
 
     protected static function booted()
     {
+        static::created(function ($donor) {
+            $donor->statusLogs()->create([
+                'is_active' => (bool) $donor->is_active,
+                'changed_at' => now(),
+            ]);
+        });
+
         static::updating(function ($donor) {
             if ($donor->isDirty('is_active')) {
                 $donor->status_changed_at = now();
+            }
+        });
+
+        static::updated(function ($donor) {
+            if ($donor->isDirty('is_active')) {
+                $donor->statusLogs()->create([
+                    'is_active' => (bool) $donor->is_active,
+                    'changed_at' => now(),
+                ]);
             }
         });
     }
@@ -55,7 +71,11 @@ class Donor extends Model
 
     public function donations(): HasMany
     {
-        // Se ordena del más reciente al más antiguo por defecto
         return $this->hasMany(Donation::class, 'donor_id')->orderBy('payment_date', 'desc');
+    }
+
+    public function statusLogs(): HasMany
+    {
+        return $this->hasMany(DonorStatusLog::class)->orderBy('changed_at', 'desc');
     }
 }

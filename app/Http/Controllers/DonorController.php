@@ -6,38 +6,68 @@ use App\Models\Donor;
 use App\Http\Requests\StoreDonorRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Sponsor;
+use Illuminate\Support\Facades\DB;
 
 class DonorController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        // Este método solo buscará en la tabla DONORS
         $donors = Donor::with('fiscalRecords')
-            // Filtro por Nombre / Razón Social / Empresa
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
                 $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhere('second_last_name', 'like', "%{$search}%")
-                      ->orWhere('company_name', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('company_name', 'like', "%{$search}%");
                 });
-            })
-            // Filtro por Tipo de Actividad (Prospecto para)
-            ->when($request->filled('activity_type'), function ($query) use ($request) {
-                $activity = $request->input('activity_type');
-                // Asumiendo que guardas 'prospect_for' como JSON cast en el modelo
-                $query->whereJsonContains('prospect_for', $activity);
-            })
-            // Filtro por Mes de Cumpleaños (birth_date formato Y-m-d)
-            ->when($request->filled('birth_month'), function ($query) use ($request) {
-                $month = $request->input('birth_month');
-                $query->whereMonth('birth_date', $month);
             })
             ->orderBy('first_name')
             ->get()
             ->append('full_name');
 
         return response()->json($donors);
+    }
+
+    public function searchDonorsAndSponsors(Request $request): JsonResponse
+    {
+        $search = $request->query('search', '');
+
+        // Buscar Donantes
+        $donors = Donor::where(function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('company_name', 'like', "%{$search}%");
+            })
+            ->with('fiscalRecords')
+            ->get()
+            ->map(function ($donor) {
+                return [
+                    'id' => $donor->id,
+                    'full_name' => trim($donor->first_name . ' ' . $donor->last_name . ' ' . ($donor->company_name ?? '')),
+                    'origin' => 'donante',
+                    'fiscal_records' => $donor->fiscalRecords
+                ];
+            });
+
+        // Buscar Sponsors
+        $sponsors = Sponsor::where('name', 'like', "%{$search}%")
+            ->where('type', 'general')
+            ->get()
+            ->map(function ($sponsor) {
+                return [
+                    'id' => $sponsor->id,
+                    'full_name' => trim($sponsor->name . ' ' . $sponsor->last_name),
+                    'origin' => 'sponsor',
+                    'company_name' => $sponsor->company_name,
+                    'fiscal_records' => []
+                ];
+            });
+
+        $results = $donors->concat($sponsors)->sortBy('full_name')->values();
+
+        return response()->json($results);
     }
 
     public function store(StoreDonorRequest $request)
@@ -64,7 +94,8 @@ class DonorController extends Controller
             'visits.responsible:id,name,last_name,second_last_name',
             'gratitudes',
             'shipments',
-            'donations'
+            'donations',
+            'statusLogs'
         ]);
 
         // Aseguramos que el atributo full_name se calcule y se envíe
@@ -94,5 +125,21 @@ class DonorController extends Controller
         });
 
         return response()->json($donor->load('fiscalRecords')->append('full_name'), 200);
+    }
+
+    public function toggleStatus(Request $request, $id): JsonResponse
+    {
+        $donor = Donor::find($id);
+
+        if (!$donor) {
+            return response()->json(['message' => 'Donante no encontrado'], 404);
+        }
+
+        $request->validate(['is_active' => 'required|boolean']);
+
+        $donor->is_active = $request->is_active;
+        $donor->save();
+
+        return response()->json(['message' => 'Estatus actualizado']);
     }
 }

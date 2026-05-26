@@ -38,4 +38,14 @@ class Donation extends Model
     {
         return $this->belongsTo(ProcurationActivity::class);
     }
+
+    public function fiscalRecord()
+    {
+        return $this->belongsTo(DonorFiscalRecord::class, 'fiscal_record_id');
+    }
+
+    public function sponsor()
+    {
+        return $this->belongsTo(Sponsor::class, 'sponsor_id');
+    }
 }

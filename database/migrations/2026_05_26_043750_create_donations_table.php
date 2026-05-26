@@ -12,9 +12,11 @@ return new class extends Migration
             $table->id();
 
             // Relaciones y Datos del Donante
-            $table->unsignedBigInteger('donor_id');
-            $table->unsignedBigInteger('procuration_activity_id'); // Enlace al catálogo que hicimos
-            $table->string('activity_type'); // Copia del tipo para agilizar consultas en el front
+            $table->unsignedBigInteger('donor_id')->nullable();
+            $table->unsignedBigInteger('sponsor_id')->nullable();
+            $table->unsignedBigInteger('fiscal_record_id')->nullable();
+            $table->unsignedBigInteger('procuration_activity_id');
+            $table->string('activity_type');
 
             // Información Financiera
             $table->string('folio_number')->unique(); // Ej: P-26-00001

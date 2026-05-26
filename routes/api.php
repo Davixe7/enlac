@@ -61,6 +61,9 @@ use App\Http\Controllers\reports\BeneficiaryScoreReportController;
 use App\Http\Controllers\reports\ExcecutiveReportController;
 use App\Http\Controllers\reports\GeneralReportController;
 use App\Http\Controllers\reports\RideReportController;
+use App\Http\Controllers\reports\DonationReportController;
+use App\Http\Controllers\reports\VisitReportController;
+
 use App\Http\Controllers\SocioeconomicProfileController;
 use App\Models\Candidate;
 use App\Models\CandidateStatusLog;
@@ -274,14 +277,21 @@ Route::middleware('auth:sanctum')->group(function () {
         return $pdf->download('carta.pdf');
     });
 
+    Route::get('/donors/search-all', [DonorController::class, 'searchDonorsAndSponsors']);
     Route::apiResource('donors', DonorController::class);
+    Route::post('/donors/{donor}/toggle-status', [DonorController::class, 'toggleStatus']);
+
     Route::apiResource('fiscal-records', DonorFiscalRecordController::class);
     Route::apiResource('radiomarathon-keys', RadiomarathonKeyController::class);
 
     Route::get('/procuration-activities', [ProcurationActivityController::class, 'index']);
     Route::post('/procuration-activities', [ProcurationActivityController::class, 'store']);
     Route::put('/procuration-activities/{id}', [ProcurationActivityController::class, 'update']);
+
     Route::post('/donations', [DonationController::class, 'store']);
+    Route::post('donations/print', [DonationController::class, 'storeAndPrint']);
+    Route::get('/reports/donations/export', [DonationReportController::class, 'export']);
+
     Route::apiResource('capacitations', CapacitationController::class);
 
     Route::apiResource('donor-gratitudes', DonorGratitudeController::class);
@@ -290,6 +300,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('donor-shipments', DonorShipmentController::class);
 
     Route::get('/donors/{id}/donations', [DonationController::class, 'getLinesByDonor']);
-    Route::get('/reports/donations', [DonationController::class, 'report']);
-    Route::get('/reports/visits', [DonorVisitController::class, 'report']);
+    Route::get('/reports/donations', [DonationReportController::class, 'index']);
+    Route::get('/reports/visits', [VisitReportController::class, 'index']);
+
+    Route::get('/reports/visits/export', [VisitReportController::class, 'export']);
 });

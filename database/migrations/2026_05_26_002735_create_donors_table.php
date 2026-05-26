@@ -51,7 +51,7 @@ return new class extends Migration
             $table->string('referral_relationship')->nullable();
             $table->text('notes')->nullable();
             $table->boolean('is_private_contact')->default(false);
-            $table->string('prospect_for')->nullable();
+            $table->json('prospect_for')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamp('status_changed_at')->useCurrent();
 

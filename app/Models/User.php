@@ -16,6 +16,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
+    protected $appends = ['full_name'];
+
     public function guardName()
     {
         return 'sanctum';

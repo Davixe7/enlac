@@ -6,51 +6,50 @@ use App\Models\Donation;
 use App\Http\Requests\StoreDonationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
 class DonationController extends Controller
 {
-    /**
-     * Registrar un nuevo donativo aplicando lógica de folios atómicos
-     */
-    public function store(StoreDonationRequest $request): JsonResponse
+    private function createDonationWithFolio($data)
     {
-        // Usamos una transacción para garantizar que el folio no se duplique si entran dos peticiones en simultáneo
-        $donation = DB::transaction(function () use ($request) {
-
-            // 1. Lógica de Generación de Folio Automático (P-26-00001)
-            $yearIndicator = '26'; // Año en curso 2026 fijo por requerimiento
+        return DB::transaction(function () use ($data) {
+            $yearIndicator = '26';
             $prefix = "P-{$yearIndicator}-";
 
-            // Buscamos el último folio generado para este año con bloqueo de escritura
             $lastDonation = Donation::where('folio_number', 'like', "{$prefix}%")
                 ->lockForUpdate()
                 ->orderBy('id', 'desc')
                 ->first();
 
-            if ($lastDonation) {
-                // Extraemos el número correlativo final (ej: de P-26-00005 toma 5)
-                $lastNumber = (int) substr($lastDonation->folio_number, -5);
-                $nextNumber = $lastNumber + 1;
-            } else {
-                $nextNumber = 1;
-            }
+            $nextNumber = $lastDonation ? (int) substr($lastDonation->folio_number, -5) + 1 : 1;
+            $data['folio_number'] = $prefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
-            // Rellenamos con ceros a la izquierda hasta completar los 5 dígitos
-            $generatedFolio = $prefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
-
-            // 2. Unimos el folio generado a los datos limpios validados
-            $data = $request->validated();
-            $data['folio_number'] = $generatedFolio;
-
-            // 3. Crear el registro en la base de datos
             return Donation::create($data);
         });
+    }
 
-        return response()->json([
-            'message' => 'Donativo aplicado con éxito',
-            'data' => $donation
-        ], 201);
+    public function store(StoreDonationRequest $request): JsonResponse
+    {
+        $donation = $this->createDonationWithFolio($request->validated());
+        return response()->json(['message' => 'Donativo aplicado con éxito', 'data' => $donation], 201);
+    }
+
+    public function storeAndPrint(Request $request)
+    {
+        $data = $request->all();
+
+        if (isset($data['fiscal_record_id']) && !is_numeric($data['fiscal_record_id'])) {
+            $data['fiscal_record_id'] = null;
+        }
+
+        $donation = $this->createDonationWithFolio($data);
+        $donation->load(['donor', 'fiscalRecord', 'procurationActivity', 'sponsor']);
+
+        $pdf = Pdf::loadView('pdf.donation_receipt', compact('donation'))
+                ->setPaper([0, 0, 226.77, 368.5], 'portrait');
+
+        return $pdf->download('recibo_' . $donation->folio_number . '.pdf');
     }
 
     public function getLinesByDonor($donorId): JsonResponse
@@ -59,43 +58,6 @@ class DonationController extends Controller
         $donations = Donation::where('donor_id', $donorId)
             ->orderBy('payment_date', 'desc')
             ->get();
-
-        return response()->json([
-            'data' => $donations
-        ], 200);
-    }
-
-    /**
-     * Reporte avanzado de donativos con filtros
-     */
-    public function report(Request $request): JsonResponse
-    {
-        // Iniciamos la consulta cargando la relación del donante
-        $query = Donation::with(['donor:id,first_name,last_name,second_last_name']);
-
-        // Filtro: Fecha Desde (Rango de pago)
-        if ($request->filled('date_from')) {
-            $query->whereDate('payment_date', '>=', $request->date_from);
-        }
-
-        // Filtro: Fecha Hasta
-        if ($request->filled('date_to')) {
-            $query->whereDate('payment_date', '<=', $request->date_to);
-        }
-
-        // Filtro: Nombre del Donante (Buscando en la relación)
-        if ($request->filled('search_donor')) {
-            $search = $request->search_donor;
-
-            $query->whereHas('donor', function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                ->orWhere('last_name', 'like', "%{$search}%")
-                ->orWhere('second_last_name', 'like', "%{$search}%");
-            });
-        }
-
-        // Obtenemos los donativos ordenados de forma descendente por fecha de pago
-        $donations = $query->orderBy('payment_date', 'desc')->get();
 
         return response()->json([
             'data' => $donations

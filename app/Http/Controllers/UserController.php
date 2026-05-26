@@ -19,8 +19,13 @@ class UserController extends Controller
         return response()->json([
             'data' => User::query()
                 ->orderBy('name', 'ASC')
-                ->select('id as value', 'name as label')
                 ->get()
+                ->map(function ($user) {
+                    return [
+                        'value' => $user->id,
+                        'label' => $user->full_name
+                    ];
+                })
         ]);
     }
         $users = User::with(['work_area', 'leader', 'roles'])->orderBy('name')->get();
