@@ -23,4 +23,8 @@ class Interview extends Model
     {
         return $this->belongsToMany(InterviewQuestion::class);
     }
+
+    public function interviewee(){
+        return $this->belongsTo(Interviewee::class);
+    }
 }

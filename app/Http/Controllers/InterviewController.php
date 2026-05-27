@@ -20,7 +20,7 @@ class InterviewController extends Controller
     public function index()
     {
         if( request()->filled('candidate_id') ){
-            $interview = Interview::whereCandidateId(request()->candidate_id)->firstOrFail();
+            $interview = Interview::whereCandidateId(request()->candidate_id)->with('interviewee')->firstOrFail();
             return new InterviewResource($interview);
         }
         $interviews = Interview::all();
