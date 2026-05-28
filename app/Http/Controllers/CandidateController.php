@@ -24,7 +24,7 @@ class CandidateController extends Controller
     public function index() {
         $candidates = Candidate::pending()
         ->with(['evaluationSchedules', 'evaluationSchedule.evaluator'])
-        ->orderBy('first_name', 'ASC')
+        ->orderBy('last_name', 'ASC')
         ->get();
 
         return CandidateResource::collection($candidates);
@@ -46,7 +46,8 @@ class CandidateController extends Controller
             'contacts.addresses',
             'interviewee',
             'locationDetail',
-            'candidateStatus'
+            'candidateStatus',
+            'issues'
         ]));
     }
 

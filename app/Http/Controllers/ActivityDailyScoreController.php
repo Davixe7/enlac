@@ -17,7 +17,7 @@ class ActivityDailyScoreController extends Controller
     public function index(Request $request){
         $mode = $request->mode ?: 'user';
         $date = $request->date ?: now()->format('Y-m-d');
-        
+
         $data = Candidate::join('candidate_group', 'candidates.id', '=', 'candidate_group.candidate_id')
         ->join('plans', 'plans.group_id', '=', 'candidate_group.group_id')
         ->where('plans.category_id', $request->category_id)
@@ -44,6 +44,9 @@ class ActivityDailyScoreController extends Controller
 
             'activity_plan.daily_goal as activity_daily_goal',
             'activity_plan.final_goal as activity_final_goal',
+            'activity_plan.intensity as activity_intensity',
+            'activity_plan.frequency as activity_frequency',
+            'activity_plan.duration as activity_duration',
             'activity_plan.id as activity_plan_id',
 
             'activity_daily_scores.score',
@@ -75,7 +78,11 @@ class ActivityDailyScoreController extends Controller
                             'goal_type' => $score->activity_goal_type,
                             'plan_category_id' => $request->category_id,
                             'final_goal'       => $score->activity_final_goal,
-                            'daily_goal'       => $score->activity_daily_goal
+                            'daily_goal'       => $score->activity_daily_goal,
+                            'intensity'        => $score->activity_intensity,
+                            'frequency'        => $score->activity_frequency,
+                            'duration'         => $score->activity_duration,
+                            'activity_plan.id as activity_plan_id',
                         ],
                     ];
                 })

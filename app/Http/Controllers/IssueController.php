@@ -18,12 +18,18 @@ class IssueController extends Controller
             $data = Issue::filterByDate($request->date)
             ->filterByCandidate($request->candidate_id)
             ->filterByDates($request->start_date, $request->end_date)
-            ->with(['user', 'plan_category', 'candidate'])->get();
+            ->with(['user', 'plan_category', 'candidate', 'attachments'])
+            ->latest()
+            ->get();
 
             return response()->json(compact('data'));
         }
 
-        $data = Issue::filterByDate($request->date)->with(['user', 'plan_category', 'candidate'])->get();
+        $data = Issue::filterByDate($request->date)
+        ->with(['user', 'plan_category', 'candidate', 'attachments'])
+        ->latest() // <--- Agregado aquí
+        ->get();
+
         return response()->json(compact('data'));
     }
 
@@ -55,6 +61,21 @@ class IssueController extends Controller
             $issue->addMedia( $attachment )->toMediaCollection('attachments');
         }
         return response()->json(['data'=>$issue]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        $issue = Issue::findOrFail($id);
+
+        // Esto borrará también los archivos adjuntos asociados (Spatie MediaLibrary)
+        $issue->clearMediaCollection('attachments');
+
+        $issue->delete();
+
+        return response()->json(['message' => 'Incidencia eliminada correctamente']);
     }
 
     public function export(Request $request)

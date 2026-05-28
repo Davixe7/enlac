@@ -14,6 +14,10 @@ class ActivityPlan extends Model
         'plan_id',
         'activity_id',
         'daily_goal',
+        'final_goal',
+        'intensity',
+        'frequency',
+        'duration'
     ];
 
     public function scores(): HasMany

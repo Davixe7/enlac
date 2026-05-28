@@ -90,9 +90,9 @@ trait BeneficiaryScopes
         });
     }
 
-    public function scopeFullName($query){
-        return $query
-        ->select(['candidates.id', 'candidates.first_name', 'candidates.last_name', 'candidates.middle_name', 'candidates.diagnosis'])
-        ->selectRaw("CONCAT_WS(' ', candidates.first_name, candidates.middle_name, candidates.last_name) as full_name");
+    public function scopeFullName($query)
+    {
+        return $query->select(['candidates.*'])
+            ->selectRaw("TRIM(CONCAT_WS(' ', candidates.last_name, candidates.middle_name, candidates.first_name)) as full_name");
     }
 }

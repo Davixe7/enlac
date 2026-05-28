@@ -82,7 +82,9 @@ class BeneficiaryController extends Controller
             return BeneficiaryResource::collection($data);
         }
 
-        $beneficiaries = $beneficiaries->orderBy('first_name')->get();
+        $beneficiaries = $beneficiaries
+        ->orderBy('last_name', 'asc')
+        ->get();
 
         return BeneficiaryResource::collection($beneficiaries);
     }

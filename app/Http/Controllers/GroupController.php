@@ -21,6 +21,7 @@ class GroupController extends Controller
         ->whereIsIndividual(false)
         ->includesCandidate( $request->candidate_id )
         ->with(['program', 'leader', 'assistant'])
+        ->latest()
         ->get();
 
         return GroupResource::collection($groups);

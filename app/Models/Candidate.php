@@ -174,7 +174,7 @@ class Candidate extends Model implements HasMedia
 
     public function getFullNameAttribute()
     {
-        $fullNameArray = array_filter([$this->first_name, $this->last_name, $this->middle_name]);
+        $fullNameArray = array_filter([$this->last_name, $this->middle_name, $this->first_name]);
         return join(" ", $fullNameArray);
     }
 
@@ -191,6 +191,11 @@ class Candidate extends Model implements HasMedia
     public function scores()
     {
         return $this->hasMany(ActivityDailyScore::class);
+    }
+
+    public function issues()
+    {
+        return $this->hasMany(Issue::class);
     }
 
     public function enlacResponsible()

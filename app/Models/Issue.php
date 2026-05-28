@@ -54,4 +54,10 @@ class Issue extends Model implements HasMedia
         }
         return $query->whereBetween('date', [$start, $end]);
     }
+
+    public function attachments()
+    {
+        // Esto mapea la colección de Spatie a una relación de Laravel
+        return $this->media()->where('collection_name', 'attachments');
+    }
 }
