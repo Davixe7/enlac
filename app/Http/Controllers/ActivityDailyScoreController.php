@@ -84,6 +84,7 @@ class ActivityDailyScoreController extends Controller
                             'intensity'        => $score->activity_intensity,
                             'frequency'        => $score->activity_frequency,
                             'duration'         => $score->activity_duration,
+                            'comments'         => $score->comments,
                             'activity_plan.id as activity_plan_id',
                         ],
                     ];
@@ -91,7 +92,6 @@ class ActivityDailyScoreController extends Controller
             ];
         })
         ->values();
-
         return response()->json(compact('data'));
     }
 

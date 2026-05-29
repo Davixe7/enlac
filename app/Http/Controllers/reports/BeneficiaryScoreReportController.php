@@ -49,6 +49,7 @@ class BeneficiaryScoreReportController extends Controller
                 'activity_daily_scores.color as color',
                 'activity_daily_scores.closed as closed',
                 'activity_daily_scores.activity_plan_id as activity_plan_id',
+                'activity_daily_scores.comments as comments',
             )
             ->where('candidates.id','=', $candidate_id)
             ->where('plans.start_date', '<=', $date)
@@ -77,7 +78,8 @@ class BeneficiaryScoreReportController extends Controller
                 'goal_type'        => $item->goal_type,
                 'score'            => $item->score,
                 'closed'           => $item->closed,
-                'color'            => $item->color
+                'color'            => $item->color,
+                'comments'         => $item->comments
             ];
         }
         // Convert indexed array to simple array
@@ -158,7 +160,7 @@ class BeneficiaryScoreReportController extends Controller
 
         return Excel::download($export, $filename);
     }
-    
+
     public function exportMonthly(Candidate $candidate, Request $request)
     {
         $request->validate([
@@ -214,7 +216,7 @@ class BeneficiaryScoreReportController extends Controller
 
         return Excel::download($export, $filename);
     }
-    
+
 
     public function getColorAttribute($activity, $item, $prevValue)
     {
