@@ -50,6 +50,7 @@ class ActivityDailyScoreController extends Controller
             'activity_plan.id as activity_plan_id',
 
             'activity_daily_scores.score',
+            'activity_daily_scores.comments',
             'activity_daily_scores.closed',
             'activity_daily_scores.date',
             'activity_daily_scores.id',
@@ -71,6 +72,7 @@ class ActivityDailyScoreController extends Controller
                         'candidate_id'     => $score->candidate_id,
                         'closed'           => $score->closed ?: false,
                         'score'            => $score->score,
+                        'comments'         => $score->comments,
                         'candidate'        => [ 'id' => $score->candidate_id, 'name' => $score->candidate_name],
                         'activity' => [
                             'id'        => $score->activity_id,
@@ -116,6 +118,7 @@ class ActivityDailyScoreController extends Controller
             'scores.*.activity_plan_id'  => 'required|exists:activity_plan,id',
             'scores.*.candidate_id'      => 'required|exists:candidates,id',
             'scores.*.score'             => 'required',
+            'scores.*.comments'          => 'nullable|string',
             'scores.*.closed'            => 'nullable|boolean',
         ]);
 
@@ -150,6 +153,7 @@ class ActivityDailyScoreController extends Controller
                     ],
                     [
                         'score'             => $item['score'],
+                        'comments'          => $item['comments'] ?? null,
                         'closed'            => $request->closed ?: $item['closed']
                     ]
                 );
