@@ -25,7 +25,7 @@ class Contact extends Model
     protected function rfc(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value) => strtoupper(str_replace(' ', '', $value)),
+            set: fn (?string $value) => $value ? strtoupper(str_replace(' ', '', $value)) : null,
         );
     }
 

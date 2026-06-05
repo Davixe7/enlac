@@ -4,13 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProgramResource;
 use App\Models\Program;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ProgramController extends Controller
 {
     public function index()
     {
-        $programs = Program::where('is_active', true)->orderBy('order')->get();
+        $today = Carbon::today()->toDateString();
+
+        $programs = Program::where('is_active', true)
+            ->where(function ($query) use ($today) {
+                $query->where('valid_since', '<=', $today) // Ya entró en vigor
+                    ->orWhereNull('valid_since');        // O no requiere fecha específica
+            })
+            ->orderBy('order')
+            ->get();
+
         return ProgramResource::collection($programs);
     }
 
@@ -20,8 +30,22 @@ class ProgramController extends Controller
         return ProgramResource::collection($programs);
     }
 
-    public function store(Request $request, Program $program)
+    public function store(Request $request)
     {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'price'       => 'required|numeric',
+            'is_active'   => 'sometimes|boolean',
+            'order'       => 'sometimes|integer',
+            'valid_since' => 'nullable|date_format:Y-m-d',
+        ]);
+
+        // Asignamos un orden por defecto
+        if (!isset($validated['order'])) {
+            $validated['order'] = Program::max('order') + 1;
+        }
+
+        $program = Program::create($validated);
         return new ProgramResource($program);
     }
 
@@ -33,14 +57,14 @@ class ProgramController extends Controller
     public function update(Request $request, Program $program)
     {
         $validated = $request->validate([
-            'name'        => 'sometimes|string',
+            'name'        => 'sometimes|string|max:255',
             'price'       => 'sometimes|numeric',
             'is_active'   => 'sometimes|boolean',
             'order'       => 'sometimes|integer',
-            'valid_since' => 'sometimes|date_format:Y-m-d', // Cambiado a valid_since
+            'valid_since' => 'sometimes|date_format:Y-m-d',
         ]);
 
-        $program->update($request->except('valid_since'));
+        $program->update($validated);
 
         return new ProgramResource($program);
     }

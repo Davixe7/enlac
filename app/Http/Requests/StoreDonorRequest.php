@@ -46,7 +46,7 @@ class StoreDonorRequest extends FormRequest
             'country'              => 'nullable|string',
             'is_private_contact'   => 'nullable|integer',
             'notes'                => 'nullable|string',
-            'contact_restrictions' => 'nullable|string',
+            'contact_restrictions' => 'required|string|max:255',
             'prospect_for'         => 'nullable|array',
 
             // Los campos que ya corregimos
@@ -63,6 +63,17 @@ class StoreDonorRequest extends FormRequest
 
             // Registros fiscales anidados
             'fiscal_records'          => 'nullable|array',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'first_name'           => 'Nombre',
+            'last_name'            => 'Apellido paterno',
+            'cellphone'            => 'Celular',
+            'sector'               => 'Sector',
+            'contact_restrictions' => 'Restricciones de Contacto',
         ];
     }
 }

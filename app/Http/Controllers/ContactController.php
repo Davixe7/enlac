@@ -18,9 +18,8 @@ class ContactController extends Controller
                 'data' => Contact::query()
                     ->orderBy('first_name', 'ASC')
                     ->orderBy('last_name', 'ASC')
-                    // Seleccionamos la estructura id => value, y concatenamos el label
                     ->select('id as value')
-                    ->selectRaw("CONCAT_WS(' ', first_name, middle_name, last_name) as label")
+                    ->selectRaw("CONCAT_WS(' ', first_name, last_name, middle_name ) as label")
                     ->get()
             ]);
         }

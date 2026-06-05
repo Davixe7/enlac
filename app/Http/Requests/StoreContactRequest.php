@@ -32,6 +32,7 @@ class StoreContactRequest extends FormRequest
             'email'                => 'nullable|email|max:255',
             'whatsapp'             => 'nullable|string|max:255',
             'home_phone'           => 'nullable|string|max:255',
+            'rfc'                  => 'nullable|string|max:15',
         ];
     }
 

@@ -33,6 +33,7 @@ class UpdateContactRequest extends FormRequest
             'email'                => 'email|max:255',
             'whatsapp'             => 'nullable|string|max:255',
             'home_phone'           => 'nullable|string|max:255',
+            'rfc'                  => 'nullable|string|max:15',
         ];
     }
 

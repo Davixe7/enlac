@@ -11,6 +11,10 @@ class Program extends Model
     use HasFactory ;
     protected $guarded = [];
     protected $hidden = ['created_at', 'updated_at'];
+    protected $casts = [
+        'is_active' => 'boolean',
+        'valid_since' => 'date:Y-m-d', // Fuerza el formato de fecha correcto
+    ];
 
     public function snapshots(): HasMany
     {
