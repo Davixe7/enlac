@@ -18,7 +18,8 @@ class ProgramResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'is_active' => $this->is_active,
-            'price'   => $this->price
+            'price'   => $this->price,
+            'valid_since' => $this->valid_since
         ];
     }
 }

@@ -15,8 +15,8 @@ class ProgramController extends Controller
 
         $programs = Program::where('is_active', true)
             ->where(function ($query) use ($today) {
-                $query->where('valid_since', '<=', $today) // Ya entró en vigor
-                    ->orWhereNull('valid_since');        // O no requiere fecha específica
+            $query->whereNotNull('valid_since')
+                  ->where('valid_since', '<=', $today);
             })
             ->orderBy('order')
             ->get();
