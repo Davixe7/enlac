@@ -56,4 +56,45 @@ class StoreDonorFiscalRecordRequest extends FormRequest
             'billing_state'           => 'nullable|string|max:255',
         ];
     }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'donor_id'                => 'donante',
+            'commercial_name'         => 'nombre comercial',
+            'tax_name'                => 'razón o denominación social',
+            'rfc'                     => 'RFC',
+            'email'                   => 'correo electrónico fiscal',
+            'tax_regimen'             => 'régimen fiscal',
+            'cfdi_use'                => 'uso de CFDI',
+            'company_anniversary'     => 'aniversario de la empresa',
+            'postal_code'             => 'código postal fiscal',
+            'street'                  => 'calle fiscal',
+            'exterior_number'         => 'número exterior fiscal',
+            'neighborhood'            => 'colonia fiscal',
+            'city'                    => 'ciudad fiscal',
+            'state'                   => 'estado fiscal',
+
+            // Cobranza
+            'billing_contact_name'    => 'contacto de cobranza',
+            'billing_job_title'       => 'puesto u ocupación',
+            'billing_landline'        => 'teléfono fijo de cobranza',
+            'billing_cellphone'       => 'celular de cobranza',
+            'billing_email'           => 'correo de cobranza',
+            'billing_birth_date'      => 'cumpleaños del contacto',
+            'home_collection'         => 'cobro a domicilio',
+            'payment_day'             => 'día preferente de pago',
+            'billing_street'          => 'calle de cobranza',
+            'billing_exterior_number' => 'número exterior de cobranza',
+            'billing_neighborhood'    => 'colonia de cobranza',
+            'billing_postal_code'     => 'código postal de cobranza',
+            'billing_city'            => 'ciudad de cobranza',
+            'billing_state'           => 'estado de cobranza',
+        ];
+    }
 }
