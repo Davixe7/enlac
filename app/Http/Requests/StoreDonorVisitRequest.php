@@ -29,4 +29,26 @@ class StoreDonorVisitRequest extends FormRequest
             'interests_hobbies'      => 'nullable|string',
         ];
     }
+
+    /**
+     * Define nombres amigables para los campos.
+     */
+    public function attributes(): array
+    {
+        return [
+            'donor_id'               => 'donante',
+            'visit_date'             => 'fecha de la visita',
+            'enlac_user_id'          => 'responsable de la visita',
+            'reason'                 => 'motivo de la visita',
+            'recommended_by'         => 'quien recomienda',
+            'schedule_contact_name'  => 'nombre del contacto',
+            'schedule_contact_phone' => 'celular del contacto',
+            'received_by'            => 'persona que recibe',
+            'visitors_names'         => 'nombres de los visitantes',
+            'material_presented'     => 'material presentado',
+            'result'                 => 'resultado',
+            'comments'               => 'comentarios',
+            'interests_hobbies'      => 'intereses y hobbies',
+        ];
+    }
 }
