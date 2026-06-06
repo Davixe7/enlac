@@ -46,14 +46,15 @@
 
         <!-- Campos de datos -->
         <div class="field">
-    <span class="bold">Donante:</span>
-    {{ $donation->donor->full_name ?? ($donation->sponsor->name ?? 'N/A') }}
-</div>
+            <span class="bold">Donante:</span>
+            {{ $donation->donor->full_name ?? ($donation->sponsor->name ?? 'N/A') }}
+        </div>
 
-<div class="field">
-    <span class="bold">Razón Social:</span>
-    {{ $donation->fiscalRecord->tax_name ?? ($donation->sponsor->company_name ?? 'N/A') }}
-</div>
+        <div class="field">
+            <span class="bold">Razón Social:</span>
+            {{ $donation->fiscalRecord->tax_name ?? ($donation->sponsor->company_name ?? 'N/A') }}
+        </div>
+
         <div class="field"><span class="bold">Tipo de Actividad:</span> {{ $donation->activity_type }}</div>
         <div class="field"><span class="bold">Actividad:</span> {{ $donation->procurationActivity->name ?? 'N/A' }}</div>
         <div class="field"><span class="bold">Concepto:</span> {{ $donation->concept }}</div>
@@ -66,8 +67,15 @@
         </div>
 
         <div class="field"><span class="bold">Moneda:</span> {{ $donation->currency }}</div>
-        <div class="field"><span class="bold">Tipo de cambio:</span> {{ $donation->exchange_rate }}</div>
-        <div class="field"><span class="bold">Equivalencia en pesos:</span> $ {{ number_format($donation->equivalent_amount_mxn, 2) }}</div>
+
+        <!-- Lógica condicional para Tipo de Cambio y Equivalencia -->
+        @if($donation->currency === 'MXN')
+            <div class="field"><span class="bold">Tipo de cambio:</span> N/A</div>
+        @else
+            <div class="field"><span class="bold">Tipo de cambio:</span> {{ $donation->exchange_rate }}</div>
+            <div class="field"><span class="bold">Equivalencia en pesos:</span> $ {{ number_format($donation->equivalent_amount_mxn, 2) }}</div>
+        @endif
+
         <div class="field"><span class="bold">No. Recibo Deducible:</span> {{ $donation->tax_receipt_number ?? 'N/A' }}</div>
 
         <div class="footer-msg">¡Gracias por apoyar!</div>
