@@ -15,6 +15,7 @@ class DonorController extends Controller
     {
         // Este método solo buscará en la tabla DONORS
         $donors = Donor::with('fiscalRecords')
+            // Filtro por término de búsqueda (Nombre, apellido, empresa)
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
                 $query->where(function ($q) use ($search) {
@@ -22,6 +23,17 @@ class DonorController extends Controller
                     ->orWhere('last_name', 'like', "%{$search}%")
                     ->orWhere('company_name', 'like', "%{$search}%");
                 });
+            })
+            // SOLUCIÓN: Filtro por Tipo de Actividad (Buscando dentro del array JSON)
+            ->when($request->filled('activity_type'), function ($query) use ($request) {
+                $activityType = $request->input('activity_type');
+                // Usamos whereJsonContains porque 'prospect_for' se comporta como un array en el JSON
+                $query->whereJsonContains('prospect_for', $activityType);
+            })
+            // EXTRA: Filtro por Mes de Cumpleaños
+            ->when($request->filled('birth_month'), function ($query) use ($request) {
+                $month = $request->input('birth_month'); // Ej: "01", "02"
+                $query->whereMonth('birth_date', $month);
             })
             ->orderBy('first_name')
             ->get()
