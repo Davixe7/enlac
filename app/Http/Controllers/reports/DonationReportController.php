@@ -14,7 +14,12 @@ class DonationReportController extends Controller
 {
     private function buildQuery(Request $request)
     {
-        $query = Donation::with(['donor:id,first_name,last_name,second_last_name', 'sponsor:id,name,last_name,second_last_name,company_name']);
+        // Añadimos procurationActivity a la carga ansiosa (Eager Loading)
+        $query = Donation::with([
+            'donor:id,first_name,last_name,second_last_name',
+            'sponsor:id,name,last_name,second_last_name,company_name',
+            'procurationActivity:id,name'
+        ]);
 
         if ($request->filled('date_from')) $query->whereDate('payment_date', '>=', $request->date_from);
         if ($request->filled('date_to')) $query->whereDate('payment_date', '<=', $request->date_to);
