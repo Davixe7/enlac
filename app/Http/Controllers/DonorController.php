@@ -8,14 +8,25 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Sponsor;
 use Illuminate\Support\Facades\DB;
+use App\Exports\DonorReportExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class DonorController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        // Este método solo buscará en la tabla DONORS
-        $donors = Donor::with('fiscalRecords')
-            // Filtro por término de búsqueda (Nombre, apellido, empresa)
+        $donors = $this->buildDonorQuery($request)
+            ->orderBy('first_name')
+            ->get()
+            ->append('full_name');
+
+        return response()->json($donors);
+    }
+
+    private function buildDonorQuery(Request $request)
+    {
+        return Donor::with('fiscalRecords')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
                 $query->where(function ($q) use ($search) {
@@ -24,22 +35,14 @@ class DonorController extends Controller
                     ->orWhere('company_name', 'like', "%{$search}%");
                 });
             })
-            // SOLUCIÓN: Filtro por Tipo de Actividad (Buscando dentro del array JSON)
             ->when($request->filled('activity_type'), function ($query) use ($request) {
                 $activityType = $request->input('activity_type');
-                // Usamos whereJsonContains porque 'prospect_for' se comporta como un array en el JSON
                 $query->whereJsonContains('prospect_for', $activityType);
             })
-            // EXTRA: Filtro por Mes de Cumpleaños
             ->when($request->filled('birth_month'), function ($query) use ($request) {
-                $month = $request->input('birth_month'); // Ej: "01", "02"
+                $month = $request->input('birth_month');
                 $query->whereMonth('birth_date', $month);
-            })
-            ->orderBy('first_name')
-            ->get()
-            ->append('full_name');
-
-        return response()->json($donors);
+            });
     }
 
     public function searchDonorsAndSponsors(Request $request): JsonResponse
@@ -153,5 +156,18 @@ class DonorController extends Controller
         $donor->save();
 
         return response()->json(['message' => 'Estatus actualizado']);
+    }
+
+    public function export(Request $request)
+    {
+        $data = $this->buildDonorQuery($request)->orderBy('first_name')->get();
+
+        if ($data->isEmpty()) {
+            return response()->json(['message' => 'No hay datos para exportar'], 404);
+        }
+
+        $fileName = 'Reporte_Donantes_' . Carbon::now()->format('d-m') . '.xlsx';
+
+        return Excel::download(new DonorReportExport($data), $fileName);
     }
 }

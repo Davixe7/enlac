@@ -278,8 +278,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/donors/search-all', [DonorController::class, 'searchDonorsAndSponsors']);
-    Route::apiResource('donors', DonorController::class);
+    Route::get('donors/export', [DonorController::class, 'export']);
     Route::post('/donors/{donor}/toggle-status', [DonorController::class, 'toggleStatus']);
+    Route::apiResource('donors', DonorController::class);
 
     Route::apiResource('fiscal-records', DonorFiscalRecordController::class);
     Route::apiResource('radiomarathon-keys', RadiomarathonKeyController::class);
