@@ -9,42 +9,41 @@ class DonorFiscalRecordResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        // Usamos $this->resource para referirnos al modelo instanciado
         return [
-            'id' => $this->id,
-            'donor_id' => $this->donor_id,
-            'commercial_name' => $this->commercial_name,
-            'tax_name' => $this->tax_name,
-            'rfc' => $this->rfc,
-            'email' => $this->email,
-            'tax_regimen' => $this->tax_regimen,
-            'cfdi_use' => $this->cfdi_use,
-            'company_anniversary' => $this->company_anniversary ? $this->company_anniversary->format('Y-m-d') : null,
-            'street' => $this->street,
-            'exterior_number' => $this->exterior_number,
-            'neighborhood' => $this->neighborhood,
-            'postal_code' => $this->postal_code,
-            'city' => $this->city,
-            'state' => $this->state,
+            'id'                  => $this->resource->id,
+            'donor_id'            => $this->resource->donor_id,
+            'commercial_name'     => $this->resource->commercial_name,
+            'tax_name'            => $this->resource->tax_name,
+            'rfc'                 => $this->resource->rfc,
+            'email'               => $this->resource->email,
+            'tax_regimen'         => $this->resource->tax_regimen,
+            'cfdi_use'            => $this->resource->cfdi_use,
+            'company_anniversary' => $this->resource->company_anniversary ? $this->resource->company_anniversary->format('Y-m-d') : null,
+            'street'              => $this->resource->street,
+            'exterior_number'     => $this->resource->exterior_number,
+            'neighborhood'        => $this->resource->neighborhood,
+            'postal_code'         => $this->resource->postal_code,
+            'city'                => $this->resource->city,
+            'state'               => $this->resource->state,
 
-            // Datos de cobranza
-            'billing_contact_name' => $this->billing_contact_name,
-            'billing_job_title' => $this->billing_job_title,
-            'billing_landline' => $this->billing_landline,
-            'billing_cellphone' => $this->billing_cellphone,
-            'billing_email' => $this->billing_email,
-            'billing_birth_date' => $this->billing_birth_date ? $this->billing_birth_date->format('Y-m-d') : null,
-            'home_collection' => (int) $this->home_collection, // Casteado a entero/booleano limpio para Quasar
-            'payment_day' => $this->payment_day,
+            'billing_contact_name'    => $this->resource->billing_contact_name,
+            'billing_job_title'       => $this->resource->billing_job_title,
+            'billing_landline'        => $this->resource->billing_landline,
+            'billing_cellphone'       => $this->resource->billing_cellphone,
+            'billing_email'           => $this->resource->billing_email,
+            'billing_birth_date'      => $this->resource->billing_birth_date ? $this->resource->billing_birth_date->format('Y-m-d') : null,
+            'home_collection'         => (bool) $this->resource->home_collection,
+            'payment_day'             => $this->resource->payment_day,
+            'billing_street'          => $this->resource->billing_street,
+            'billing_exterior_number' => $this->resource->billing_exterior_number,
+            'billing_neighborhood'    => $this->resource->billing_neighborhood,
+            'billing_postal_code'     => $this->resource->billing_postal_code,
+            'billing_city'            => $this->resource->billing_city,
+            'billing_state'           => $this->resource->billing_state,
 
-            // Domicilio alternativo de cobranza
-            'billing_street' => $this->billing_street,
-            'billing_exterior_number' => $this->billing_exterior_number,
-            'billing_neighborhood' => $this->billing_neighborhood,
-            'billing_postal_code' => $this->billing_postal_code,
-            'billing_city' => $this->billing_city,
-            'billing_state' => $this->billing_state,
-
-            'created_at' => $this->created_at->toIso8601String(),
+            'created_at' => $this->resource->created_at?->toIso8601String(),
+            'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];
     }
 }

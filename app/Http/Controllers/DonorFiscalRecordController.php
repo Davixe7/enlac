@@ -47,10 +47,10 @@ class DonorFiscalRecordController extends Controller
     /**
      * Actualiza un registro fiscal existente.
      */
-    public function update(StoreDonorFiscalRecordRequest $request, DonorFiscalRecord $donorFiscalRecord): DonorFiscalRecordResource
+    public function update(StoreDonorFiscalRecordRequest $request, DonorFiscalRecord $fiscalRecord)
     {
-        $fiscalRecord = DonorFiscalRecord::findOrFail($donorFiscalRecord);
         $fiscalRecord->update($request->validated());
+        $fiscalRecord->refresh();
 
         return new DonorFiscalRecordResource($fiscalRecord);
     }
@@ -61,8 +61,8 @@ class DonorFiscalRecordController extends Controller
     public function destroy($id)
     {
         $fiscalRecord = DonorFiscalRecord::findOrFail($id);
-        $fiscalRecord->delete();
 
-        return response()->json(['message' => 'Registro eliminado con éxito']);
+        $fiscalRecord->delete();
+        return response()->json(['message' => 'Registro eliminado con éxito'], 200);
     }
 }
