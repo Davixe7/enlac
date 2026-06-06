@@ -22,6 +22,7 @@ class BeneficiaryController extends Controller
     {
         $this->candidateService = $candidateService;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -52,10 +53,9 @@ class BeneficiaryController extends Controller
                 });
             })
             ->select('id as value')
-            ->selectRaw("CONCAT_WS(' ', first_name, middle_name, last_name) as label")
+            // Corregido duplicidad de select y garantizado el orden Nombre / Apellido Paterno / Apellido Materno
+            ->selectRaw("CONCAT_WS(' ', first_name, last_name, middle_name) as label")
             ->limit(15)
-            ->select('id as value')
-            ->selectRaw("CONCAT_WS(' ', first_name, middle_name, last_name) as label")
             ->get();
             return response()->json(compact('data'), 200);
         }
@@ -68,6 +68,7 @@ class BeneficiaryController extends Controller
             $beneficiaries = $beneficiaries->equinetherapyActivePlan();
         }
 
+        // CORRECCIÓN AQUÍ: Bloque que se ejecuta al elegir Natación (activity_id)
         if( $request->activity_id  ||  $request->category_id ){
 
             $groups = Plan::hasActivity($request->activity_id)
@@ -77,7 +78,10 @@ class BeneficiaryController extends Controller
             ->pluck('group_id');
 
             $data = Candidate::name($request->name)
-            ->whereHas('groups', fn($q)=>$q->whereIn('groups.id', $groups))->get();
+            ->whereHas('groups', fn($q)=>$q->whereIn('groups.id', $groups))
+            ->orderBy('first_name', 'asc') // Ordena por Nombre
+            ->orderBy('last_name', 'asc')  // Luego por Apellido Paterno
+            ->get();
 
             return BeneficiaryResource::collection($data);
         }

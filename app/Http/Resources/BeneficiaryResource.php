@@ -15,9 +15,16 @@ class BeneficiaryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $dropdownName = trim(implode(' ', array_filter([
+            $this->first_name,
+            $this->last_name,       // Apellido Paterno
+            $this->middle_name      // Apellido Materno
+        ])));
+
         return [
             'id'                                      => $this->id,
             'name'                                    => $this->full_name,
+            'dropdown_name'                           => $dropdownName ?: $this->full_name,
             'sheet'                                   => $this->sheet,
             'status'                                  => $this->status,
             'entry_date'                              => $this->entry_date ? Carbon::parse($this->entry_date)->format('d/m/Y') : null,
