@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\DonorReportExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Models\DonorStatusLog;
 
 class DonorController extends Controller
 {
@@ -85,7 +86,7 @@ class DonorController extends Controller
         return response()->json($results);
     }
 
-    public function store(StoreDonorRequest $request)
+   public function store(StoreDonorRequest $request)
     {
         $validatedData = $request->validated();
         $fiscalRecords = $validatedData['fiscal_records'] ?? [];
@@ -93,13 +94,35 @@ class DonorController extends Controller
         unset($validatedData['fiscal_records']);
         unset($validatedData['donor_type']);
 
-        $donor = Donor::create($validatedData);
+        // El modelo se encargará de insertar el log de forma automática en su evento static::created
+        $donor = DB::transaction(function () use ($validatedData, $fiscalRecords) {
+            $donor = Donor::create($validatedData);
 
-        if (count($fiscalRecords) > 0) {
-            $donor->fiscalRecords()->createMany($fiscalRecords);
-        }
+            if (count($fiscalRecords) > 0) {
+                $donor->fiscalRecords()->createMany($fiscalRecords);
+            }
+
+            return $donor;
+        });
 
         return response()->json($donor->load('fiscalRecords')->append('full_name'), 201);
+    }
+
+    public function toggleStatus(Request $request, $id): JsonResponse
+    {
+        $donor = Donor::find($id);
+
+        if (!$donor) {
+            return response()->json(['message' => 'Donante no encontrado'], 404);
+        }
+
+        $request->validate(['is_active' => 'required|boolean']);
+
+        // Al cambiar 'is_active', el evento static::updated del modelo creará el log automáticamente
+        $donor->is_active = $request->is_active;
+        $donor->save();
+
+        return response()->json(['message' => 'Estatus actualizado con éxito']);
     }
 
     public function show(Donor $donor): JsonResponse
@@ -140,22 +163,6 @@ class DonorController extends Controller
         });
 
         return response()->json($donor->load('fiscalRecords')->append('full_name'), 200);
-    }
-
-    public function toggleStatus(Request $request, $id): JsonResponse
-    {
-        $donor = Donor::find($id);
-
-        if (!$donor) {
-            return response()->json(['message' => 'Donante no encontrado'], 404);
-        }
-
-        $request->validate(['is_active' => 'required|boolean']);
-
-        $donor->is_active = $request->is_active;
-        $donor->save();
-
-        return response()->json(['message' => 'Estatus actualizado']);
     }
 
     public function export(Request $request)

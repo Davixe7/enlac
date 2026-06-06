@@ -22,8 +22,12 @@ class Donor extends Model
     protected static function booted()
     {
         static::created(function ($donor) {
+            // Si por alguna razón 'is_active' no viene asignado en memoria,
+            // evaluamos si es null para darle el valor true por defecto (el de la BD)
+            $isActive = is_null($donor->is_active) ? true : (bool) $donor->is_active;
+
             $donor->statusLogs()->create([
-                'is_active' => (bool) $donor->is_active,
+                'is_active'  => $isActive,
                 'changed_at' => now(),
             ]);
         });
@@ -37,7 +41,7 @@ class Donor extends Model
         static::updated(function ($donor) {
             if ($donor->isDirty('is_active')) {
                 $donor->statusLogs()->create([
-                    'is_active' => (bool) $donor->is_active,
+                    'is_active'  => (bool) $donor->is_active,
                     'changed_at' => now(),
                 ]);
             }
