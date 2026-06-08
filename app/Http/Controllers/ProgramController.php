@@ -14,10 +14,6 @@ class ProgramController extends Controller
         $today = Carbon::today()->toDateString();
 
         $programs = Program::where('is_active', true)
-            ->where(function ($query) use ($today) {
-            $query->whereNotNull('valid_since')
-                  ->where('valid_since', '<=', $today);
-            })
             ->orderBy('order')
             ->get();
 
