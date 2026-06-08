@@ -80,6 +80,9 @@ use App\Http\Controllers\DonorGratitudeController;
 use App\Http\Controllers\DonorShipmentController;
 use App\Http\Controllers\DonorVisitController;
 
+use App\Http\Controllers\EventsCalendarController;
+use App\Http\Controllers\MedicalRecordsController;
+
 Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
 Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
 Route::patch('payment_configs/{id}/restore', [PaymentConfigController::class, 'restore']);
@@ -90,6 +93,26 @@ Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
 Route::get('issues/export', [IssueController::class, 'export']);
 Route::get('sponsors/export', [SponsorController::class, 'export']);
+
+Route::get('events', [EventsCalendarController::class, 'index']);
+Route::get('beneficiaries/{candidate_id}/by-id', [BeneficiaryController::class, 'showById']);
+Route::get('beneficiaries/{idAppoiment}/medical-records', [BeneficiaryController::class, 'medicalRecords']);
+Route::get('beneficiaries/{candidate_id}/medicaments', [BeneficiaryController::class, 'internMedicaments']);
+Route::put('medications/{medicament}/update', [MedicationController::class, 'update']);
+Route::delete('medications/{medicament}/destroy', [MedicationController::class, 'destroy']);
+// Route::get('candidates/{candidate_id}', [CandidateController::class, 'show']);
+// Medical Records
+Route::put('medical-records/{id_medical_record}/update', [MedicalRecordsController::class, 'update']);
+Route::post('medical-records', [MedicalRecordsController::class, 'store']);
+Route::get('events', [EventsCalendarController::class, 'index']);
+//media upload for medical records
+Route::get('medical-records/{medical_record_id}/showMedicalFiles', [MedicalRecordsController::class, 'showMedicalFiles']);
+Route::put('medical-records/{medical_record_id}/medicalFiles', [MedicalRecordsController::class, 'uploadMedia']);
+Route::delete('medical-records/{medical_record_id}/medicalFiles/{file_id}', [MedicalRecordsController::class, 'deleteMedia']);
+//media upload for SOAP
+Route::get('soap/{soap_id}/showSoapFiles', [MedicalRecordsController::class, 'showSoapFiles']);
+Route::put('soap/{soap_id}/soapFiles', [MedicalRecordsController::class, 'uploadSoapMedia']);
+Route::delete('soap/{soap_id}/soapFiles/{file_id}', [MedicalRecordsController::class, 'deleteSoapMedia']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('admin/programs', [ProgramController::class, 'adminIndex']);
@@ -137,6 +160,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'issues'                 => IssueController::class,
         'family_members'         => FamilyMemberController::class,
         'socioeconomic_profiles' => SocioeconomicProfileController::class,
+        'medical_records'        => MedicalRecordsController::class,
     ]);
 
     Route::get('groups/options', [GroupController::class, 'options']);

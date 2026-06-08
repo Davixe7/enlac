@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\MedicalRecords;
 class Appointment extends Model
 {
     use HasFactory;
@@ -36,5 +37,10 @@ class Appointment extends Model
         }
 
         return $query->whereCandidateId($candidate_id);
+    }
+
+    public function medicalRecords(): HasMany
+    {
+        return $this->hasMany(MedicalRecords::class);
     }
 }
