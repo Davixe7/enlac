@@ -52,7 +52,7 @@ class GroupController extends Controller
      */
     public function show(Group $group)
     {
-        $group->load(['program', 'leader', 'assistant', 'candidates', 'plans.subcategory.parent']);
+        $group->load(['program', 'leader', 'assistant', 'candidates']);
         return new GroupResource($group);
     }
 
