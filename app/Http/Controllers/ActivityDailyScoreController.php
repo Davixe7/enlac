@@ -34,9 +34,9 @@ class ActivityDailyScoreController extends Controller
         ->select(
             'candidates.id as candidate_id',
             'candidates.first_name',
-            'candidates.middle_name',
             'candidates.last_name',
-            DB::raw("CONCAT_WS(' ', LPAD(candidates.id, 5, '0'), candidates.first_name, candidates.middle_name, candidates.last_name) as candidate_name"),
+            'candidates.middle_name',
+            DB::raw("CONCAT_WS(' ', LPAD(candidates.id, 5, '0'), candidates.first_name, candidates.last_name, candidates.middle_name) as candidate_name"),
 
             'activities.id as activity_id',
             'activities.name as activity_name',
