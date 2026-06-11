@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <style>
         @page {
-            /* Definimos el tamaño exacto solicitado */
             size: 8cm 13cm;
             margin: 0.5cm;
         }
