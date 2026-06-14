@@ -15,10 +15,10 @@ class ProgramResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'is_active' => $this->is_active,
-            'price'   => $this->price,
+            'id'          => $this->id,
+            'name'        => $this->name,
+            'is_active'   => $this->is_active,
+            'price'       => $this->current_price,
             'valid_since' => $this->valid_since
         ];
     }

@@ -35,7 +35,7 @@ class FinancialController extends Controller
         $candidates = $candidates->map(function ($candidate) use ($date) {
             $candidate->sponsr_amount = $candidate->payment_confix->where('type', 'sponsor')->first()?->quota ?: 0;
             $candidate->parent_amount = $candidate->payment_confix->where('type', 'parent')->first()?->quota ?: 0;
-            $candidate->enlacs_amount = $candidate->program->price - $candidate->sponsr_amount - $candidate->parent_amount;
+            $candidate->enlacs_amount = $candidate->program->currentPrice - $candidate->sponsr_amount - $candidate->parent_amount;
             $candidate->sponsr_paid = 0;
             $candidate->parent_paid = 0;
 

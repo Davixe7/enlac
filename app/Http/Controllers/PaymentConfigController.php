@@ -75,25 +75,15 @@ class PaymentConfigController extends Controller
         $data = $request->validated();
         unset($data['receipt']);
 
-        $originalAmount = $paymentConfig->amount;
+        $today             = now()->toDateString();
+        $originalAmount    = $paymentConfig->amount;
         $originalFrequency = $paymentConfig->frequency;
+        $isDirty           = $originalAmount != $paymentConfig->amount || $originalFrequency != $paymentConfig->frequency;
 
         $paymentConfig->update($data);
 
-        if ($originalAmount != $paymentConfig->amount || $originalFrequency != $paymentConfig->frequency) {
-            $today = now()->toDateString();
-
-            $currentSnapshot = $paymentConfig->snapshots()
-                ->whereNull('effective_until')
-                ->orderByDesc('effective_since')
-                ->first();
-
-            if ($currentSnapshot) {
-                $currentSnapshot->update([
-                    'effective_until' => $today,
-                ]);
-            }
-
+        if ($isDirty) {
+            $paymentConfig->snapshot->update(['effective_until' => $today]);
             $paymentConfig->snapshots()->create([
                 'amount'          => $paymentConfig->amount,
                 'frequency'       => $paymentConfig->frequency,

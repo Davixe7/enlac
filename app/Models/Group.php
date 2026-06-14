@@ -39,4 +39,11 @@ class Group extends Model
     {
         return $this->belongsTo(User::class, 'assistant_id');
     }
+
+    public function scopeHasPlanInCategory($query, $categoryId = null){
+        if( !$categoryId || $categoryId == null ){ return $query; }
+        return $query->whereHas('plans', function($q) use ($categoryId){
+            $q->where('category_id', $categoryId);
+        });
+    }
 }

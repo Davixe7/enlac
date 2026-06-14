@@ -71,4 +71,10 @@ class PaymentConfig extends Model
             ->orderByDesc('effective_since')
             ->first();
     }
+
+    public function snapshot(){
+        return $this->hasOne(PaymentConfigSnapshot::class)
+        ->where('effective_since', '<=', now())
+        ->whereNull('effective_until');
+    }
 }

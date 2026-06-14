@@ -16,20 +16,40 @@ class Program extends Model
         'valid_since' => 'date:Y-m-d', // Fuerza el formato de fecha correcto
     ];
 
-    public function snapshots(): HasMany
+    public function prices(): HasMany
     {
-        return $this->hasMany(ProgramSnapshot::class);
+        return $this->hasMany(ProgramPrice::class);
     }
 
-    public function currentPrice($date = null) {
+    /* public function currentPrice($date = null) {
         $date = $date ?? now();
 
-        return $this->snapshots()
+        return $this->hasOne(ProgramPrice::class)
+            ->where('valid_since', '<=', $date)
+            ->where(function($query) use ($date) {
+                $query->whereNull('valid_until')
+                    ->orWhere('valid_until', '>=', $date);
+            });
+    } */
+
+    public function getCurrentPriceAttribute($date = null) {
+        $date = $date ?? now();
+
+        return $this->prices()
             ->where('valid_since', '<=', $date)
             ->where(function($query) use ($date) {
                 $query->whereNull('valid_until')
                     ->orWhere('valid_until', '>=', $date);
             })
             ->first()?->price ?? $this->price;
+    }
+
+    public function programStatusLogs(){
+        return $this->hasMany(ProgramStatusLog::class);
+    }
+
+    public function pendingPriceUpdate(){
+        return $this->hasOne(ProgramPrice::class)
+        ->where('valid_since', '>', now());
     }
 }

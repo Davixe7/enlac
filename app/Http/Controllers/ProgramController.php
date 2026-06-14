@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProgramResource;
 use App\Models\Program;
+use App\Models\ProgramPrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,8 @@ class ProgramController extends Controller
 
     public function adminIndex()
     {
-        $programs = Program::orderBy('order')->get();
+        $programs = Program::orderBy('order')
+        ->get();
         return ProgramResource::collection($programs);
     }
 
@@ -42,6 +44,7 @@ class ProgramController extends Controller
         }
 
         $program = Program::create($validated);
+
         return new ProgramResource($program);
     }
 
@@ -56,8 +59,7 @@ class ProgramController extends Controller
             'name'        => 'sometimes|string|max:255',
             'price'       => 'sometimes|numeric',
             'is_active'   => 'sometimes|boolean',
-            'order'       => 'sometimes|integer',
-            'valid_since' => 'sometimes|date_format:Y-m-d',
+            'order'       => 'sometimes|integer'
         ]);
 
         $program->update($validated);

@@ -82,6 +82,8 @@ use App\Http\Controllers\DonorVisitController;
 
 use App\Http\Controllers\EventsCalendarController;
 use App\Http\Controllers\MedicalRecordsController;
+use App\Http\Controllers\ProgramPriceController;
+use App\Models\ProgramPrice;
 
 Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
 Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
@@ -284,7 +286,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'periodo'                       => $request->periodo ,
             'beneficiario'                  => $candidate->full_name,
             'programa'                      => $candidate->program->name,
-            'costo_mensual'                 => $candidate->program->price,
+            'costo_mensual'                 => $candidate->program->currentPrice,
             'cuota_enlac'                   => $cuota_enlac,
             'cuota_enlac_porcentaje'        => $cuota_enlac_porcentaje,
             'cuota_padres'                  => $cuota_padres,
@@ -329,4 +331,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/visits', [VisitReportController::class, 'index']);
 
     Route::get('/reports/visits/export', [VisitReportController::class, 'export']);
+
+    Route::apiResource('program_prices', ProgramPriceController::class)->only(['store', 'update', 'index']);
 });

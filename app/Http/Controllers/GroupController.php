@@ -20,6 +20,7 @@ class GroupController extends Controller
         $groups = Group::withCount('candidates')
         ->whereIsIndividual(false)
         ->includesCandidate( $request->candidate_id )
+        ->hasPlanInCategory( $request->plan_category_id )
         ->with(['program', 'leader', 'assistant'])
         ->latest()
         ->get();

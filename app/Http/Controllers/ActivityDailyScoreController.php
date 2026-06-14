@@ -24,6 +24,9 @@ class ActivityDailyScoreController extends Controller
         ->where('plans.start_date', '<=', $date)
         ->where('plans.end_date', '>=', $date)
         ->where('plans.status', '1')
+        ->when($request->group_id, function($query) use ($request) {
+            return $query->where('plans.group_id', $request->group_id);
+        })
         ->join('activity_plan', 'activity_plan.plan_id', '=', 'plans.id')
         ->join('activities', 'activities.id', '=', 'activity_plan.activity_id')
         ->leftJoin('activity_daily_scores', function($join) use ($date) {
