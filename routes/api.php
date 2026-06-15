@@ -82,6 +82,7 @@ use App\Http\Controllers\DonorVisitController;
 
 use App\Http\Controllers\EventsCalendarController;
 use App\Http\Controllers\MedicalRecordsController;
+use App\Http\Controllers\ParentQuotaUpdateController;
 use App\Http\Controllers\ProgramPriceController;
 use App\Models\ProgramPrice;
 
@@ -333,4 +334,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/visits/export', [VisitReportController::class, 'export']);
 
     Route::apiResource('program_prices', ProgramPriceController::class)->only(['store', 'update', 'index']);
+    Route::post('parent-quota-updates', [ParentQuotaUpdateController::class, 'store']);
+    Route::get('parent-quota-updates', [ParentQuotaUpdateController::class, 'index']);
 });
