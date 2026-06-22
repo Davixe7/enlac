@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -22,25 +23,34 @@ class Sponsor extends Model implements HasMedia
         return $this->hasMany(SponsorAddress::class);
     }
 
+    public function sponsorships(){
+        return $this->hasMany(Sponsorship::class);
+    }
+
     public function candidates(){
-        return $this->belongsToMany(Candidate::class, 'payment_configs', 'candidate_id', 'sponsor_id');
+        return $this->hasManyThrough(Candidate::class, Sponsorship::class);
+    }
+
+    public function paymentConfigs(){
+        return $this->hasMany(PaymentConfig::class);
     }
 
     public function payments(){
         return $this->hasMany(Payment::class);
     }
 
-    public function payment_configs(){
-        return $this->hasMany(PaymentConfig::class);
+    public function getFullNameAttribute(){
+        $fullNameArray = array_filter([$this->name, $this->last_name, $this->second_last_name]);
+        return join(" ", $fullNameArray);
     }
 
-    public function scopeByCandidate($query, $candidateId){
+    public function scopeByCandidate(Builder $query, ?int $candidateId = null){
         if( !$candidateId ){
             return $query;
         }
 
-        return $query->whereHas(['payment_configs' => function($query) use ($candidateId){
+        return $query->whereHas('sponsorships', function($query) use ($candidateId){
             $query->whereCandidateId( $candidateId );
-        }]);
+        });
     }
 }

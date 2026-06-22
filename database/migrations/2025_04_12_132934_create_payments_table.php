@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
             $table->foreignId('created_by_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('sponsor_id')->nullable();
+            $table->foreignId('payment_config_id')->constrained()->onDelete('cascade');
             $table->enum('payment_type', ['parent', 'sponsor'])->default('parent');
             $table->boolean('is_partial')->default(false);
             $table->date('date');

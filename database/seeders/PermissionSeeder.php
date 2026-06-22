@@ -18,7 +18,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'beneficiaries.update'],
             ['name' => 'kardexes.update'],
             ['name' => 'appointments.update'],
-            ['name' => 'payment_configs.update'],
+            ['name' => 'sponsorships.update'],
             ['name' => 'sponsors.update'],
             ['name' => 'payments.update'],
         ];

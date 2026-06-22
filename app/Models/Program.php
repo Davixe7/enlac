@@ -21,18 +21,19 @@ class Program extends Model
         return $this->hasMany(ProgramPrice::class);
     }
 
-    /* public function currentPrice($date = null) {
+    public function getCurrentPriceAttribute($date = null) {
         $date = $date ?? now();
 
-        return $this->hasOne(ProgramPrice::class)
+        return $this->prices()
             ->where('valid_since', '<=', $date)
             ->where(function($query) use ($date) {
                 $query->whereNull('valid_until')
                     ->orWhere('valid_until', '>=', $date);
-            });
-    } */
+            })
+            ->first()?->price ?? $this->price;
+    }
 
-    public function getCurrentPriceAttribute($date = null) {
+    public function priceAt($date){
         $date = $date ?? now();
 
         return $this->prices()
@@ -46,6 +47,10 @@ class Program extends Model
 
     public function programStatusLogs(){
         return $this->hasMany(ProgramStatusLog::class);
+    }
+
+    public function latestLog(){
+        return $this->hasOne(ProgramStatusLog::class)->latestOfMany();
     }
 
     public function pendingPriceUpdate(){

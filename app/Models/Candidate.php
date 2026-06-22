@@ -26,6 +26,31 @@ class Candidate extends Model implements HasMedia
 
     public $appends = ['full_name'];
 
+    public function sponsorships()
+    {
+        return $this->hasMany(Sponsorship::class);
+    }
+
+    public function sponsors()
+    {
+        return $this->belongsToMany(Sponsor::class, 'sponsorships');
+    }
+
+    public function paymentConfigs()
+    {
+        return $this->hasMany(PaymentConfig::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function paymentDetails()
+    {
+        return $this->hasManyThrough(PaymentDetail::class, Payment::class);
+    }
+
     public function candidateStatus()
     {
         return $this->belongsTo(\App\Models\CandidateStatus::class);
@@ -86,19 +111,9 @@ class Candidate extends Model implements HasMedia
         return $this->hasMany(Medication::class);
     }
 
-    public function sponsors()
-    {
-        return $this->belongsToMany(Sponsor::class, 'payment_configs');
-    }
-
-    public function payment_configs()
-    {
-        return $this->hasMany(PaymentConfig::class);
-    }
-
     public function payment_confix()
     {
-        return $this->hasMany(PaymentConfig::class);
+        return $this->hasMany(Sponsorship::class);
     }
 
     public function registerMediaConversions(?Media $media = null): void
@@ -118,11 +133,6 @@ class Candidate extends Model implements HasMedia
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
     }
 
     public function evaluationSchedule()
@@ -246,19 +256,14 @@ class Candidate extends Model implements HasMedia
         ]);
     }
 
-    public function paymentConfigSnapshots()
-    {
-        return $this->hasManyThrough(PaymentConfigSnapshot::class, PaymentConfig::class);
-    }
-
     public function getQuotaAmount($type = 'parent'){
-        return $this->paymentConfigSnapshots()
-        ->where('payment_configs.type', $type)
-        ->whereIn('payment_config_snapshots.id', function($query){
+        return $this->sponsorships()
+        ->where('sponsorships.type', $type)
+        ->whereIn('sponsorships.id', function($query){
             $query->selectRaw('MAX(id)')
-            ->from('payment_config_snapshots')
-            ->groupBy('payment_config_id');
+            ->from('sponsorships')
+            ->groupBy('sponsorship_id');
         })
-        ->sum('payment_config_snapshots.amount');
+        ->sum('sponsorships.amount');
     }
 }

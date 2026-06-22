@@ -2,91 +2,96 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePaymentConfigRequest;
-use App\Http\Requests\UpdatePaymentConfigRequest;
-use App\Http\Resources\PaymentConfigResource;
+use App\Http\Requests\StoreSponsorshipRequest;
+use App\Http\Requests\UpdateSponsorshipRequest;
+use App\Http\Resources\SponsorshipResource;
 use App\Models\DeductibleReceipt;
-use App\Models\PaymentConfig;
 use App\Models\PaymentConfigLog;
+use App\Models\Sponsorship;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class PaymentConfigController extends Controller
+class SponsorshipController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $paymentConfigs = PaymentConfig::with(['candidate', 'sponsor'])
+        $sponsorships = Sponsorship::with(['candidate', 'sponsor'])
         ->bySponsor( $request->sponsor_id )
         ->byCandidate( $request->candidate_id )
         ->get();
 
         if( $request->filled(['candidate_id', 'sponsor_id']) ){
-            return new PaymentConfigResource( $paymentConfigs->first() );
+            return new SponsorshipResource( $sponsorships->first() );
         }
 
-        return PaymentConfigResource::collection( $paymentConfigs );
+        return SponsorshipResource::collection( $sponsorships );
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePaymentConfigRequest $request)
+    public function store(StoreSponsorshipRequest $request)
     {
         $data = $request->validated();
         unset($data['receipt']);
 
-        $paymentConfig = PaymentConfig::create($data);
+        $sponsorship = Sponsorship::create($data);
 
         // Crea el primer snapshot cuando se genera un PaymentConfig
-        $paymentConfig->snapshots()->create([
-            'amount'          => $paymentConfig->amount,
-            'frequency'       => $paymentConfig->frequency,
+        $sponsorship->paymentConfigs()->create([
+            'amount'          => $sponsorship->amount,
+            'frequency'       => $sponsorship->frequency,
             'effective_since' => now()->toDateString(),
             'effective_until' => null,
+            'candidate_id'    => $sponsorship->candidate_id,
+            'sponsor_id'      => $sponsorship->sponsor_id ?: 0,
         ]);
 
         $receiptData = $request->validated()['receipt'] ?? null;
         if( $receiptData ){
             unset($receiptData['fiscalStatusFile']);
             $fiscalStatusFile = $request->file('receipt.fiscalStatusFile');
-            $receipt          = $paymentConfig->deductible_receipt()->create($receiptData);
+            $receipt          = $sponsorship->deductible_receipt()->create($receiptData);
             $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
         }
 
-        return new PaymentConfigResource($paymentConfig);
+        return new SponsorshipResource($sponsorship);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(PaymentConfig $paymentConfig)
+    public function show(Sponsorship $sponsorship)
     {
-        return new PaymentConfigResource( $paymentConfig );
+        return new SponsorshipResource( $sponsorship );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePaymentConfigRequest $request, PaymentConfig $paymentConfig)
+    public function update(UpdateSponsorshipRequest $request, Sponsorship $sponsorship)
     {
         $data = $request->validated();
         unset($data['receipt']);
 
         $today             = now()->toDateString();
-        $originalAmount    = $paymentConfig->amount;
-        $originalFrequency = $paymentConfig->frequency;
-        $isDirty           = $originalAmount != $paymentConfig->amount || $originalFrequency != $paymentConfig->frequency;
+        $originalAmount    = $sponsorship->amount;
+        $originalFrequency = $sponsorship->frequency;
 
-        $paymentConfig->update($data);
+        $sponsorship->update($data);
+        $isDirty           = $originalAmount != $sponsorship->amount || $originalFrequency != $sponsorship->frequency;
 
         if ($isDirty) {
-            $paymentConfig->snapshot->update(['effective_until' => $today]);
-            $paymentConfig->snapshots()->create([
-                'amount'          => $paymentConfig->amount,
-                'frequency'       => $paymentConfig->frequency,
+            Log::info('Is Dirty');
+            $sponsorship->paymentConfig->update(['effective_until' => $today]);
+            $sponsorship->paymentConfigs()->create([
+                'amount'          => $sponsorship->amount,
+                'frequency'       => $sponsorship->frequency,
+                'candidate_id'    => $sponsorship->candidate_id,
                 'effective_since' => $today,
                 'effective_until' => null,
             ]);
@@ -96,33 +101,33 @@ class PaymentConfigController extends Controller
         if( $receiptData ){
             unset($receiptData['fiscalStatusFile']);
             $fiscalStatusFile = $request->file('receipt.fiscalStatusFile');
-            $receipt = DeductibleReceipt::updateOrCreate(['payment_config_id' => $paymentConfig->id], $receiptData);
+            $receipt = DeductibleReceipt::updateOrCreate(['sponsorship_id' => $sponsorship->id], $receiptData);
             $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
         }
 
-        return new PaymentConfigResource($paymentConfig);
+        return new SponsorshipResource($sponsorship);
     }
 
-    public function destroy($id, Request $request) {
-        $config = PaymentConfig::findOrFail($id);
+    public function destroy(Sponsorship $sponsorship, Request $request) {
+        $id = $sponsorship->id;
 
         PaymentConfigLog::create([
-            'payment_config_id' => $id,
-            'action' => 'cancelled',
-            'reason' => $request->cancellation_reason,
-            'created_at' => now()
+            'created_at'     => now(),
+            'sponsorship_id' => $id,
+            'action'         => 'cancelled',
+            'reason'         => $request->cancellation_reason,
         ]);
 
         // Borrar (Soft Delete)
-        $config->update(['cancellation_reason' => $request->cancellation_reason]);
-        $config->delete();
+        $sponsorship->update(['cancellation_reason' => $request->cancellation_reason]);
+        $sponsorship->delete();
     }
 
     public function restore($id) {
-        $config = PaymentConfig::onlyTrashed()->findOrFail($id);
+        $config = Sponsorship::onlyTrashed()->findOrFail($id);
 
         PaymentConfigLog::create([
-            'payment_config_id' => $id,
+            'sponsorship_id' => $id,
             'action' => 'restored',
             'created_at' => now()
         ]);
@@ -134,7 +139,7 @@ class PaymentConfigController extends Controller
 
     public function trashed(Request $request)
     {
-        $query = PaymentConfig::onlyTrashed()->with(['candidate', 'sponsor']);
+        $query = Sponsorship::onlyTrashed()->with(['candidate', 'sponsor']);
 
         if ($request->has('candidate_id')) {
             $query->where('candidate_id', $request->candidate_id);
@@ -154,7 +159,7 @@ class PaymentConfigController extends Controller
 
     public function allHistory(Request $request)
     {
-        $configs = PaymentConfig::onlyTrashed()
+        $configs = Sponsorship::onlyTrashed()
             ->where('candidate_id', $request->candidate_id)
             ->with(['sponsor'])->get();
 
@@ -176,7 +181,7 @@ class PaymentConfigController extends Controller
 
     public function hasHistory(Request $request)
     {
-        $exists = PaymentConfig::onlyTrashed()
+        $exists = Sponsorship::onlyTrashed()
             ->where('candidate_id', $request->candidate_id)
             ->exists();
 
@@ -185,7 +190,7 @@ class PaymentConfigController extends Controller
 
     public function getHistoryLogs($id)
     {
-        $logs = \App\Models\PaymentConfigLog::where('payment_config_id', $id)
+        $logs = \App\Models\PaymentConfigLog::where('sponsorship_id', $id)
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($log) {

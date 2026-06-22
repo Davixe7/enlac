@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdatePaymentConfigRequest extends FormRequest
+class StoreSponsorshipRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,14 +23,15 @@ class UpdatePaymentConfigRequest extends FormRequest
     {
         return [
             'candidate_id'             => 'required|exists:candidates,id',
-            'sponsor_id'               => 'nullable|exists:sponsors,id',
+            'sponsor_id'               => 'sometimes|exists:sponsors,id',
             'amount'                   => 'required|numeric|min:0',
-            'frequency'                => ['required', Rule::in([.5, 1,2,3,6,12,24])],
+            'frequency'                => 'required',
             'month_payday'             => 'required|integer|min:1|max:31',
             'address_type'             => 'required|in:home,office',
             'wants_pickup'             => 'nullable|boolean',
             'wants_reminder'           => 'nullable|boolean',
             'wants_deductible_receipt' => 'nullable|boolean',
+            'type'                     => 'nullable',
             'amount_usd'               => 'nullable',
 
             'receipt.rfc'              => 'required_if_accepted:wants_deductible_receipt',
@@ -54,7 +54,6 @@ class UpdatePaymentConfigRequest extends FormRequest
     public function attributes()
     {
         return  [
-            'wants_deductible_receipt' => 'Requiere Recibo Deducible',
             'receipt.rfc'             => 'RFC',
             'receipt.company_name'    => 'razón social',
             'receipt.fiscalRegime'    => 'régimen fiscal',

@@ -3,78 +3,73 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PaymentConfig extends Model
 {
-    use SoftDeletes;
     protected $guarded = [];
 
-    public function snapshots(){
-        return $this->hasMany(PaymentConfigSnapshot::class);
+    protected function casts(): array{
+        return [
+            'effective_since' => 'date',
+            'effective_until' => 'date',
+        ];
     }
 
-    public function candidate(){
-        return $this->belongsTo(Candidate::class);
+    public function sponsorship()
+    {
+        return $this->belongsTo(Sponsorship::class);
+    }
+
+    public function getMonthlyAmountAttribute()
+    {
+        if (!$this->frequency) {
+            return 0;
+        }
+
+        return $this->amount / $this->frequency;
+    }
+
+    public function getSchoolYearAttribute(){
+        $month = $this->effective_since->month;
+        $year  = $this->effective_since->year;
+        return $month >= 8 ? $year : $year - 1;
+    }
+
+    public function getStartMonthSchoolAttribute()
+    {
+        $today = now();
+        $currentSchoolYear = $today->month >= 8 ? $today->year : $today->year - 1;
+
+        if ($this->schoolYear != $currentSchoolYear) {
+            return 8;
+        }
+
+        return $this->effective_since->month;
+    }
+
+    public function payments(){
+        return $this->hasMany(Payment::class);
     }
 
     public function sponsor(){
-        return $this->belongsTo(Sponsor::class);
+        return $this->belongsTo(Sponsor::class)->withDefault(function(){
+            return [
+                'full_name' => 'Cuota de Padres'
+            ];
+        });
     }
 
-    public function deductible_receipt(){
-        return $this->hasOne(DeductibleReceipt::class);
-    }
-
-    public function getMonthlyAmountAttribute(){
-        $yearlyPaymentCount = 12 / $this->frequency;
-        $yearlyPaidAmount = $yearlyPaymentCount * $this->amount;
-        return $yearlyPaidAmount / 12;
-    }
-
-    public function getYearlyPaymentsCountAttribute(){
-        return 12 / $this->frequency;
-    }
-
-    public function scopeBySponsor($query, $sponsor_id){
-        if( !$sponsor_id ){
+    public function scopeByType($query, $type){
+        if(!$type){
             return $query;
         }
 
-        return $query->whereSponsorId( $sponsor_id );
+        return $query
+        ->whereHas('sponsorship', fn($q)=>$q->where('type', 'parent'));
     }
 
-    public function scopeByCandidate($query, $candidate_id){
-        if( !$candidate_id ){
-            return $query;
-        }
-
-        return $query->whereCandidateId( $candidate_id );
-    }
-
-    public function periodBalance($startDate, $endDate){
-        return Payment::where('candidate_id', $this->candidate_id)
-                    ->where('sponsor_id', $this->sponsor_id)
-                    ->whereBetween('date', [$startDate, $endDate])
-                    ->groupBy('candidate_id')
-                    ->sum('amount');
-    }
-
-    public function getSnapshotForPeriod(int $year, int $month, int $day = 1): ?PaymentConfigSnapshot
-    {
-        $date = \Carbon\Carbon::create($year, $month, $day);
-        return $this->snapshots()
-            ->where('effective_since', '<=', $date)
-            ->where(function ($q) use ($date) {
-                $q->whereNull('effective_until')->orWhere('effective_until', '>=', $date);
-            })
-            ->orderByDesc('effective_since')
-            ->first();
-    }
-
-    public function snapshot(){
-        return $this->hasOne(PaymentConfigSnapshot::class)
-        ->where('effective_since', '<=', now())
-        ->whereNull('effective_until');
+    public function paymentDetails(){
+        return $this->hasMany(PaymentDetail::class);
     }
 }
+

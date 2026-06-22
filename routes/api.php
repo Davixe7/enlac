@@ -84,13 +84,17 @@ use App\Http\Controllers\EventsCalendarController;
 use App\Http\Controllers\MedicalRecordsController;
 use App\Http\Controllers\ParentQuotaUpdateController;
 use App\Http\Controllers\ProgramPriceController;
+use App\Http\Controllers\SemaforoController;
+use App\Http\Controllers\SponsorshipController;
 use App\Models\ProgramPrice;
 
-Route::get('payment_configs/list/trashed', [PaymentConfigController::class, 'trashed']);
-Route::get('payment_configs/list/all-history', [PaymentConfigController::class, 'allHistory']);
-Route::patch('payment_configs/{id}/restore', [PaymentConfigController::class, 'restore']);
-Route::get('payment_configs/has-history', [PaymentConfigController::class, 'hasHistory']);
-Route::get('payment_configs/{id}/history-logs', [PaymentConfigController::class, 'getHistoryLogs']);
+Route::get('semaforo', [SemaforoController::class, 'index']);
+
+Route::get('sponsorships/list/trashed',     [SponsorshipController::class, 'trashed']);
+Route::get('sponsorships/list/all-history', [SponsorshipController::class, 'allHistory']);
+Route::get('sponsorships/has-history',      [SponsorshipController::class, 'hasHistory']);
+Route::get('sponsorships/{id}/history-logs',[SponsorshipController::class, 'getHistoryLogs']);
+Route::patch('sponsorships/{id}/restore',   [SponsorshipController::class, 'restore']);
 
 Route::get('financial', [FinancialController::class, 'index']);
 Route::get('financial/semaforo', [FinancialController::class, 'semaforo']);
@@ -147,7 +151,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'roles'                  => RoleController::class,
         'users'                  => UserController::class,
         'sponsors'               => SponsorController::class,
-        'payment_configs'        => PaymentConfigController::class,
+        'sponsorships'           => SponsorshipController::class,
         'kardexes'               => KardexController::class,
         'dashboard-slides'       => DashboardSlideController::class,
         'payments'               => PaymentController::class,

@@ -19,7 +19,7 @@ class SponsorExport implements FromCollection, WithHeadings, WithMapping, Should
 
     public function collection()
     {
-        return $this->query->with(['payment_configs.candidate'])->get();
+        return $this->query->with(['sponsorships.candidate'])->get();
     }
 
     public function headings(): array
@@ -38,8 +38,8 @@ class SponsorExport implements FromCollection, WithHeadings, WithMapping, Should
 
     public function map($sponsor): array
     {
-        $beneficiarios = $sponsor->payment_configs->map(function($config) {
-            return $config->candidate->full_name ?? 'N/A';
+        $beneficiarios = $sponsor->sponsorships->map(function($sponsorship) {
+            return $sponsorship->candidate->full_name ?? 'N/A';
         })->filter()->unique()->implode(', ');
 
         $fullName = implode(' ', array_filter([
@@ -54,7 +54,7 @@ class SponsorExport implements FromCollection, WithHeadings, WithMapping, Should
             str_pad($sponsor->id, 4, '0', STR_PAD_LEFT),
             $fullName,
             $sponsor->company_name ?? 'N/A',
-            $sponsor->payment_configs->count(),
+            $sponsor->sponsorship->count(),
             $beneficiarios ?: 'Sin beneficiarios asignados',
             $sponsor->is_anonymous ? 'Sí' : 'No',
             $contacto,

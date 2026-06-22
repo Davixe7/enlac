@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Program;
 use App\Models\ProgramSnapshot;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ProgramObserver
 {
@@ -14,8 +15,8 @@ class ProgramObserver
     public function created(Program $program): void
     {
         $program->programStatusLogs()->create([
-            'is_active' => $program->is_active,
-            'user_id'   => auth()->id()
+            'is_active' => !is_null($program->is_active) ? $program->is_active : 1,
+            'user_id'   => Auth::check() ? auth()->id() : 1
         ]);
 
         $startDate = request()->input('valid_since', now()->format('Y-m-d'));

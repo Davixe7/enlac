@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CandidateStatus;
 use App\Http\Resources\BeneficiaryFinancialResource;
 use App\Models\Candidate;
 use App\Models\Payment;
+use App\Models\PaymentConfig;
+use App\Models\Sponsorship;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -13,7 +16,93 @@ class FinancialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    function fromSchoolMonth(string $schoolMonth, string $schoolYear) {
+        // Invierte el proceso para obtener el mes real y el año real calendario
+        if ($schoolMonth <= 5) { // Agosto a Diciembre
+            $realMonth = $schoolMonth + 7;
+            $realYear = $schoolYear;
+        } else { // Enero a Julio
+            $realMonth = $schoolMonth - 5;
+            $realYear = $schoolYear + 1;
+        }
+        return Carbon::createFromDate($realYear, $realMonth, 1)->startOfDay();
+    }
+
+    public function paintBlock($goal, $paid, $year, $month){
+        if( $goal == $paid ){
+            return 'green-3';
+        }
+        else if ($year == now()->year && $month == now()->month){
+            return now() < now()->startOfMonth()->addDays(5)
+            ? 'yellow-3'
+            : 'red-3';
+        }
+        return Carbon::parse($year, $month, 1) > now()
+        ? 'grey-3'
+        : 'red-3';
+    }
+
+    public function index(Request $request){
+        $calendarDate = $this->fromSchoolMonth($request->month, $request->year);
+        $realMonth = $calendarDate->month;
+        $realYear  = $calendarDate->year;
+
+        $candidates = Candidate::where('status', CandidateStatus::ACTIVE)->get();
+        $data = [];
+
+        foreach($candidates as $candidate){
+            $configs = PaymentConfig::where('candidate_id', $candidate->id)
+            ->where('effective_since', '<=', $calendarDate)
+            ->where(function($query){
+                $query->whereNull('effective_until')
+                ->orWhere('effective_until', '>=', now()->addYears(100));
+            })
+            ->with(['sponsorship', 'paymentDetails'=>function($q) use($realMonth, $realYear){
+                $q->where('month', $realMonth)
+                ->where('year', $realYear);
+            }])
+            ->get();
+
+            $sheet              = $candidate->id;
+            $candidateName      = $candidate->full_name;
+            $programName        = $candidate->program->name;
+            $programPrice       = $candidate->program->priceAt($calendarDate);
+            $parentConfig       = $configs->where('sponsorship.type', 'parent')->first();
+            $parentGoalAmount   = $parentConfig ? $parentConfig->amount : 0;
+            $parentPaidAmount   = $parentConfig ? $parentConfig->payments->sum('amount') : 0;
+            $sponsorGoalAmount  = $configs->where('sponsorship.type', 'sponsor')->sum('amount');
+            $sponsorPaidAmount  = $configs->where('sponsorship.type', 'sponsor')->pluck('paymentDetails')->collapse()->sum('amount');
+            $enlac              = $programPrice - $parentGoalAmount - $sponsorGoalAmount . " / " . $programPrice;
+
+            $parentStatus       = $this->paintBlock($parentGoalAmount, $parentPaidAmount, $realYear, $realMonth);
+            $sponsorStatus      = $this->paintBlock($sponsorGoalAmount, $sponsorPaidAmount, $realYear, $realMonth);
+
+            $parents  = $parentPaidAmount . " / " . $parentGoalAmount;
+            $sponsors = $sponsorPaidAmount . " / " . $sponsorGoalAmount;
+
+            $row = compact(
+                'parentStatus',
+                'sponsorStatus',
+                'sheet',
+                'candidateName',
+                'programName',
+                'programPrice',
+                'parentGoalAmount',
+                'parentPaidAmount',
+                'sponsorGoalAmount',
+                'sponsorPaidAmount',
+                'enlac',
+                'parents',
+                'sponsors'
+            );
+
+            $data[] = $row;
+        }
+
+        return response()->json(compact('data'));
+    }
+
+    public function index2(Request $request)
     {
         $month = request()->month ?: now()->month;
         $year  = request()->year ?: now()->year;
@@ -27,7 +116,7 @@ class FinancialController extends Controller
         $candidates = Candidate::whereStatus('activo')
             ->with([
                 'program',
-                'payment_configs',
+                'sponsorships',
                 'payment_confix' => fn($q) => $q->groupBy(['candidate_id', 'type'])->selectRaw('candidate_id, type, SUM( ((12/frequency) * amount) / 12) as quota'),
             ])
             ->get();
@@ -39,7 +128,7 @@ class FinancialController extends Controller
             $candidate->sponsr_paid = 0;
             $candidate->parent_paid = 0;
 
-            $candidate->payment_configs->where('type', 'parent')->map(function ($paycfg) use (&$candidate, $date) {
+            $candidate->sponsorships->where('type', 'parent')->map(function ($paycfg) use (&$candidate, $date) {
                 $payments = Payment::whereBetween('date', [$date['yearStart'], $date['yearEnd']])
                     ->where('candidate_id', $paycfg->candidate_id)
                     ->where('sponsor_id', null)
@@ -58,7 +147,7 @@ class FinancialController extends Controller
                 }
             });
 
-            $candidate->payment_configs->map(function ($paycfg) use (&$candidate, $date) {
+            $candidate->sponsorships->map(function ($paycfg) use (&$candidate, $date) {
                 $payments = Payment::whereBetween('date', [$date['yearStart'], $date['yearEnd']])
                     ->where('candidate_id', $paycfg->candidate_id)
                     ->where('payment_type', 'sponsor')
@@ -95,15 +184,15 @@ class FinancialController extends Controller
 
     public function semaforo(Request $request)
     {
-        $candidate = Candidate::findOrFail($request->candidate_id);
-        $paymentsConfigs = $candidate->payment_configs;
-        $year = now()->month > 7 ? now()->year : now()->year - 1;
-        $startDate = Carbon::create($year, 8);
-        $endDate   = Carbon::create($year, 20)->endOfMonth();
+        $candidate    = Candidate::findOrFail($request->candidate_id);
+        $sponsorships = $candidate->sponsorships;
+        $year         = now()->month > 7 ? now()->year : now()->year - 1;
+        $startDate    = Carbon::create($year, 8);
+        $endDate      = Carbon::create($year, 20)->endOfMonth();
 
         $wallets = [];
 
-        $paymentsConfigs->each(function ($paymentConfig) use ($year, $startDate, $endDate, &$wallets) {
+        $sponsorships->each(function ($paymentConfig) use ($year, $startDate, $endDate, &$wallets) {
             $balance    = $paymentConfig->periodBalance($startDate, $endDate);
             $start      = 8;
             $lastSnapId = null;
@@ -139,7 +228,7 @@ class FinancialController extends Controller
             ? $maxDate->copy()->addDays(10)
             : $maxDate->copy()->addDays(21);
 
-        $status = $abono == $amountToPay ? 'green' : ((now() > $maxDate) ? 'red' : 'yellow');
+        $status = $abono == $amountToPay ? 'green-3' : ((now() > $maxDate) ? 'red-3' : 'yellow');
 
         $wallets[$sponsor_id][$monthNumber][] = [
             'month'     => $monthNumber,

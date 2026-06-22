@@ -14,9 +14,9 @@ class ProgramController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        $programs = Program::where('is_active', true)
-            ->orderBy('order')
-            ->get();
+        $programs = Program::whereHas('latestLog', function($query){
+            $query->where('is_active', 1);
+        })->get();
 
         return ProgramResource::collection($programs);
     }

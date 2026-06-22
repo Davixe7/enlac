@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PaymentsResource;
 use App\Models\Candidate;
 use App\Models\Payment;
+use App\Models\PaymentConfig;
 use Illuminate\Http\Request;
 use Rap2hpoutre\FastExcel\FastExcel;
 
@@ -28,21 +29,36 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate(['payment_config_id'=>'required|exists:payment_configs,id']);
+
         $data = $request->validate([
-            'candidate_id'   => ['required', 'exists:candidates,id'],
-            'sponsor_id'     => ['nullable', 'exists:sponsors,id'],
-            'payment_type'   => ['required', 'in:parent,sponsor'],
-            'is_partial'     => ['required', 'boolean'],
-            'date'           => ['required', 'date'],
-            'payment_method' => ['required', 'string'],
-            'ref'            => ['nullable', 'string'],
-            'comments'       => ['nullable', 'string'],
-            'amount'         => ['required', 'numeric', 'min:0'],
+            'payment_config_id' => ['required', 'exists:candidates,id'],
+            'candidate_id'      => ['required', 'exists:candidates,id'],
+            'sponsor_id'        => ['nullable', 'exists:sponsors,id'],
+            'payment_type'      => ['required', 'in:parent,sponsor'],
+            'is_partial'        => ['required', 'boolean'],
+            'date'              => ['required', 'date'],
+            'payment_method'    => ['required', 'string'],
+            'ref'               => ['nullable', 'string'],
+            'comments'          => ['nullable', 'string'],
+            'amount'            => ['required', 'numeric', 'min:0'],
         ]);
 
         $data['created_by_id'] = auth()->id();
 
         $payment = Payment::create($data);
+        $paymentConfig = PaymentConfig::find($request->payment_config_id);
+
+        foreach($request->targetMonths as $targetMonth){
+            $payment->paymentDetails()->create([
+                'payment_config_id' => $paymentConfig->id,
+                'candidate_id'      => $payment->candidate_id,
+                'amount'            => $targetMonth['goal_amount'],
+                'year'              => $targetMonth['year'],
+                'month'             => $targetMonth['month'],
+            ]);
+        }
+
         return response()->json(['data' => $payment]);
     }
 

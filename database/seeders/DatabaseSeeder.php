@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Kardex;
-use App\Models\PlanCategory;
+use App\Models\Sponsor;
+use App\Models\Sponsorship;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        /* $this->call(RoleSeeder::class);
+        $this->call(RoleSeeder::class);
         $this->call(WorkAreaSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(BrainLevelSeeder::class);
@@ -27,44 +27,41 @@ class DatabaseSeeder extends Seeder
         $this->call(PlanCategorySeeder::class);
         $this->call(ActivityCategorySeeder::class);
         $this->call(GroupSeeder::class);
-        $this->call(CandidateStatusSeeder::class);
         $this->call(ActivitySeeder::class);
+        $this->call(PermissionSeeder::class);
 
         $evaluatorRole = Role::whereName('evaluator')->first();
+        $adminRole = Role::whereName('admin')->first();
+
         $user = User::create([
-            'name' => 'Dev',
-            'last_name' => 'Enlac',
+            'name'             => 'Dev',
+            'last_name'        => 'Enlac',
             'second_last_name' => 'Enlac',
-            'email' => 'dev@gmail.com',
-            'password' => bcrypt(123456),
-            'work_area_id' => 1
-        ]);
-        $user->roles()->attach( $evaluatorRole ); */
-
-        /* Kardex::create([
-            'name'     => 'Esquema de Vacunación',
-            'slug'     => Str::slug('Esquema de Vacunación'),
-            'category' => 'default',
-            'order'    => 4
+            'email'            => 'dev@gmail.com',
+            'password'         => bcrypt(123456),
+            'work_area_id'     => 1
         ]);
 
+        $user->roles()->attach( [$evaluatorRole, $adminRole] );
 
-        DB::statement("ALTER TABLE plan_categories AUTO_INCREMENT = 1;");
+        Sponsor::create([
+            'name' => 'Sponsor',
+            'last_name' => '01',
+            'second_last_name' => '01',
+            'birthdate' => '2020-01-01',
+            'is_anonymous' => false
+        ]);
 
-        PlanCategory::create([
-            'id'        => 7,
-            'label'     => 'Programa de Escucha',
-            'name'      => Str::slug('Programa de Escucha', '_'),
-            'parent_id' => null,
-        ]); */
+        Sponsorship::create([
+            'candidate_id' => 1,
+            'sponsor_id'   => 1,
+            'amount'       => 1000,
+            'frequency'    => 1,
+            'type'         => 'sponsor',
+            'month_payday' => 1,
+            'address_type' => 'home'
+        ]);
 
-        //$this->call(PlanTypeSeeder::class);
-        //$this->call(ActivitySeeder::class);
-
-        //$this->call(RoleSeeder::class);
-        //$this->call(WorkAreaSeeder::class);
-        //$this->call(UserSeeder::class);
-        //$this->call(ProgramSeeder::class);
         $this->call(RadiomarathonKeySeeder::class);
     }
 }

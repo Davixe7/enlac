@@ -1,26 +1,11 @@
 <?php
 use App\Http\Controllers\BeneficiaryController;
-use App\Models\Candidate;
-use App\Models\PaymentConfig;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
-
-Route::get('kiut', function(){
-    PaymentConfig::whereDoesntHave('snapshots')
-    ->each(function($paymentConfig){
-        $paymentConfig->snapshots()->create([
-            'amount'          => $paymentConfig->amount,
-            'frequency'       => $paymentConfig->frequency,
-            'effective_since' => $paymentConfig->created_at,
-        ]);
-    });
-});
 
 Route::get('search', [BeneficiaryController::class, 'index']);
 
 Route::get('seasons', function () {
-    //App\Models\PaymentConfig::create(['candidate_id' => 1, 'sponsor_id' => null, 'frequency' => 1, 'amount' => 500, 'month_payday'=>1]);
     $curntDate = now();
     $startDate = Carbon::parse('2024-06-01');
     $startYear = $startDate->month <= 7 ? $startDate->year - 1 : $startDate->year;

@@ -17,53 +17,54 @@ class KardexSeeder extends Seeder
     {
         $kardexes = [
             'default' => [
-                ['name' => 'Acta de Nacimiento de'],
-                ['name' => 'CURP'],
-                ['name' => 'Cartilla de Vacunación'],
-                ['name' => 'Comprobante de Domicilio'],
-                ['name' => 'Número de Servicio Médico'],
-                ['name' => 'INE Frente (Responsable del Beneficiario)'],
-                ['name' => 'INE Atrás (Responsable del Beneficiario)'],
-                ['name' => 'INE Frente (Tutor Legal)'],
-                ['name' => 'INE Atrás (Tutor Legal)'],
+                ['order'=>1, 'name' => 'Acta de Nacimiento de'],
+                ['order'=>2, 'name' => 'CURP'],
+                ['order'=>3, 'name' => 'Cartilla de Vacunación'],
+                ['order'=>4, 'name' => 'Comprobante de Domicilio'],
+                ['order'=>5, 'name' => 'Número de Servicio Médico'],
+                ['order'=>6, 'name' => 'INE Frente (Responsable del Beneficiario)'],
+                ['order'=>7, 'name' => 'INE Atrás (Responsable del Beneficiario)'],
+                ['order'=>8, 'name' => 'INE Frente (Tutor Legal)'],
+                ['order'=>9, 'name' => 'INE Atrás (Tutor Legal)'],
             ],
 
             'tutor' => [
-                ['template' => 'docx', 'name' => 'Reglamento para Padres de Familia'],
-                ['template' => 'docx', 'name' => 'Carta de Consentimiento'],
-                ['template' => 'docx', 'name' => 'Carta de Asignación del Responsable del Beneficiario'],
-                ['template' => 'pdf',  'name' => 'Código de Ética'],
-                ['template' => 'docx', 'name' => 'Autorización de Uso de Imagen y Pinturas'],
-                ['template' => 'pdf',  'name' => 'Aviso de Privacidad'],
-                ['template' => 'docx', 'name' => 'Autorización de Salidas'],
-                ['template' => 'docx', 'name' => 'Acuerdo de No Divulgación'],
-                ['template' => false,  'name' => 'Convenio de Pago Líderes ENLAC (sólo para Programa Asistido)'],
-                ['template' => false,  'name' => 'Compromiso Previo de Pago (sólo para Programa Asistido)'],
-                ['template' => false,  'name' => 'Certificado Médico'],
-                ['template' => false,  'name' => 'Credencial de Discapacidad'],
-                ['template' => false,  'name' => 'Tarjeta del Bienestar'],
-                ['template' => false,  'name' => 'Estudio Socio-Económico'],
+                ['order'=> 1,'template' => 'docx', 'name' => 'Reglamento para Padres de Familia'],
+                ['order'=> 2,'template' => 'docx', 'name' => 'Carta de Consentimiento'],
+                ['order'=> 3,'template' => 'docx', 'name' => 'Carta de Asignación del Responsable del Beneficiario'],
+                ['order'=> 4,'template' => 'pdf',  'name' => 'Código de Ética'],
+                ['order'=> 5,'template' => 'docx', 'name' => 'Autorización de Uso de Imagen y Pinturas'],
+                ['order'=> 6,'template' => 'pdf',  'name' => 'Aviso de Privacidad'],
+                ['order'=> 7,'template' => 'docx', 'name' => 'Autorización de Salidas'],
+                ['order'=> 8,'template' => 'docx', 'name' => 'Acuerdo de No Divulgación'],
+                ['order'=> 9,'template' => false,  'name' => 'Convenio de Pago Líderes ENLAC (sólo para Programa Asistido)'],
+                ['order'=> 10,'template' => false,  'name' => 'Compromiso Previo de Pago (sólo para Programa Asistido)'],
+                ['order'=> 11,'template' => false,  'name' => 'Certificado Médico'],
+                ['order'=> 12,'template' => false,  'name' => 'Credencial de Discapacidad'],
+                ['order'=> 13,'template' => false,  'name' => 'Tarjeta del Bienestar'],
+                ['order'=> 14,'template' => false,  'name' => 'Estudio Socio-Económico'],
             ],
 
             'doctor' => [
-                ['template' => 'docx', 'name' => 'Autorización de Equinoterapia'],
-                ['template' => 'doc', 'name' => 'Autorización Médica para Realizar el Programa Físico'],
+                ['order'=>1, 'template' => 'docx', 'name' => 'Autorización de Equinoterapia'],
+                ['order'=>2, 'template' => 'doc', 'name' => 'Autorización Médica para Realizar el Programa Físico'],
             ],
 
             'external' => [
-                ['template' => 'docx', 'name' => 'Reglamento de Uso de Alberca'],
-                ['template' => 'docx', 'name' => 'Reglamento para Usuarios Externos de Alberca'],
-                ['template' => false, 'name' => 'Hoja de Datos Generales de Contacto'],
+                ['order'=>1, 'template' => 'docx', 'name' => 'Reglamento de Uso de Alberca'],
+                ['order'=>2, 'template' => 'docx', 'name' => 'Reglamento para Usuarios Externos de Alberca'],
+                ['order'=>3, 'template' => false, 'name' => 'Hoja de Datos Generales de Contacto'],
             ]
         ];
 
         foreach ($kardexes as $category => $items) {
             foreach($items as $index => $item){
                 $kardex = Kardex::create([
-                    'category' => $category,
-                    'name' => $item['name'],
-                    'slug' => Str::slug($item['name']),
-                    'has_template' => false
+                    'category'     => $category,
+                    'order'        => $item['order'],
+                    'name'         => $item['name'],
+                    'slug'         => Str::slug($item['name']),
+                    'has_template' => false,
                 ]);
 
                 $realIndex = $index + 1;
@@ -71,7 +72,7 @@ class KardexSeeder extends Seeder
                 $template_path = array_key_exists('template', $item) ? $item['template'] : null;
                 $template_path = !$template_path ? $template_path : "kardexes/{$category}/{$realIndex}_{$filename}.{$template_path}";
                 if( !$template_path || !Storage::exists($template_path) ){ continue; }
-                
+
                 $kardex
                 ->addMediaFromDisk($template_path)
                 ->preservingOriginal()
