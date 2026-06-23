@@ -35,7 +35,6 @@ class ProgramController extends Controller
             'price'       => 'required|numeric',
             'is_active'   => 'sometimes|boolean',
             'order'       => 'sometimes|integer',
-            'valid_since' => 'nullable|date_format:Y-m-d',
         ]);
 
         // Asignamos un orden por defecto

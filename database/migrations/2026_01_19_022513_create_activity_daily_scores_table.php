@@ -16,14 +16,16 @@ return new class extends Migration
     {
         Schema::create('activity_daily_scores', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(ActivityPlan::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Candidate::class)->constrained()->onDelete('cascade');
+            $table->foreignId('activity_plan_id')->constrained()->onDelete('cascade');
+            $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
             $table->date('date');
             $table->string('score');
+            $table->text('comments')->nullable();
             $table->enum('color', ['negative', 'warning', 'positive', 'grey'])->default('grey');
-            $table->index('color');
             $table->boolean('closed')->default(false);
             $table->timestamps();
+
+            $table->index('color');
         });
     }
 

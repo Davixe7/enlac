@@ -13,24 +13,12 @@ class Program extends Model
     protected $hidden = ['created_at', 'updated_at'];
     protected $casts = [
         'is_active' => 'boolean',
-        'valid_since' => 'date:Y-m-d', // Fuerza el formato de fecha correcto
     ];
 
     public function prices(): HasMany
     {
         return $this->hasMany(ProgramPrice::class);
     }
-
-    /* public function currentPrice($date = null) {
-        $date = $date ?? now();
-
-        return $this->hasOne(ProgramPrice::class)
-            ->where('valid_since', '<=', $date)
-            ->where(function($query) use ($date) {
-                $query->whereNull('valid_until')
-                    ->orWhere('valid_until', '>=', $date);
-            });
-    } */
 
     public function getCurrentPriceAttribute($date = null) {
         $date = $date ?? now();
