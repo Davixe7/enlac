@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('payment_config_id')->constrained()->onDelete('cascade');
             $table->foreignId('payment_id')->constrained()->onDelete('cascade');
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
             $table->decimal('amount', 10, 2);
             $table->integer('month');
             $table->integer('year');
+            $table->timestamps();
         });
     }
 

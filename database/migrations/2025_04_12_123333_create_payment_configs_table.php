@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_config_snapshots', function (Blueprint $table) {
+        Schema::create('payment_configs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_config_id')->constrained()->onDelete('cascade');
+            $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sponsor_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sponsorship_id')->constrained()->onDelete('cascade');
+
             $table->decimal('amount', 10, 2);
             $table->decimal('frequency', 4, 2);
             $table->date('effective_since');

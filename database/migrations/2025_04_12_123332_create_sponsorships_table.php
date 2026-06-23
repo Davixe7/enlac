@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Candidate;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,20 +12,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_configs', function (Blueprint $table) {
+        Schema::create('sponsorships', function(Blueprint $table){
             $table->id();
-            $table->timestamps();
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('sponsor_id')->nullable();
+            $table->foreignId('sponsor_id')->nullable()->constrained()->onDelete('cascade');
             $table->enum('type', ['parent', 'sponsor'])->default('parent');
-            $table->decimal('amount');
+            $table->decimal('amount', 10, 2);
             $table->unsignedTinyInteger('frequency');
             $table->unsignedTinyInteger('month_payday');
             $table->enum('address_type', ['home', 'office']);
             $table->boolean('wants_pickup')->default(false);
             $table->boolean('wants_reminder')->default(false);
             $table->boolean('wants_deductible_receipt')->default(false);
+            $table->timestamps();
         });
+
+        Schema::table('deductible_receipts', function (Blueprint $table) {
+            $table->renameColumn('payment_config_id', 'sponsorship_id');
+            $table->foreign('sponsorship_id')->references('id')->on('sponsorships');
+        });
+
     }
 
     /**
@@ -32,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_configs');
+        Schema::dropIfExists('sponsorships');
     }
 };
