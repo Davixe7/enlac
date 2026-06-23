@@ -25,10 +25,10 @@ return new class extends Migration
             $table->boolean('requires_transport')->default(false);
 
             $table->string('status')->default(CandidateStatus::PENDING)->nullable();
-            $table->string('admission_comment')->default(null)->nullable();
+            $table->string('admission_comment')->nullable();
             $table->boolean('equinetherapy_permission_medical')->default(false);
             $table->boolean('equinetherapy_permission_legal_guardian')->default(false);
-            $table->date('entry_date')->default(null)->nullable();
+            $table->date('entry_date')->nullable();
             $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
 
             $table->timestamps();
