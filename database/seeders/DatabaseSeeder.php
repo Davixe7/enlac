@@ -15,53 +15,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RoleSeeder::class);
-        $this->call(WorkAreaSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(BrainLevelSeeder::class);
-        $this->call(BrainFunctionSeeder::class);
-        $this->call(InterviewQuestionSeeder::class);
-        $this->call(ProgramSeeder::class);
-        $this->call(CandidateSeeder::class);
-        $this->call(KardexSeeder::class);
-        $this->call(PlanCategorySeeder::class);
-        $this->call(ActivityCategorySeeder::class);
-        $this->call(GroupSeeder::class);
-        $this->call(ActivitySeeder::class);
-        $this->call(PermissionSeeder::class);
-
-        $evaluatorRole = Role::whereName('evaluator')->first();
-        $adminRole = Role::whereName('admin')->first();
-
-        $user = User::create([
-            'name'             => 'Dev',
-            'last_name'        => 'Enlac',
-            'second_last_name' => 'Enlac',
-            'email'            => 'dev@gmail.com',
-            'password'         => bcrypt(123456),
-            'work_area_id'     => 1
-        ]);
-
-        $user->roles()->attach( [$evaluatorRole, $adminRole] );
-
-        Sponsor::create([
-            'name' => 'Sponsor',
-            'last_name' => '01',
-            'second_last_name' => '01',
-            'birthdate' => '2020-01-01',
-            'is_anonymous' => false
-        ]);
-
-        Sponsorship::create([
-            'candidate_id' => 1,
-            'sponsor_id'   => 1,
-            'amount'       => 1000,
-            'frequency'    => 1,
-            'type'         => 'sponsor',
-            'month_payday' => 1,
-            'address_type' => 'home'
-        ]);
-
+        //$this->call(RoleSeeder::class);
+        //$this->call(WorkAreaSeeder::class);
+        //$this->call(UserSeeder::class);
+        //$this->call(BrainLevelSeeder::class);
+        //$this->call(BrainFunctionSeeder::class);
+        //$this->call(InterviewQuestionSeeder::class);
+        //$this->call(ProgramSeeder::class);
+        //$this->call(CandidateSeeder::class);
+        //$this->call(KardexSeeder::class);
+        //$this->call(PlanCategorySeeder::class);
+        //$this->call(ActivityCategorySeeder::class);
+        //$this->call(GroupSeeder::class);
+        //$this->call(ActivitySeeder::class);
+        //$this->call(PermissionSeeder::class);
         $this->call(RadiomarathonKeySeeder::class);
+
+        //$evaluatorRole = Role::whereName('evaluator')->first();
+        //$adminRole     = Role::whereName('admin')->first();
+        //$user->roles()->attach( [$evaluatorRole, $adminRole] );
     }
 }

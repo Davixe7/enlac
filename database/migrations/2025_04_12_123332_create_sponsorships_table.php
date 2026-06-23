@@ -18,20 +18,16 @@ return new class extends Migration
             $table->foreignId('sponsor_id')->nullable()->constrained()->onDelete('cascade');
             $table->enum('type', ['parent', 'sponsor'])->default('parent');
             $table->decimal('amount', 10, 2);
-            $table->unsignedTinyInteger('frequency');
+            $table->string('amount_usd')->nullable();
+            $table->decimal('frequency', 4,2);
             $table->unsignedTinyInteger('month_payday');
             $table->enum('address_type', ['home', 'office']);
             $table->boolean('wants_pickup')->default(false);
             $table->boolean('wants_reminder')->default(false);
             $table->boolean('wants_deductible_receipt')->default(false);
+            $table->text('cancellation_reason')->nullable();
             $table->timestamps();
         });
-
-        Schema::table('deductible_receipts', function (Blueprint $table) {
-            $table->renameColumn('payment_config_id', 'sponsorship_id');
-            $table->foreign('sponsorship_id')->references('id')->on('sponsorships');
-        });
-
     }
 
     /**

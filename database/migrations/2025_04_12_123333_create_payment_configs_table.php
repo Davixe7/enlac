@@ -23,7 +23,7 @@ return new class extends Migration
             $table->date('effective_until')->nullable();
             $table->timestamps();
 
-            $table->index(['payment_config_id', 'effective_since', 'effective_until'], 'payment_cfg_snapshots_period_idx');
+            $table->index(['sponsorship_id', 'effective_since', 'effective_until'], 'payment_cfg_snapshots_period_idx');
         });
     }
 
