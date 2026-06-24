@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ParentQuotaUpdate;
 use App\Models\PaymentConfig;
-use App\Models\PaymentConfigSnapshot;
+use App\Models\Sponsorship;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -43,35 +43,24 @@ class ApplyParentQuotaUpdate extends Command
         }
 
         DB::transaction(function () use ($increase, $today) {
-            // 2. Actualización masiva de todos los padrinos
-            /* PaymentConfigSnapshot::where('effective_since', '<=', $today)
+            $configs = PaymentConfig::whereHas('sponsorship', function($query){
+                $query->whereType('parent');
+            })
             ->whereNull('effective_until')
-            ->increment('amount', $increase->amount); */
+            ->increment('amount', $increase->amount);
 
-            $configs = PaymentConfig::whereType('parent')
-            ->with('snapshot')
-            ->get();
+            $sponsorships = Sponsorship::whereType('parent')
+            ->whereDoesntHave('paymentConfig')
+            ->increment('amount', $increase->amount);
 
-            $this->info($configs->count() . " " . 'Snapshots conseguidos');
+            $this->info($configs + $sponsorships . " " . 'patrocinios conseguidos');
 
-            $configs->each(function($config)use($increase){
-                $snap = $config->snapshot;
-                $amount = $snap ? $snap->amount : $config->amount;
-                $amount = $amount + $increase->amount;
-                if( $snap ){
-                    $snap->update(['amount' => $amount]);
-                }
-                $config->update(['amount' => $amount]);
-            });
-
-            // 3. Marcar el incremento actual como aplicado
             $increase->update(['applied' => true]);
 
-            // 4. Crear el pendiente para el próximo año
             ParentQuotaUpdate::create([
-                'amount' => $increase->amount,
+                'amount'      => $increase->amount,
                 'valid_since' => Carbon::parse($increase->valid_since)->addYear()->toDateString(),
-                'applied' => false
+                'applied'     => false
             ]);
 
             $this->info('Aplicado con éxito');

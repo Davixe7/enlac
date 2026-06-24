@@ -8,6 +8,7 @@ use App\Http\Resources\SponsorshipResource;
 use App\Models\DeductibleReceipt;
 use App\Models\PaymentConfigLog;
 use App\Models\Sponsorship;
+use App\Models\SponsorshipLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -42,14 +43,6 @@ class SponsorshipController extends Controller
         $sponsorship = Sponsorship::create($data);
 
         // Crea el primer snapshot cuando se genera un PaymentConfig
-        $sponsorship->paymentConfigs()->create([
-            'amount'          => $sponsorship->amount,
-            'frequency'       => $sponsorship->frequency,
-            'effective_since' => now()->toDateString(),
-            'effective_until' => null,
-            'candidate_id'    => $sponsorship->candidate_id,
-            'sponsor_id'      => $sponsorship->sponsor_id ?: 0,
-        ]);
 
         $receiptData = $request->validated()['receipt'] ?? null;
         if( $receiptData ){
@@ -78,25 +71,6 @@ class SponsorshipController extends Controller
         $data = $request->validated();
         unset($data['receipt']);
 
-        $today             = now()->toDateString();
-        $originalAmount    = $sponsorship->amount;
-        $originalFrequency = $sponsorship->frequency;
-
-        $sponsorship->update($data);
-        $isDirty           = $originalAmount != $sponsorship->amount || $originalFrequency != $sponsorship->frequency;
-
-        if ($isDirty) {
-            Log::info('Is Dirty');
-            $sponsorship->paymentConfig->update(['effective_until' => $today]);
-            $sponsorship->paymentConfigs()->create([
-                'amount'          => $sponsorship->amount,
-                'frequency'       => $sponsorship->frequency,
-                'candidate_id'    => $sponsorship->candidate_id,
-                'effective_since' => $today,
-                'effective_until' => null,
-            ]);
-        }
-
         $receiptData = $request->validated()['receipt'] ?? null;
         if( $receiptData ){
             unset($receiptData['fiscalStatusFile']);
@@ -111,14 +85,13 @@ class SponsorshipController extends Controller
     public function destroy(Sponsorship $sponsorship, Request $request) {
         $id = $sponsorship->id;
 
-        PaymentConfigLog::create([
+        SponsorshipLog::create([
             'created_at'     => now(),
             'sponsorship_id' => $id,
             'action'         => 'cancelled',
             'reason'         => $request->cancellation_reason,
         ]);
 
-        // Borrar (Soft Delete)
         $sponsorship->update(['cancellation_reason' => $request->cancellation_reason]);
         $sponsorship->delete();
     }
@@ -126,7 +99,7 @@ class SponsorshipController extends Controller
     public function restore($id) {
         $config = Sponsorship::onlyTrashed()->findOrFail($id);
 
-        PaymentConfigLog::create([
+        SponsorshipLog::create([
             'sponsorship_id' => $id,
             'action' => 'restored',
             'created_at' => now()
@@ -190,7 +163,7 @@ class SponsorshipController extends Controller
 
     public function getHistoryLogs($id)
     {
-        $logs = \App\Models\PaymentConfigLog::where('sponsorship_id', $id)
+        $logs = SponsorshipLog::where('sponsorship_id', $id)
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($log) {

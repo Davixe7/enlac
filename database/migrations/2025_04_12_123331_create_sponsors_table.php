@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('sponsors', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
             $table->string('name', 191);
             $table->string('last_name', 191);
             $table->string('second_last_name', 191);
@@ -23,6 +22,8 @@ return new class extends Migration
             $table->string('marital_status')->nullable();
             $table->boolean('is_anonymous')->default(false);
             $table->enum('contact_by', ['enlac', 'parent'])->default('parent');
+            $table->enum('type', ['link', 'general'])->default('link');
+            $table->timestamps();
         });
     }
 

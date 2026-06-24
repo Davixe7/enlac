@@ -26,7 +26,6 @@ use App\Http\Controllers\KardexController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MedicationLogController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PaymentConfigController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PersonalProgramController;
 use App\Http\Controllers\PlanCategoryController;
@@ -86,7 +85,6 @@ use App\Http\Controllers\ParentQuotaUpdateController;
 use App\Http\Controllers\ProgramPriceController;
 use App\Http\Controllers\SemaforoController;
 use App\Http\Controllers\SponsorshipController;
-use App\Models\ProgramPrice;
 
 Route::get('semaforo', [SemaforoController::class, 'index']);
 

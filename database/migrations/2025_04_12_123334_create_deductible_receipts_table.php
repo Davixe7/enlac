@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('deductible_receipts', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-            $table->foreignId('payment_config_id')->onDelete('cascade');
+            $table->foreignId('sponsorship_id')->constrained()->onDelete('cascade');
             $table->string('rfc');
             $table->string('company_name');
             $table->string('fiscalRegime');
             $table->string('cfdi');
             $table->string('email');
-            
+
             $table->string('street');
             $table->string('external_number');
             $table->string('neighborhood');
@@ -31,6 +30,7 @@ return new class extends Migration
 
             $table->string('observations')->nullable();
             $table->string('fiscalStatus')->nullable();
+            $table->timestamps();
         });
     }
 

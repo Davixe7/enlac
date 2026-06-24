@@ -51,6 +51,13 @@ class CandidateService
                 $group->candidates()->attach([$candidate->id]);
             }
 
+            if( $candidate ){
+                $candidate->statusLogs()->create([
+                    'status'  => CandidateStatus::PENDING,
+                    'user_id' => auth()->id()
+                ]);
+            }
+
             return $candidate;
         });
     }

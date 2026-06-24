@@ -5,17 +5,9 @@ namespace App\Services;
 use App\Http\Requests\StoreCandidateRequest;
 use App\Models\Candidate;
 use App\Models\Contact;
-use App\Models\Address;
-use App\Models\EvaluationSchedule;
 use App\Models\Medication;
-use App\Models\User;
-use App\Notifications\EvaluationScheduled;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class CandidateService
 {

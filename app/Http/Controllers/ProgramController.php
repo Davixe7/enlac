@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProgramResource;
 use App\Models\Program;
-use App\Models\ProgramPrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 

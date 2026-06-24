@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payment_config_logs', function (Blueprint $table) {
+        Schema::create('sponsorship_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_config_id')->constrained('payment_configs')->onDelete('cascade');
-            $table->string('action'); // 'cancelado' o 'restaurado'
+            $table->foreignId('sponsorship_id')->constrained()->onDelete('cascade');
+            $table->string('action');
             $table->text('reason')->nullable();
             $table->timestamp('created_at')->useCurrent();
         });
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payment_config_logs');
+        Schema::dropIfExists('sponsorship_logs');
     }
 };

@@ -72,7 +72,13 @@ class FinancialController extends Controller
             $parentPaidAmount   = $parentConfig ? $parentConfig->payments->sum('amount') : 0;
             $sponsorGoalAmount  = $configs->where('sponsorship.type', 'sponsor')->sum('amount');
             $sponsorPaidAmount  = $configs->where('sponsorship.type', 'sponsor')->pluck('paymentDetails')->collapse()->sum('amount');
-            $enlac              = $programPrice - $parentGoalAmount - $sponsorGoalAmount . " / " . $programPrice;
+            $enlac              = $programPrice - $parentGoalAmount - $sponsorGoalAmount;
+
+            $parentGoalAmount   = '$' . number_format($parentGoalAmount, 2);
+            $parentPaidAmount   = '$' . number_format($parentPaidAmount, 2);
+            $sponsorGoalAmount  = '$' . number_format($sponsorGoalAmount, 2);
+            $sponsorPaidAmount  = '$' . number_format($sponsorPaidAmount, 2);
+            $enlac              = '$' . number_format($enlac, 2) . ' / $' . number_format($programPrice, 2);
 
             $parentStatus       = $this->paintBlock($parentGoalAmount, $parentPaidAmount, $realYear, $realMonth);
             $sponsorStatus      = $this->paintBlock($sponsorGoalAmount, $sponsorPaidAmount, $realYear, $realMonth);

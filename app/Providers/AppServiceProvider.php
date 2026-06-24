@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Candidate;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Program;
+use App\Models\Sponsorship;
+use App\Observers\CandidateObserver;
 use App\Observers\ProgramObserver;
+use App\Observers\SponsorshipObserver;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,7 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Candidate::observe(CandidateObserver::class);
         Program::observe(ProgramObserver::class);
+        Sponsorship::observe(SponsorshipObserver::class);
         //JsonResource::withoutWrapping();
     }
 }

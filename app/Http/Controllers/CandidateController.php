@@ -62,7 +62,7 @@ class CandidateController extends Controller
 
     public function admission(Request $request, Candidate $candidate){
         $request->validate([
-            'status' => 'required',
+            'status'            => 'required',
             'admission_comment' => 'required_if:status,rechazado,null,false'
         ]);
 

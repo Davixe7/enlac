@@ -7,6 +7,7 @@ use App\Models\Candidate;
 use App\Models\Payment;
 use App\Models\PaymentConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Rap2hpoutre\FastExcel\FastExcel;
 
 class PaymentController extends Controller
@@ -32,7 +33,7 @@ class PaymentController extends Controller
         $request->validate(['payment_config_id'=>'required|exists:payment_configs,id']);
 
         $data = $request->validate([
-            'payment_config_id' => ['required', 'exists:candidates,id'],
+            'payment_config_id' => ['required', 'exists:payment_configs,id'],
             'candidate_id'      => ['required', 'exists:candidates,id'],
             'sponsor_id'        => ['nullable', 'exists:sponsors,id'],
             'payment_type'      => ['required', 'in:parent,sponsor'],
@@ -44,22 +45,30 @@ class PaymentController extends Controller
             'amount'            => ['required', 'numeric', 'min:0'],
         ]);
 
-        $data['created_by_id'] = auth()->id();
+        try {
+            DB::transaction(function() use ($request, $data) {
+                $data['created_by_id'] = auth()->id();
+                $payment               = Payment::create($data);
+                $paymentConfig         = PaymentConfig::find($request->payment_config_id);
 
-        $payment = Payment::create($data);
-        $paymentConfig = PaymentConfig::find($request->payment_config_id);
+                foreach($request->targetMonths as $targetMonth){
+                    $amount = $request->is_partial ? $request->amount : $targetMonth['goal_amount'];
+                    $payment->paymentDetails()->create([
+                        'payment_config_id' => $paymentConfig->id,
+                        'candidate_id'      => $payment->candidate_id,
+                        'amount'            => $amount,
+                        'year'              => $targetMonth['year'],
+                        'month'             => $targetMonth['month'],
+                    ]);
+                }
 
-        foreach($request->targetMonths as $targetMonth){
-            $payment->paymentDetails()->create([
-                'payment_config_id' => $paymentConfig->id,
-                'candidate_id'      => $payment->candidate_id,
-                'amount'            => $targetMonth['goal_amount'],
-                'year'              => $targetMonth['year'],
-                'month'             => $targetMonth['month'],
-            ]);
+                return response()->json(['data' => $payment]);
+            });
+        } catch (\Throwable $th) {
+            //'No se pudo crear el pago o alguno de sus detalles'
+            return response()->json(['error' => $th->getMessage()], 500);
         }
 
-        return response()->json(['data' => $payment]);
     }
 
     /**

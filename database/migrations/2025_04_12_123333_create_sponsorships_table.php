@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('wants_reminder')->default(false);
             $table->boolean('wants_deductible_receipt')->default(false);
             $table->text('cancellation_reason')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

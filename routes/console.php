@@ -8,4 +8,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('sponsorships:apply-increase')->everyMinute();
+Schedule::command('candidates:activate-programmed')->dailyAt('00:00');
+Schedule::command('sponsorships:apply-increase')->dailyAt('00:00');
+Schedule::command('programs:update-prices')->dailyAt('00:00');

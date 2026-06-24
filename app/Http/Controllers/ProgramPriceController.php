@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Program;
 use App\Models\ProgramPrice;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ProgramPriceController extends Controller
@@ -34,14 +36,15 @@ class ProgramPriceController extends Controller
             'valid_since' => 'required|date'
         ]);
 
-        if( $request->valid_since == now()->format('Y-m-d') ){
-            $current = ProgramPrice::where('program_id', $request->program_id)
-            ->current()
-            ->first();
+        $validSince = Carbon::parse($request->input('valid_since'));
+        $validUntil = $validSince->copy()->subDay();
 
-            if( $current ){
-                $current->update('valid_until', now()->subDay()->format('Y-m-d'));
-            }
+        if( $validSince->isToday() ){
+            ProgramPrice::whereProgramId($request->program_id)
+            ->current()
+            ->update(['valid_until' => $validUntil]);
+
+            Program::where('id', $request->program_id)->update(['price'=>$request->price]);
         }
 
         $programPrice = ProgramPrice::create($validated);
@@ -59,15 +62,15 @@ class ProgramPriceController extends Controller
             'valid_since' => 'sometimes|date'
         ]);
 
-        if( $request->valid_since == now()->format('Y-m-d') ){
-            $current = ProgramPrice::whereProgramId($request->program_id)
-            ->where('valid_since', '<=', now())
-            ->whereNull('valid_until')
-            ->first();
+        $validSince = Carbon::parse($request->input('valid_since'));
+        $validUntil = $validSince->copy()->subDay();
 
-            if( $current ){
-                $current->update(['valid_until' => now()->subDay()->format('Y-m-d')]);
-            }
+        if( $validSince->isToday() ){
+            ProgramPrice::whereProgramId($programPrice->program_id)
+            ->current()
+            ->update(['valid_until' => $validUntil]);
+
+            Program::where('id', $request->program_id)->update(['price'=>$request->price]);
         }
 
         $programPrice->update($validated);

@@ -259,11 +259,6 @@ class Candidate extends Model implements HasMedia
     public function getQuotaAmount($type = 'parent'){
         return $this->sponsorships()
         ->where('sponsorships.type', $type)
-        ->whereIn('sponsorships.id', function($query){
-            $query->selectRaw('MAX(id)')
-            ->from('sponsorships')
-            ->groupBy('sponsorship_id');
-        })
         ->sum('sponsorships.amount');
     }
 }

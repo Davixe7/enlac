@@ -19,7 +19,7 @@ class ProgramObserver
             'user_id'   => Auth::check() ? auth()->id() : 1
         ]);
 
-        $startDate = request()->input('valid_since', now()->format('Y-m-d'));
+        $startDate = request()->input('valid_since', $program->created_at);
         $program->prices()->create([
             'price'       => $program->price,
             'valid_since' => $startDate,
@@ -33,12 +33,15 @@ class ProgramObserver
     public function updated(Program $program): void
     {
 
-        if ($program->isDirty(['is_active'])) {
-            $program->programStatusLogs()->create(['is_active' => $program->is_active, 'user_id'=>auth()->id()]);
+        if ($program->wasChanged(['is_active'])) {
+            $program->programStatusLogs()->create([
+                'is_active' => $program->is_active,
+                'user_id'   => auth()->id()
+            ]);
         }
 
-        if ($program->isDirty(['price'])) {
-            $validSince = request()->input('valid_since', now()->format('Y-m-d'));
+        /* if ($program->wasChanged(['price'])) {
+            $validSince       = request()->input('valid_since', now()->format('Y-m-d'));
             $carbonValidSince = Carbon::parse($validSince);
             $program->prices()->current()
             ->update([
@@ -50,7 +53,7 @@ class ProgramObserver
                 'valid_since' => $validSince,
                 'valid_until' => null,
             ]);
-        }
+        } */
     }
 
     /**

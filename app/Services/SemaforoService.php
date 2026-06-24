@@ -147,14 +147,16 @@ class SemaforoService
     private function buildMonthPayload($currentConfig, $paid, $goal, $color, $realMonth, $realYear): array
     {
         return [
-            'month'             => $realMonth,
-            'year'              => $realYear,
-            'paid_amount'       => $paid,
-            'goal_amount'       => $goal,
-            'color'             => $color,
-            'payment_config_id' => $currentConfig ? $currentConfig->id : null,
-            'sponsorship_id'    => $currentConfig ? $currentConfig->sponsorship_id : null,
-            'type'              => $currentConfig ? $currentConfig->sponsorship->type : null
+            'month'              => $realMonth,
+            'year'               => $realYear,
+            'paid_amount'        => $paid,
+            'goal_amount'        => $goal,
+            'paid_amount_format' => '$' . number_format($paid, 2),
+            'goal_amount_format' => '$' . number_format($goal, 2),
+            'color'              => $color,
+            'payment_config_id'  => $currentConfig ? $currentConfig->id : null,
+            'sponsorship_id'     => $currentConfig ? $currentConfig->sponsorship_id : null,
+            'type'               => $currentConfig ? $currentConfig->sponsorship->type : null
         ];
     }
 }

@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PaymentConfigLog extends Model
+class SponsorshipLog extends Model
 {
     public $timestamps = false;
 
     protected $guarded = [];
 
-    public function paymentConfig()
+    public function Sponsorship()
     {
-        return $this->belongsTo(PaymentConfig::class);
+        return $this->belongsTo(Sponsorship::class);
     }
 }

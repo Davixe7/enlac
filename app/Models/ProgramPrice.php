@@ -16,6 +16,18 @@ class ProgramPrice extends Model
         $date = $date ?: now();
         return $query
         ->where('valid_since', '<=', $date)
-        ->whereNull('valid_until');
+        ->where(function($query){
+            $query->whereNull('valid_until')
+            ->orWhere('valid_until', '>=', now());
+        });
+    }
+
+    public function scopeCurrent($query){
+        return $query
+        ->where('valid_since', '<=', now())
+        ->where(function($query){
+            $query->whereNull('valid_until')
+            ->orWhere('valid_until', '>=', now());
+        });
     }
 }
