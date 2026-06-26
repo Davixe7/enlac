@@ -3,8 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Program;
-use App\Models\ProgramSnapshot;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class ProgramObserver
@@ -16,14 +14,15 @@ class ProgramObserver
     {
         $program->programStatusLogs()->create([
             'is_active' => !is_null($program->is_active) ? $program->is_active : 1,
-            'user_id'   => Auth::check() ? auth()->id() : 1
+            'user_id'   => Auth::check() ? auth()->id() : null
         ]);
 
         $startDate = request()->input('valid_since', $program->created_at);
         $program->prices()->create([
             'price'       => $program->price,
             'valid_since' => $startDate,
-            'valid_until' => null
+            'valid_until' => null,
+            'applied'     => 1
         ]);
     }
 

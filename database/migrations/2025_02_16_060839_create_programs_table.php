@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('order')->nullable();
             $table->string('name');
             $table->decimal('price');
+            $table->boolean('is_active');
             $table->timestamps();
         });
     }

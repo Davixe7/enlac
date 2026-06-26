@@ -6,6 +6,7 @@ use App\Models\Program;
 use App\Models\ProgramPrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProgramPriceController extends Controller
 {
@@ -38,18 +39,28 @@ class ProgramPriceController extends Controller
 
         $validSince = Carbon::parse($request->input('valid_since'));
         $validUntil = $validSince->copy()->subDay();
+        $data       = array_merge($validated,[
+            'valid_since' => $validSince->format('Y-m-d'),
+            'applied'     => 0
+        ]);
 
         if( $validSince->isToday() ){
+            $data['applied'] = 1;
+
             ProgramPrice::whereProgramId($request->program_id)
             ->current()
-            ->update(['valid_until' => $validUntil]);
+            ->update(['valid_until' => $validUntil->format('Y-m-d')]);
 
-            Program::where('id', $request->program_id)->update(['price'=>$request->price]);
+            Program::where('id', $request->program_id)
+            ->update(['price'=>$request->price]);
         }
 
-        $programPrice = ProgramPrice::create($validated);
+        $newPrice = ProgramPrice::updateOrCreate([
+            'program_id' => $request->program_id,
+            'applied'    => 0
+        ], $data);
 
-        return response()->json(['data'=>$programPrice], 201);
+        return response()->json(['data'=>$newPrice], 201);
     }
 
     /**
@@ -64,6 +75,7 @@ class ProgramPriceController extends Controller
 
         $validSince = Carbon::parse($request->input('valid_since'));
         $validUntil = $validSince->copy()->subDay();
+        $applied    = false;
 
         if( $validSince->isToday() ){
             ProgramPrice::whereProgramId($programPrice->program_id)
@@ -71,9 +83,13 @@ class ProgramPriceController extends Controller
             ->update(['valid_until' => $validUntil]);
 
             Program::where('id', $request->program_id)->update(['price'=>$request->price]);
+
+            $applied    = true;
         }
 
-        $programPrice->update($validated);
+        $programPrice->update(array_merge($validated, [
+            'applied' => $applied
+        ]));
 
         return response()->json(['data'=>$programPrice], 200);
     }

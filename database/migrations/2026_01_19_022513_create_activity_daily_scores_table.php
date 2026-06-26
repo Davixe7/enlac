@@ -16,7 +16,8 @@ return new class extends Migration
     {
         Schema::create('activity_daily_scores', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('activity_plan_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('activity_plan_id');
+            $table->foreign('activity_plan_id')->references('id')->on('activity_plan')->onDelete('cascade');
             $table->foreignId('candidate_id')->constrained()->onDelete('cascade');
             $table->date('date');
             $table->string('score');

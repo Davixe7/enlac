@@ -5,6 +5,7 @@ use Illuminate\Console\Command;
 use App\Models\ProgramPrice;
 use App\Models\Program;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UpdateProgramPrices extends Command
 {
@@ -23,10 +24,9 @@ class UpdateProgramPrices extends Command
      */
     public function handle()
     {
-        $today = now()->format('Y-m-d');
+        $today     = now()->format('Y-m-d');
         $yesterday = now()->subDay()->format('Y-m-d');
 
-        // 1. Buscar todos los precios que están programados para empezar HOY
         $preciosProgramados = ProgramPrice::where('valid_since', $today)->get();
 
         if ($preciosProgramados->isEmpty()) {
@@ -46,10 +46,12 @@ class UpdateProgramPrices extends Command
                 // B. Actualizar el fast-read en la tabla principal de Programas
                 Program::where('id', $nuevoPrecio->program_id)
                     ->update(['price' => $nuevoPrecio->price]);
+
+                $nuevoPrecio->update(['applied'=>1]);
             });
         }
 
-        $this->info("Se han procesado {$preciosProgramados->count()} actualización(es) de precios para hoy.");
+        $this->info("Se aplicaron 1 cambios de precio.");
         return Command::SUCCESS;
     }
 }

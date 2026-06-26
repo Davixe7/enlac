@@ -336,6 +336,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/visits/export', [VisitReportController::class, 'export']);
 
     Route::apiResource('program_prices', ProgramPriceController::class)->only(['store', 'update', 'index']);
-    Route::post('parent-quota-updates', [ParentQuotaUpdateController::class, 'store']);
-    Route::get('parent-quota-updates', [ParentQuotaUpdateController::class, 'index']);
+    Route::apiResource('parent-quota-updates', ParentQuotaUpdateController::class)->only(['store', 'index']);;
 });

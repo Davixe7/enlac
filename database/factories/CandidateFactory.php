@@ -18,22 +18,22 @@ class CandidateFactory extends Factory
      */
     public function definition(): array
     {
-        $birthDate = $this->faker->date();
+        $birthDate = now()->subYears(fake()->numberBetween(10, 15)) ;
 
         return [
-            'first_name'   => $this->faker->firstName(),
-            'middle_name'  => $this->faker->firstName(),
-            'last_name'    => $this->faker->lastName(),
-            'birth_date'   => $birthDate,
-            'diagnosis'    => $this->faker->sentence(),
-            'sheet'        => $this->faker->unique()->randomNumber(5), // Genera un número de hoja único
-            'info_channel' => $this->faker->randomElement(['Redes Sociales', 'Referencia', 'Publicidad', 'Otro']),
-            'status' => $this->faker->randomElement(['pendiente', 'aceptado', 'rechazado']),
-            'admission_comment' => $this->faker->optional()->sentence(),
-            'entry_date' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
-            'program_id' => 1, // Asocia un programa existente o crea uno nuevo
-            'created_at' => now(),
-            'updated_at' => now(),
+            'first_name'        => fake()->firstName(),
+            'middle_name'       => fake()->firstName(),
+            'last_name'         => fake()->lastName(),
+            'birth_date'        => $birthDate,
+            'diagnosis'         => fake()->sentence(),
+            'sheet'             => fake()->unique()->randomNumber(5), // Genera un número de hoja único
+            'info_channel'      => fake()->randomElement(['Redes Sociales', 'Referencia', 'Publicidad', 'Otro']),
+            'status'            => fake()->randomElement(['pendiente', 'aceptado', 'rechazado']),
+            'admission_comment' => fake()->optional()->sentence(),
+            'entry_date'        => fake()->optional()->dateTimeBetween('-1 year', 'now'),
+            'program_id'        => 1, // Asocia un programa existente o crea uno nuevo
+            'created_at'        => now(),
+            'updated_at'        => now(),
         ];
     }
 
@@ -48,7 +48,7 @@ class CandidateFactory extends Factory
             return [
                 'status'              => CandidateStatus::ACCEPTED,
                 'admission_comment'   => null,
-                'entry_date'          => $this->faker->randomElement([$this->faker->dateTimeBetween('-1 year', 'now'), null]),
+                'entry_date'          => fake()->randomElement([fake()->dateTimeBetween('-1 year', 'now'), null]),
             ];
         });
     }
@@ -63,10 +63,10 @@ class CandidateFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'status'              => CandidateStatus::REJECTED,
-                'admission_comment'   => $this->faker->sentence(),
+                'admission_comment'   => fake()->sentence(),
                 'entry_date'          => null,
                 'program_id'          => null,
-                'entry_date'          => $this->faker->randomElement([$this->faker->dateTimeBetween('-1 year', 'now'), null]),
+                'entry_date'          => fake()->randomElement([fake()->dateTimeBetween('-1 year', 'now'), null]),
             ];
         });
     }

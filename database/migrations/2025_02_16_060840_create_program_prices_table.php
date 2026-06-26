@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->date('valid_since');
             $table->date('valid_until')->nullable();
+            $table->boolean('applied');
             $table->timestamps();
         });
     }

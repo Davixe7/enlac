@@ -10,7 +10,7 @@ use App\Services\InterviewService;
 
 class InterviewController extends Controller
 {
-    protected $interviewService;
+    protected InterviewService $interviewService;
 
     public function __construct(InterviewService $interviewService)
     {
