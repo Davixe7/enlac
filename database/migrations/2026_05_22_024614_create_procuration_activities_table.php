@@ -21,14 +21,6 @@ return new class extends Migration
             // Campos específicos para Radiomaratón
             $table->decimal('goal_amount', 12, 2)->nullable();
 
-            // Campos específicos para Obsequio entre Amigos
-            $table->integer('tickets_count')->nullable();
-            $table->decimal('ticket_price', 10, 2)->nullable();
-            $table->string('place')->nullable();
-            $table->string('winning_ticket')->nullable();
-            $table->string('winner_name')->nullable();
-            $table->string('seller_winner_name')->nullable();
-
             $table->timestamps();
         });
     }

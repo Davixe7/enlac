@@ -59,4 +59,8 @@ class Donation extends Model
     {
         return $this->belongsTo(Sponsor::class, 'sponsor_id');
     }
+
+    public function ticket(){
+        return $this->belongsTo(RaffleTicket::class, 'raffle_ticket_id', 'id');
+    }
 }

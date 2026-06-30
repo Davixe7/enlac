@@ -15,9 +15,10 @@ class StoreDonationRequest extends FormRequest
     {
         return [
             // Datos del Donante fijos
-            'donor_id' => 'required|exists:donors,id',
+            'donor_id'                => 'required|exists:donors,id',
             'procuration_activity_id' => 'required|exists:procuration_activities,id',
-            'activity_type' => 'required|string',
+            'raffle_ticket_id'        => 'sometimes|exists:raffle_tickets,id',
+            'activity_type'           => 'required|string',
 
             // Info Financiera fija
             'concept' => 'nullable|string',

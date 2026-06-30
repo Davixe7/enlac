@@ -83,6 +83,9 @@ use App\Http\Controllers\EventsCalendarController;
 use App\Http\Controllers\MedicalRecordsController;
 use App\Http\Controllers\ParentQuotaUpdateController;
 use App\Http\Controllers\ProgramPriceController;
+use App\Http\Controllers\RaffleController;
+use App\Http\Controllers\RaffleSellerController;
+use App\Http\Controllers\RaffleTicketController;
 use App\Http\Controllers\SemaforoController;
 use App\Http\Controllers\SponsorshipController;
 
@@ -166,7 +169,13 @@ Route::middleware('auth:sanctum')->group(function () {
         'family_members'         => FamilyMemberController::class,
         'socioeconomic_profiles' => SocioeconomicProfileController::class,
         'medical_records'        => MedicalRecordsController::class,
+        'raffles'                => RaffleController::class,
+        'raffle_sellers'         => RaffleSellerController::class,
+        'raffle_tickets'         => RaffleTicketController::class,
     ]);
+
+    Route::post('raffles/{raffle}/assignTickets', [RaffleController::class, 'assignTickets']);
+    Route::get('raffles/{raffle}/startsAt', [RaffleController::class, 'startsAt']);
 
     Route::get('groups/options', [GroupController::class, 'options']);
 

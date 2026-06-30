@@ -17,6 +17,11 @@ class DonorController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        if( $request->filled('cellphone') ){
+            $data = Donor::whereCellphone($request->cellphone)->firstOrFail();
+            return response()->json(compact('data'));
+        }
+
         $donors = $this->buildDonorQuery($request)
             ->orderBy('first_name')
             ->get()
