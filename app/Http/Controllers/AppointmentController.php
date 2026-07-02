@@ -14,6 +14,7 @@ class AppointmentController extends Controller
     public function index(Request $request)
     {
         $appointments = Appointment::byCandidate($request->candidate_id)
+        ->byType($request->type)
         ->with('evaluator')
         ->orderBy('date')
         ->get();

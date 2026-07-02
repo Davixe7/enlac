@@ -12,6 +12,7 @@ use App\Models\Medication;
 use App\Notifications\EvaluationScheduled;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CandidateService
 {
@@ -98,16 +99,19 @@ class CandidateService
             /*
             Si cambian evaluador o fecha de cita
             cancelar cita actual, generar nueva cita. */
-            if($candidate->status == 'pending' && $request->filled('evaluation_schedule')){
-                $newEvaluatorId    = $request->filled('evaluation_schedule.evaluator_id') ? $request->evaluation_schedule['evaluator_id'] : null;
-                $newEvaluationDate = $request->filled('evaluation_schedule.date')         ? $request->evaluation_schedule['evaluadatetor_id'] : null;
 
-                $evaluator_changed = $newEvaluatorId    && $candidate->evaluation_schedule->evaluator_id != $newEvaluatorId;
-                $date_changed      = $newEvaluationDate && $candidate->evaluation_schedule->date != $newEvaluationDate;
+            if($candidate->status == CandidateStatus::PENDING && $request->filled('evaluation_schedule')){
+                $newEvaluatorId    = $request->filled('evaluation_schedule.evaluator_id') ? $request->evaluation_schedule['evaluator_id'] : null;
+                $newEvaluationDate = $request->filled('evaluation_schedule.date')         ? $request->evaluation_schedule['date'] : null;
+
+                $evaluator_changed = $newEvaluatorId    && $candidate->evaluationSchedule->evaluator_id != $newEvaluatorId;
+                $date_changed      = $newEvaluationDate && $candidate->evaluationSchedule->date != $newEvaluationDate;
 
                 if (!$evaluator_changed && !$date_changed) { return; }
 
-                $candidate->evaluation_schedule->update(['status' => 'canceled']);
+                Log::info('It changed!');
+
+                $candidate->evaluationSchedule->update(['status' => 'canceled']);
                 $schedule = $candidate->appointments()->create([
                     'type_id' => 0,
                     'evaluator_id' => $request->evaluation_schedule['evaluator_id'],
