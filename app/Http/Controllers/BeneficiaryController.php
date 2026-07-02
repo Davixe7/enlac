@@ -7,7 +7,6 @@ use App\Enums\CandidateStatus;
 use App\Http\Resources\BeneficiaryReportsResource;
 use App\Http\Resources\BeneficiaryResource;
 use App\Models\Candidate;
-use App\Models\Activity;
 use App\Models\Plan;
 use App\Models\Appointment;
 
@@ -18,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 class BeneficiaryController extends Controller
 {
 
-    protected $candidateService;
+    protected CandidateService $candidateService;
 
     public function __construct(CandidateService $candidateService)
     {

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class CandidateController extends Controller
 {
-    protected $candidateService;
+    protected CandidateService $candidateService;
 
     public function __construct(CandidateService $candidateService)
     {

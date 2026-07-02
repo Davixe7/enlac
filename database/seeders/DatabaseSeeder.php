@@ -2,11 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Sponsor;
-use App\Models\Sponsorship;
-use App\Models\User;
+use App\Models\Program;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -34,5 +31,11 @@ class DatabaseSeeder extends Seeder
         //$evaluatorRole = Role::whereName('evaluator')->first();
         //$adminRole     = Role::whereName('admin')->first();
         //$user->roles()->attach( [$evaluatorRole, $adminRole] );
+
+        Program::whereDoesntHave('programStatusLogs')
+        ->get()
+        ->each(function($p){
+            $p->programStatusLogs()->create(['is_active'=>1, 'user_id' => 1]);
+        });
     }
 }
