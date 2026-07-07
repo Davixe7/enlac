@@ -24,7 +24,7 @@ class StoreBrainFunctionRankRequest extends FormRequest
         return [
             'caracteristic'     => 'required|in:0,F,P',
             'comments'          => '', /* required_if:caracteristic,0,F|string|max:500 */
-            'laterality_impact' => 'required_if:caracteristic,0,F|in:l,r,b',
+            'laterality_impact' => 'nullable|in:l,r,b',
             'brain_level_id'    => 'required|exists:brain_levels,id',
             'brain_function_id' => 'required|exists:brain_functions,id',
             'evaluation_id'     => 'required|exists:evaluations,id',
