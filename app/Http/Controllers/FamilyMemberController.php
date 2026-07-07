@@ -52,7 +52,7 @@ class FamilyMemberController extends Controller
      */
     public function show(FamilyMember $familyMember)
     {
-        //
+        return response()->json(['data'=>$familyMember]);
     }
 
     /**
@@ -85,6 +85,7 @@ class FamilyMemberController extends Controller
      */
     public function destroy(FamilyMember $familyMember)
     {
-        //
+        $familyMember->delete();
+        return response()->json([], 204);
     }
 }

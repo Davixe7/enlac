@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\CandidateStatus;
+use App\Models\Program;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -31,7 +32,7 @@ class CandidateFactory extends Factory
             'status'            => fake()->randomElement(['pendiente', 'aceptado', 'rechazado']),
             'admission_comment' => fake()->optional()->sentence(),
             'entry_date'        => fake()->optional()->dateTimeBetween('-1 year', 'now'),
-            'program_id'        => 1, // Asocia un programa existente o crea uno nuevo
+            'program_id'        => Program::factory(), // Asocia un programa existente o crea uno nuevo
             'created_at'        => now(),
             'updated_at'        => now(),
         ];
