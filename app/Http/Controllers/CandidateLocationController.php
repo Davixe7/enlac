@@ -13,6 +13,7 @@ class CandidateLocationController extends Controller
         $candidateLocation = CandidateLocation::create([
             'candidate_id'            => $request->candidate_id,
             'transport_address'       => $request->transport_address,
+            'locality_name'           => $request->locality_name,
             'transport_location_link' => $request->transport_location_link,
             'curp'                    => $request->curp,
         ]);
@@ -30,6 +31,7 @@ class CandidateLocationController extends Controller
     {
         $candidateLocation->update([
             'transport_address'       => $request->transport_address,
+            'locality_name'           => $request->locality_name,
             'transport_location_link' => $request->transport_location_link,
             'curp'                    => $request->curp,
         ]);

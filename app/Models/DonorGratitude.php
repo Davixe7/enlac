@@ -14,6 +14,7 @@ class DonorGratitude extends Model
     'type',
     'delivery_method',
     'recipient_name',
+    'deliverer_name'
 ];
 
     public function donor(): BelongsTo {

@@ -43,6 +43,10 @@ class DonorController extends Controller
             ->when($request->filled('birth_month'), function ($query) use ($request) {
                 $month = $request->input('birth_month');
                 $query->whereMonth('birth_date', $month);
+            })
+            ->when($request->filled('company_anniversary'), function ($query) use ($request) {
+                $month = $request->input('company_anniversary');
+                $query->where('company_anniversary', 'like', "%-{$month}");
             });
     }
 

@@ -51,6 +51,7 @@ class StoreDonorRequest extends FormRequest
 
             // Los campos que ya corregimos
             'company_name'         => 'nullable|string|max:255',
+            'company_anniversary'  => 'nullable|string|max:5',
             'job_title'            => 'nullable|string|max:255',
             'birth_date'           => 'nullable|date_format:Y-m-d',
 

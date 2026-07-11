@@ -19,6 +19,7 @@ class StoreDonorGratitudeRequest extends FormRequest
         'type'             => 'required|string|max:255',
         'delivery_method'  => 'required',
         'recipient_name'   => 'nullable|string|max:255',
+        'deliverer_name'   => 'nullable|string|max:255',
     ];
 }
 }
