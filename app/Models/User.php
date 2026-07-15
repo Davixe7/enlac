@@ -60,6 +60,10 @@ class User extends Authenticatable
         return $this->belongsTo(WorkArea::class)->withDefault(['name' => 'Ninguna']);
     }
 
+    public function colaborators(){
+        return $this->hasMany(User::class, 'leader_id');
+    }
+
     public function leader()
     {
         return $this->belongsTo(User::class, 'leader_id');
