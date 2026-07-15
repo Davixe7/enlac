@@ -29,7 +29,7 @@ class FamilyMemberController extends Controller
         $validated = $request->validate([
             'name'                 => 'required|string|max:255',
             'candidate_id'         => 'required|exists:candidates,id',
-            'age'                  => 'nullable|integer|min:0|max:120',
+            'age'                  => 'nullable|string|max:255',
             'relationship'         => 'required|string|max:100',
             'marital_status'       => 'nullable|string|max:50',
             'scolarship'           => 'nullable|string|max:100',
