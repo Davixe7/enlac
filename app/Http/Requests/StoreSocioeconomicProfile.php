@@ -116,6 +116,7 @@ class StoreSocioeconomicProfile extends FormRequest
             'solvency_notes'              => ['nullable', 'string'],
             'economic_level'              => ['nullable', 'string'],
             'monthly_contribution_amount' => ['nullable', 'numeric', 'min:0'],
+            'observations' => 'nullable|string',
         ];
     }
 }
