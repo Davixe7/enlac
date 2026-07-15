@@ -65,6 +65,10 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'leader_id');
     }
 
+    public function collaborators(){
+        return $this->hasMany(User::class, 'leader_id');
+    }
+
     public function scopeFullName($query){
         return $query
         ->select(['users.id', 'users.name as username', 'users.last_name as userlastname', 'users.second_last_name as userlastname'])
