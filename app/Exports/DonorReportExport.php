@@ -29,6 +29,13 @@ class DonorReportExport implements FromCollection, WithHeadings, WithMapping, Wi
             'Teléfono Celular',
             'Fecha de Cumpleaños',
             'Sector',
+            'Calle',
+            'Número Exterior',
+            'Colonia',
+            'Código Postal',
+            'Ciudad',
+            'Estado',
+            'País',
             'Estatus'
         ];
     }
@@ -45,8 +52,17 @@ class DonorReportExport implements FromCollection, WithHeadings, WithMapping, Wi
             $row->company_name ?? '',
             $row->job_title ?? '',
             $row->cellphone ?? '',
-            $birthDate, // <--- Columna con la fecha limpia
+            $birthDate,
             $row->sector ?? '',
+            // --- Campos de Domicilio ---
+            $row->street ?? '',
+            $row->exterior_number ?? '',
+            $row->neighborhood ?? '',
+            $row->postal_code ?? '',
+            $row->city ?? '',
+            $row->state ?? '',
+            $row->country ?? 'México',
+            // ----------------------------------
             $row->is_active ? 'Activo' : 'Inactivo'
         ];
     }
