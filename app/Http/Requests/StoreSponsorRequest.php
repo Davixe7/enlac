@@ -32,16 +32,17 @@ class StoreSponsorRequest extends FormRequest
             'contact_by'       => 'required',
             'is_anonymous'     => 'required|boolean',
             'type'             => 'required',
-            'addresses.*.street'       => 'required',
+
+            'addresses.*.street'       => 'nullable',
             'addresses.*.inner_number' => 'nullable',
-            'addresses.*.outer_number' => 'required',
-            'addresses.*.neighborhood' => 'required',
-            'addresses.*.city'         => 'required',
-            'addresses.*.state'        => 'required',
-            'addresses.*.country'      => 'required',
-            'addresses.*.email'        => 'required',
-            'addresses.*.phone'        => 'required',
-            'addresses.*.whatsapp'     => 'required'
+            'addresses.*.outer_number' => 'nullable',
+            'addresses.*.neighborhood' => 'nullable',
+            'addresses.*.city'         => 'nullable',
+            'addresses.*.state'        => 'nullable',
+            'addresses.*.country'      => 'nullable',
+            'addresses.*.email'        => 'nullable',
+            'addresses.*.phone'        => 'nullable',
+            'addresses.*.whatsapp'     => 'nullable'
         ];
     }
 }
