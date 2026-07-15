@@ -63,4 +63,24 @@ class DonationController extends Controller
             'data' => $donations
         ], 200);
     }
+
+    /**
+     * Cancela un donativo existente.
+     */
+    public function cancel($id): JsonResponse
+    {
+        $donation = Donation::findOrFail($id);
+
+        if ($donation->is_cancelled) {
+            return response()->json(['message' => 'Este donativo ya se encuentra cancelado.'], 422);
+        }
+
+        $donation->is_cancelled = true;
+        $donation->save();
+
+        return response()->json([
+            'message' => 'Donativo cancelado con éxito',
+            'data' => $donation
+        ], 200);
+    }
 }
