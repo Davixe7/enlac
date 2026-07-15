@@ -37,7 +37,7 @@ class DonationController extends Controller
 
     public function storeAndPrint(Request $request)
     {
-        $data = $request->all();
+        $data = $request->except(['raffle_ticket_id']);
 
         if (isset($data['fiscal_record_id']) && !is_numeric($data['fiscal_record_id'])) {
             $data['fiscal_record_id'] = null;
