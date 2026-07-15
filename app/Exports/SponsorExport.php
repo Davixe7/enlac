@@ -54,7 +54,7 @@ class SponsorExport implements FromCollection, WithHeadings, WithMapping, Should
             str_pad($sponsor->id, 4, '0', STR_PAD_LEFT),
             $fullName,
             $sponsor->company_name ?? 'N/A',
-            $sponsor->sponsorship->count(),
+            $sponsor->sponsorships->count(),
             $beneficiarios ?: 'Sin beneficiarios asignados',
             $sponsor->is_anonymous ? 'Sí' : 'No',
             $contacto,
