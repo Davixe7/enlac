@@ -321,7 +321,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/donations', [DonationController::class, 'store']);
     Route::post('donations/print', [DonationController::class, 'storeAndPrint']);
     Route::get('/reports/donations/export', [DonationReportController::class, 'export']);
-    Route::put('/donations/{id}/cancel', [DonationController::class, 'cancel']);
+    Route::put('/donations/{donation}/cancel', [DonationController::class, 'cancel']);
 
     Route::apiResource('capacitations', CapacitationController::class);
 

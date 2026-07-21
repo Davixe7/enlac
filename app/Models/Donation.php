@@ -10,12 +10,23 @@ class Donation extends Model
 {
     use HasFactory;
 
-    // Permitir asignación masiva de todos los campos dinámicos enviados desde Quasar
+    protected $appends = ['is_cancelled'];
     protected $guarded = [];
+
+    public function getIsCancelledAttribute(): bool
+    {
+        return !is_null($this->cancelled_at);
+    }
+
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by_user_id');
+    }
 
     // Casts para asegurar que los tipos lleguen limpios a JavaScript
     protected $casts = [
         'payment_date' => 'date',
+        'cancelled_at' => 'datetime',
         'amount' => 'decimal:2',
         'exchange_rate' => 'decimal:4',
         'equivalent_amount_mxn' => 'decimal:2',
