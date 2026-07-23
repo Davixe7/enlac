@@ -211,7 +211,8 @@ class BeneficiaryController extends Controller
                 plan,
                 appointment_id,
                 type_id,
-                appointment_type
+                appointment_type,
+                gender
                 ")
             ->get();
         if(count($medical_record) == 0){
@@ -280,7 +281,8 @@ class BeneficiaryController extends Controller
                 'plan' => "",
                 'appointment_id' => $idAppoiment,
                 'type_id' => "",
-                'appointment_type' => ""
+                'appointment_type' => "",
+                'gender' => ""
             ];
         }else{
             $data = [
@@ -348,7 +350,8 @@ class BeneficiaryController extends Controller
                 'plan' => $medical_record[0]->plan,
                 'appointment_id' => $medical_record[0]->appointment_id,
                 'type_id' => $medical_record[0]->type_id,
-                'appointment_type' => $medical_record[0]->appointment_type
+                'appointment_type' => $medical_record[0]->appointment_type,
+                'gender' => $medical_record[0]->gender
             ];
         }
 

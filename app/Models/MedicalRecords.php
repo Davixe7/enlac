@@ -76,7 +76,8 @@ class MedicalRecords extends Model implements HasMedia
             "date_soap",
             "appointment_id",
             "type_id",
-            "appointment_type"];
+            "appointment_type",
+            "gender"];
 
     public $incrementing = true;
     protected $keyType = 'int';
