@@ -30,16 +30,18 @@ class BeneficiaryController extends Controller
     public function index(Request $request)
     {
         if( $request->plan_type_id ){
-            $data = Candidate::whereHas('groups.plans', function($query) use ($request) {
-                $query->where('plan_type_id', $request->plan_type_id);
-            })->get();
+            $data = Candidate::with(['program', 'statusLogs'])
+                ->whereHas('groups.plans', function($query) use ($request) {
+                    $query->where('plan_type_id', $request->plan_type_id);
+                })->get();
             return BeneficiaryResource::collection($data);
         }
 
         if( $request->group_id ){
-            $data = Candidate::whereHas('groups', function($query) use ($request) {
-                $query->where('id', $request->group_id);
-            })->get();
+            $data = Candidate::with(['program', 'statusLogs'])
+                ->whereHas('groups', function($query) use ($request) {
+                    $query->where('id', $request->group_id);
+                })->get();
             return BeneficiaryResource::collection($data);
         }
 
@@ -62,7 +64,7 @@ class BeneficiaryController extends Controller
         }
 
         $beneficiaries = Candidate::name($request->name)
-            ->with(['program'])
+            ->with(['program', 'statusLogs'])
             ->beneficiaries();
 
         if( $request->equinetherapy == 1 ){
@@ -79,6 +81,7 @@ class BeneficiaryController extends Controller
             ->pluck('group_id');
 
             $data = Candidate::name($request->name)
+            ->with(['program', 'statusLogs'])
             ->whereHas('groups', fn($q)=>$q->whereIn('groups.id', $groups))
             ->orderBy('first_name', 'asc') // Ordena por Nombre
             ->orderBy('last_name', 'asc')  // Luego por Apellido Paterno

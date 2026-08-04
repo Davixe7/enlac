@@ -21,7 +21,7 @@ class CandidateStatusUpdateController extends Controller
         ]);
 
         $statusEnum = CandidateStatus::from($data['status']);
-        $candidate->updateStatus($statusEnum);
+        $candidate->updateStatus($statusEnum, $request->comment);
 
         if( !$request->filled(['entry_date', 'program_id']) ){
             return response()->json([], 200);
@@ -30,6 +30,6 @@ class CandidateStatusUpdateController extends Controller
         $candidate->update($request->only(['entry_date', 'program_id']));
         //Notificar ingreso programado
 
-        return response()->json([], 200);
+        return response()->json(['data' => compact($candidate)], 200);
     }
 }

@@ -27,6 +27,9 @@ class BeneficiaryResource extends JsonResource
             'dropdown_name'                           => $dropdownName ?: $this->full_name,
             'sheet'                                   => $this->sheet,
             'status'                                  => $this->status,
+            'last_comment'                            => $this->whenLoaded('statusLogs', function () {
+                return $this->statusLogs->sortByDesc('created_at')->first()?->comments;
+                }),
             'entry_date'                              => $this->entry_date ? Carbon::parse($this->entry_date)->format('d/m/Y') : null,
             'requires_transport'                      => $this->requires_transport,
             'program'                                 => $this->whenLoaded('program'),

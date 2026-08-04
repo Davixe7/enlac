@@ -225,16 +225,16 @@ class Candidate extends Model implements HasMedia
             });
     }
 
-    public function updateStatus(CandidateStatus $newStatus, ?string $comments = null, $date = null): void
+    public function updateStatus(CandidateStatus $newStatus, ?string $comment = null, $date = null): void
     {
-        DB::transaction(function () use ($newStatus, $comments, $date) {
+        DB::transaction(function () use ($newStatus, $comment, $date) {
 
             $this->update(['status' => $newStatus]);
 
             $this->statusLogs()->create([
                 'status'     => $newStatus->value,
                 'user_id'    => Auth::id(),
-                'comments'   => $comments,
+                'comments'   => $comment,
                 'created_at' => $date ?: now(),
             ]);
         });
