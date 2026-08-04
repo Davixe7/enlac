@@ -30,6 +30,6 @@ class CandidateStatusUpdateController extends Controller
         $candidate->update($request->only(['entry_date', 'program_id']));
         //Notificar ingreso programado
 
-        return response()->json(['data' => compact($candidate)], 200);
+        return response()->json(['data' => compact('candidate')], 200);
     }
 }
