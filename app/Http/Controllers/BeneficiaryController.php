@@ -400,24 +400,36 @@ class BeneficiaryController extends Controller
         return new BeneficiaryResource($candidate->load(['statusHistory', 'personal_groups', 'program']));
     }
 
-    public function reports(Request $request){
+    public function reports(Request $request)
+    {
+        $statuses = [
+            CandidateStatus::GRADUATED->value,
+            CandidateStatus::DECEASED->value,
+            CandidateStatus::EX_ENLAC->value,
+            CandidateStatus::INACTIVE->value,
+            CandidateStatus::REJECTED->value,
+        ];
 
-        $beneficiaries = Candidate::whereIn('status', [
-                CandidateStatus::GRADUATED,
-                CandidateStatus::DECEASED,
-                CandidateStatus::EX_ENLAC,
-            ])
+        $beneficiaries = Candidate::whereIn('status', $statuses)
+            ->name($request->input('name'))
             ->orderBy('first_name', 'ASC')
             ->with(['program'])
             ->get();
 
-        $counts = $beneficiaries
-        ->groupBy('status')
-        ->map(fn ($group) => $group->count());
+        // Estructura base de conteos para garantizar que siempre retornen todas las llaves
+        $defaultCounts = array_fill_keys($statuses, 0);
+
+        // Agrupa el conteo dinámico y fusiona con la base
+        $groupedCounts = $beneficiaries
+            ->groupBy(fn ($candidate) => $candidate->status->value)
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        $counts = array_merge($defaultCounts, $groupedCounts);
 
         return new BeneficiaryReportsResource([
             'beneficiaries' => $beneficiaries,
-            'counts' => $counts,
+            'counts'        => $counts,
         ]);
     }
 }
