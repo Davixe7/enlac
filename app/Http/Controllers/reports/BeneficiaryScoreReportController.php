@@ -91,29 +91,32 @@ class BeneficiaryScoreReportController extends Controller
     public function monthly(Request $request, Candidate $candidate)
     {
         $request->validate([
-            'start_date'   => 'required|date',
-            'end_date'     => 'required|date'
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
         ]);
 
         $data = Plan::whereHas('candidates', function ($q) use ($candidate) {
-            $q->whereId($candidate->id);
-        })
-        ->where('start_date', '>=', $request->start_date)
-        /* ->where('end_date', '<=', $request->end_date) */
-        ->where('status', 1)
-        ->with('category')
-        ->with('activities.scores', function ($q) use ($candidate, $request) {
-            $q->whereCandidateId($candidate->id)
-                ->where('date', '>=', $request->start_date)
-                ->where('date', '<=', $request->end_date);
-        })
-        ->get();
+                $q->whereId($candidate->id);
+            })
+            ->where('status', 1)
+            ->with(['category', 'activities' => function ($query) use ($candidate, $request) {
+                $query->with(['scores' => function ($q) use ($candidate, $request) {
+                    $q->whereCandidateId($candidate->id)
+                    ->whereBetween('date', [$request->start_date, $request->end_date])
+                    ->orderBy('date', 'asc');
+                }]);
+            }])
+            ->get();
 
+        // Procesar totales
         $data->each(function ($plan) {
-            $plan->activities = $plan->activities->map(function ($activity) {
-                $activity->total  = trim($activity->goal_type) == 'Dominio'
-                ? $activity->scores->mode('score')
-                : $activity->scores->sum('score');
+            $plan->activities->transform(function ($activity) {
+                $scores = $activity->scores;
+
+                $activity->total = trim($activity->goal_type) === 'Dominio'
+                    ? ($scores->isNotEmpty() ? $scores->mode('score') : 0)
+                    : $scores->sum('score');
+
                 return $activity;
             });
         });
