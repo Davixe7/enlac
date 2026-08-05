@@ -14,21 +14,29 @@ class IssueController extends Controller
      */
     public function index(Request $request)
     {
-        if( $request->candidate_id ){
-            $data = Issue::filterByDate($request->date)
-            ->filterByCandidate($request->candidate_id)
-            ->filterByDates($request->start_date, $request->end_date)
-            ->with(['user', 'plan_category', 'candidate', 'attachments'])
-            ->latest()
-            ->get();
+        $query = Issue::query();
 
-            return response()->json(compact('data'));
+        // Si envían candidate_id, filtramos por beneficiario
+        if ($request->filled('candidate_id')) {
+            $query->filterByCandidate($request->candidate_id);
         }
 
-        $data = Issue::filterByDate($request->date)
-        ->with(['user', 'plan_category', 'candidate', 'attachments'])
-        ->latest() // <--- Agregado aquí
-        ->get();
+        // Si envían un rango de fechas (ej: start_date y end_date)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->filterByDates($request->start_date, $request->end_date);
+        }
+        // Si solo envían una fecha puntual (ej: date)
+        elseif ($request->filled('date')) {
+            $query->filterByDate($request->date);
+        }
+        // Si no envían ninguna fecha, por defecto traemos las de HOY
+        else {
+            $query->whereDate('date', now()->toDateString());
+        }
+
+        $data = $query->with(['user', 'plan_category', 'candidate', 'attachments'])
+            ->latest()
+            ->get();
 
         return response()->json(compact('data'));
     }
@@ -53,14 +61,15 @@ class IssueController extends Controller
 
         $issue = Issue::create($data);
 
-        if( !array_key_exists('media', $validated) ){
-            return response()->json(['data'=>$issue]);
+        if (!array_key_exists('media', $validated)) {
+            return response()->json(['data' => $issue]);
         }
 
-        foreach($validated['media'] as $attachment){
-            $issue->addMedia( $attachment )->toMediaCollection('attachments');
+        foreach ($validated['media'] as $attachment) {
+            $issue->addMedia($attachment)->toMediaCollection('attachments');
         }
-        return response()->json(['data'=>$issue]);
+
+        return response()->json(['data' => $issue]);
     }
 
     /**
@@ -70,9 +79,8 @@ class IssueController extends Controller
     {
         $issue = Issue::findOrFail($id);
 
-        // Esto borrará también los archivos adjuntos asociados (Spatie MediaLibrary)
+        // Borra archivos adjuntos asociados
         $issue->clearMediaCollection('attachments');
-
         $issue->delete();
 
         return response()->json(['message' => 'Incidencia eliminada correctamente']);
@@ -82,16 +90,16 @@ class IssueController extends Controller
     {
         $query = Issue::query();
 
-        if ($request->candidate_id) {
+        if ($request->filled('candidate_id')) {
             $query->filterByCandidate($request->candidate_id);
         }
 
-        if ($request->start_date && $request->end_date) {
+        if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->filterByDates($request->start_date, $request->end_date);
-        }
-
-        if ($request->date && !$request->start_date) {
+        } elseif ($request->filled('date')) {
             $query->filterByDate($request->date);
+        } else {
+            $query->whereDate('date', now()->toDateString());
         }
 
         $fileName = 'reporte-incidencias-' . now()->format('Y-m-d_His') . '.xlsx';
@@ -99,5 +107,3 @@ class IssueController extends Controller
         return Excel::download(new IssuesExport($query), $fileName);
     }
 }
-
-
