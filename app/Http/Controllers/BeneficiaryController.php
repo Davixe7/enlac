@@ -58,7 +58,6 @@ class BeneficiaryController extends Controller
             ->select('id as value')
             // Corregido duplicidad de select y garantizado el orden Nombre / Apellido Paterno / Apellido Materno
             ->selectRaw("CONCAT_WS(' ', first_name, last_name, middle_name) as label")
-            ->limit(15)
             ->get();
             return response()->json(compact('data'), 200);
         }
