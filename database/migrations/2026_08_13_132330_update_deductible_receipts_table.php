@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('deductible_receipts', function (Blueprint $table) {
-            $table->string('street')->nullable();
-            $table->string('external_number')->nullable();
-            $table->string('neighborhood')->nullable();
-            $table->string('city')->nullable();
-            $table->string('zip_code')->nullable();
-            $table->string('state')->nullable();
-            $table->string('country')->nullable();
+            $table->string('street')->nullable()->change();
+            $table->string('external_number')->nullable()->change();
+            $table->string('neighborhood')->nullable()->change();
+            $table->string('city')->nullable()->change();
+            $table->string('zip_code')->nullable()->change();
+            $table->string('state')->nullable()->change();
+            $table->string('country')->nullable()->change();
         });
     }
 
@@ -28,7 +28,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('deductible_receipts', function (Blueprint $table) {
-            //
+            $table->string('street')->nullable(false)->change();
+            $table->string('external_number')->nullable(false)->change();
+            $table->string('neighborhood')->nullable(false)->change();
+            $table->string('city')->nullable(false)->change();
+            $table->string('zip_code')->nullable(false)->change();
+            $table->string('state')->nullable(false)->change();
+            $table->string('country')->nullable(false)->change();
         });
     }
 };
