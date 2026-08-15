@@ -25,7 +25,7 @@ class Donation extends Model
 
     // Casts para asegurar que los tipos lleguen limpios a JavaScript
     protected $casts = [
-        'payment_date'          => 'date:m/d/Y',
+        //'payment_date'          => 'date:m/d/Y',
         'cancelled_at'          => 'datetime',
         'amount'                => 'decimal:2',
         'exchange_rate'         => 'decimal:4',
@@ -60,7 +60,13 @@ class Donation extends Model
         return $this->belongsTo(Sponsor::class, 'sponsor_id');
     }
 
-    public function ticket(){
+    public function ticket()
+    {
         return $this->belongsTo(RaffleTicket::class, 'raffle_ticket_id', 'id');
+    }
+
+    public function radiomarathonKey(): BelongsTo
+    {
+        return $this->belongsTo(RadiomarathonKey::class, 'radiomarathon_key_id');
     }
 }

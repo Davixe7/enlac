@@ -94,6 +94,7 @@ use App\Http\Resources\DonorResource;
 use App\Models\Donation;
 use App\Models\Donor;
 use App\Models\ProcurationActivity;
+use App\Http\Controllers\DonationExportController;
 
 Route::get('semaforo', [SemaforoController::class, 'index']);
 
@@ -340,19 +341,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/donations', [DonationController::class, 'store']);
     Route::get('/donations', [DonationController::class, 'index']);
     Route::post('donations/print', [DonationController::class, 'storeAndPrint']);
+    Route::post('donations/store-and-print', [DonationController::class, 'storeAndPrint']);
+    Route::post('donations/store-and-print-radiomarathon', [DonationController::class, 'storeAndPrintRadiomarathon']);
+    Route::post('radiomarathon-calls/print', [RadiomarathonCallController::class, 'storeAndPrint']);
     Route::get('/reports/donations/export', [DonationReportController::class, 'export']);
-    Route::get('donations/export', [DonationController::class, 'export']);
-    Route::put('/donations/{donation}/cancel', [DonationController::class, 'cancel']);
+    Route::get('donations/export', DonationExportController::class);
+    Route::post('donations/{donation}/cancel', [DonationController::class, 'cancel']);
+    Route::get('donations/donor/{donorId}', [DonationController::class, 'getLinesByDonor']);
+    Route::get('/reports/donations', [DonationReportController::class, 'index']);
 
     Route::apiResource('capacitations', CapacitationController::class);
-
     Route::apiResource('donor-gratitudes', DonorGratitudeController::class);
     Route::apiResource('donor-visits', DonorVisitController::class);
-
     Route::apiResource('donor-shipments', DonorShipmentController::class);
-
-    Route::get('/donors/{id}/donations', [DonationController::class, 'getLinesByDonor']);
-    Route::get('/reports/donations', [DonationReportController::class, 'index']);
     Route::get('/reports/visits', [VisitReportController::class, 'index']);
 
     Route::get('/reports/visits/export', [VisitReportController::class, 'export']);

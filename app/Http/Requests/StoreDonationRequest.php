@@ -19,7 +19,7 @@ class StoreDonationRequest extends FormRequest
             'radiomarathon_key_id'    => 'sometimes|exists:radiomarathon_keys,id',
             'procuration_activity_id' => 'required|exists:procuration_activities,id',
             'activity_type'           => 'required|string',
-            'donation_type'           => 'required|string',
+            //'donation_type'           => 'nullable|string',
             'source'                  => 'sometimes|string|in:boteo,prospecto,rrss,bazar,llamadas,templete,others',
 
             // Info Financiera fija

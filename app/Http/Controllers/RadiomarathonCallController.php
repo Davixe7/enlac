@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\RadiomarathonCall;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RadiomarathonCallController extends Controller
 {
@@ -70,5 +71,24 @@ class RadiomarathonCallController extends Controller
     public function destroy(RadiomarathonCall $radiomarathonCall)
     {
         //
+    }
+
+    public function storeAndPrint(Request $request)
+    {
+        $request->validate([
+            'donor_name'    => 'required|string',
+            'address'       => 'required|string',
+            'donation_type' => 'required|string',
+        ]);
+
+        // 1. Guardar la llamada en la base de datos
+        $call = RadiomarathonCall::create($request->all());
+
+        // 2. Generar el PDF
+        $pdf = Pdf::loadView('pdf.radiomarathon_call_receipt', compact('call'))
+                ->setPaper([0, 0, 226.77, 368.5], 'portrait');
+
+        // 3. Retornar descarga del archivo
+        return $pdf->download('folio_llamada_' . $call->id . '.pdf');
     }
 }
