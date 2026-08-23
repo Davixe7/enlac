@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class RaffleTicket extends Model
 {
+
+    protected $casts = [
+        'sold_at' => 'date:d/m/Y',
+    ];
+
     protected $guarded = [];
 
     public function raffle()

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Raffle;
 use App\Models\RaffleSeller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Exports\RaffleTicketsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RaffleController extends Controller
 {
@@ -121,6 +124,38 @@ class RaffleController extends Controller
         return response()->json([], 404);
     }
 
+    public function setWinner(Request $request, Raffle $raffle)
+    {
+        $request->validate([
+            'raffle_ticket_id' => 'required|exists:raffle_tickets,id',
+        ]);
+
+        $winningTicket = $raffle->tickets()
+            ->with(['buyer', 'seller'])
+            ->where('id', $request->raffle_ticket_id)
+            ->firstOrFail();
+
+        DB::transaction(function () use ($raffle, $winningTicket) {
+            // 1. Marcar todos los boletos de esta rifa como descartados
+            $raffle->tickets()->update(['status' => 'discarded']);
+
+            // 2. Marcar el boleto seleccionado como ganador
+            $winningTicket->update(['status' => 'won']);
+
+            // 3. Guardar información del ganador en la cabecera de la rifa
+            $raffle->update([
+                'winning_ticket'     => $winningTicket->number,
+                'winner_name'        => $winningTicket->buyer ? $winningTicket->buyer->first_name : 'Sin Comprador',
+                'seller_winner_name' => $winningTicket->seller ? $winningTicket->seller->first_name : 'Sin Vendedor',
+            ]);
+        });
+
+        return response()->json([
+            'message' => 'Ganador registrado exitosamente y boletos restantes descartados.',
+            'data'    => $raffle->fresh(['tickets.buyer', 'tickets.seller'])
+        ]);
+    }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -128,5 +163,11 @@ class RaffleController extends Controller
     {
         $raffle->delete();
         return response()->json([], 200);
+    }
+
+    public function export(Raffle $raffle)
+    {
+        $fileName = 'reporte-rifa-' . $raffle->id . '-' . now()->format('d-m-Y') . '.xlsx';
+        return Excel::download(new RaffleTicketsExport($raffle), $fileName);
     }
 }

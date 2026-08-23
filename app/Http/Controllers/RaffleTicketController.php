@@ -6,7 +6,11 @@ use App\Models\Donor;
 use App\Models\Raffle;
 use App\Models\RaffleSeller;
 use App\Models\RaffleTicket;
+use App\Models\User;
+use App\Mail\TicketDeductibleReceiptMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class RaffleTicketController extends Controller
 {
@@ -55,7 +59,8 @@ class RaffleTicketController extends Controller
 
         if( !$raffleTicket->seller_id && $request->filled('seller.phone') ){
             $seller = RaffleSeller::firstOrCreate(['phone' => $request->input('seller.phone')], [
-                'first_name' => $request->input('seller.first_name')
+                'first_name' => $request->input('seller.first_name'),
+                'last_name'  => ''
             ]);
             $data['raffle_seller_id'] = $seller->id;
         }
@@ -72,9 +77,26 @@ class RaffleTicketController extends Controller
 
         unset($data['buyer']);
         unset($data['seller']);
-        $data['status'] = $raffleTicket->status == 'available' ? 'sold' : $raffleTicket->status;
+
+        // Guardamos si el boleto estaba disponible antes del cambio
+        $wasAvailable = $raffleTicket->status === 'available';
+
+        $data['status'] = $wasAvailable ? 'sold' : $raffleTicket->status;
 
         $raffleTicket->update($data);
+        $raffleTicket->load(['buyer', 'seller']);
+
+        // Notificar a Tesorería solo si requiere recibo deducible Y acaba de venderse (o era una venta nueva)
+        if ($raffleTicket->deductible_receipt && $wasAvailable) {
+            $treasuryUsers = User::role('tesoreria', 'sanctum')->get();
+
+            foreach ($treasuryUsers as $user) {
+                if ($user->email) {
+                    Mail::to($user->email)->queue(new TicketDeductibleReceiptMail($raffleTicket));
+                }
+            }
+        }
+
         $data = $raffleTicket;
         return response()->json(compact('data'));
     }

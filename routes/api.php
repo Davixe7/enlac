@@ -176,6 +176,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('raffles/{raffle}/assignTickets', [RaffleController::class, 'assignTickets']);
     Route::get('raffles/{raffle}/startsAt', [RaffleController::class, 'startsAt']);
+    Route::post('raffles/{raffle}/set-winner', [RaffleController::class, 'setWinner']);
+    Route::get('raffles/{raffle}/export', [RaffleController::class, 'export']);
 
     Route::get('groups/options', [GroupController::class, 'options']);
 
@@ -347,4 +349,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('program_prices', ProgramPriceController::class)->only(['store', 'update', 'index']);
     Route::apiResource('parent-quota-updates', ParentQuotaUpdateController::class)->only(['store', 'index']);;
+});
+
+Route::get('public/raffles/{raffle}', function (\App\Models\Raffle $raffle) {
+    $data = $raffle->load([
+        'activity',
+        'tickets' => function ($query) {
+            $query->select('id', 'raffle_id', 'number', 'status')
+                  ->orderBy('number', 'asc');
+        }
+    ]);
+    return response()->json(compact('data'));
 });
