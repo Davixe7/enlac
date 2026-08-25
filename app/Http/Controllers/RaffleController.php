@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRaffleRequest;
+use App\Services\RaffleService;
 use App\Models\Raffle;
 use App\Models\RaffleSeller;
 use Illuminate\Http\Request;
@@ -31,36 +33,13 @@ class RaffleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRaffleRequest $request, RaffleService $raffleService)
     {
-        $data = $request->validate([
-            'procuration_activity_id' => 'required|exists:procuration_activities,id',
-            'tickets_count'           => 'nullable|integer|min:0',
-            'ticket_price'            => 'nullable|numeric|min:0|between:0,99999999.99',
-            'place'                   => 'nullable|string|max:255',
-            'winning_ticket'          => 'nullable|string|max:255',
-            'winner_name'             => 'nullable|string|max:255',
-            'seller_winner_name'      => 'nullable|string|max:255',
-        ]);
+        $raffle = $raffleService->createOrUpdateRaffle($request->validated());
 
-        $raffle = Raffle::updateOrCreate($request->only(['procuration_activity_id']), $data);
-        $count = $raffle->tickets_count;
-
-        if($count == 0 ){
-            return response()->json(compact('data'), 201);
-        }
-
-        $tickets = [];
-        for ($i=0; $i < $count; $i++) {
-            $tickets[] = [
-                'number' => $i + 1,
-                'status' => 'available'
-            ];
-        }
-
-        $raffle->tickets()->createMany($tickets);
-
-        return response()->json(compact('data'), 201);
+        return response()->json([
+            'data' => $raffle
+        ], 201);
     }
 
     /**
