@@ -46,7 +46,7 @@ class RaffleTicketController extends Controller
     {
         $data = $request->validate([
             'buyer.first_name'     => 'required|string|max:191',
-            'buyer.personal_email' => 'required|string|max:191',
+            'buyer.personal_email' => 'nullable|string|max:191',
             'buyer.cellphone'      => 'required|string|max:191',
             'seller.first_name'    => 'required|string|max:191',
             'seller.phone'         => 'required|string|max:191',
