@@ -15,6 +15,9 @@ class DonationService
      */
     public function createWithFolio(array $data): Donation
     {
+        // 1. Limpieza y formateo de los datos recibidos
+        $data = $this->prepareDonationData($data);
+
         $donation = DB::transaction(function () use ($data) {
             $yearIndicator = '26';
             $prefix = "P-{$yearIndicator}-";
@@ -34,6 +37,36 @@ class DonationService
         $this->checkAndSendDeductibleEmail($donation);
 
         return $donation;
+    }
+
+    /**
+     * Limpia y mapea los datos para garantizar coincidencia
+     * exacta con las columnas de la tabla `donations`.
+     */
+    private function prepareDonationData(array $data): array
+    {
+        if (isset($data['source']) && $data['source'] === 'others') {
+            unset($data['donor_id']);
+        }
+
+        $fullName = $data['full_name'] ?? null;
+        $companyName = $data['company_name'] ?? null;
+
+        if ($fullName && $companyName) {
+            $data['donor_name'] = "{$fullName} ({$companyName})";
+        } elseif ($fullName) {
+            $data['donor_name'] = $fullName;
+        } elseif ($companyName) {
+            $data['donor_name'] = $companyName;
+        }
+
+        unset(
+            $data['full_name'],
+            $data['company_name'],
+            $data['raffle_ticket_id']
+        );
+
+        return $data;
     }
 
     /**

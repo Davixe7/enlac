@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\ActivityDailyScoreController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\BoteoPublishedAmountController;
 use App\Http\Controllers\DailyAttendanceController;
 use App\Http\Controllers\FamilyMemberController;
 use App\Http\Controllers\IssueController;
@@ -95,6 +96,10 @@ use App\Models\Donation;
 use App\Models\Donor;
 use App\Models\ProcurationActivity;
 use App\Http\Controllers\DonationExportController;
+use App\Http\Controllers\RadiomarathonController;
+use App\Models\BoteoPublishedAmount;
+use App\Models\PaymentPromise;
+use Illuminate\Support\Facades\Cache;
 
 Route::get('semaforo', [SemaforoController::class, 'index']);
 
@@ -115,16 +120,18 @@ Route::get('beneficiaries/{idAppoiment}/medical-records', [BeneficiaryController
 Route::get('beneficiaries/{candidate_id}/medicaments', [BeneficiaryController::class, 'internMedicaments']);
 Route::put('medications/{medicament}/update', [MedicationController::class, 'update']);
 Route::delete('medications/{medicament}/destroy', [MedicationController::class, 'destroy']);
-// Route::get('candidates/{candidate_id}', [CandidateController::class, 'show']);
+
 // Medical Records
 Route::put('medical-records/{id_medical_record}/update', [MedicalRecordsController::class, 'update']);
 Route::post('medical-records', [MedicalRecordsController::class, 'store']);
 Route::get('events', [EventsCalendarController::class, 'index']);
-//media upload for medical records
+
+// Media upload for medical records
 Route::get('medical-records/{medical_record_id}/showMedicalFiles', [MedicalRecordsController::class, 'showMedicalFiles']);
 Route::put('medical-records/{medical_record_id}/medicalFiles', [MedicalRecordsController::class, 'uploadMedia']);
 Route::delete('medical-records/{medical_record_id}/medicalFiles/{file_id}', [MedicalRecordsController::class, 'deleteMedia']);
-//media upload for SOAP
+
+// Media upload for SOAP
 Route::get('soap/{soap_id}/showSoapFiles', [MedicalRecordsController::class, 'showSoapFiles']);
 Route::put('soap/{soap_id}/soapFiles', [MedicalRecordsController::class, 'uploadSoapMedia']);
 Route::delete('soap/{soap_id}/soapFiles/{file_id}', [MedicalRecordsController::class, 'deleteSoapMedia']);
@@ -319,9 +326,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         $pdf = App::make('dompdf.wrapper');
         $pdf = $pdf->loadView('pdf.carta', $data);
-        //$pdf->setPaper('letter', 'portrait');
 
-        // Descarga el archivo con un nombre descriptivo
         return $pdf->download('carta.pdf');
     });
 
@@ -361,6 +366,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('program_prices', ProgramPriceController::class)->only(['store', 'update', 'index']);
     Route::apiResource('parent-quota-updates', ParentQuotaUpdateController::class)->only(['store', 'index']);
     Route::apiResource('payment-promises', PaymentPromiseController::class);
+    Route::apiResource('boteo-published-amounts', BoteoPublishedAmountController::class);
 
     Route::get('radiomarathon/{procuration_activity}/donors', function(Request $request, ProcurationActivity $procurationActivity){
         $data = Donor::whereJsonContains('prospect_for', 'Radiomaratón')
@@ -385,7 +391,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('radiomarathon/{procuration_activity}/boteos', function(Request $request, ProcurationActivity $procurationActivity){
         $data = Donation::where('procuration_activity_id', $procurationActivity->id)
         ->where('source', 'boteo')
-        ->with('donor')
+        ->with(['donor', 'radiomarathonKey'])
         ->get();
 
         return response()->json(compact('data'));
@@ -401,7 +407,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::apiResource('radiomarathon-calls', RadiomarathonCallController::class);
-    Route::get('radiomarathon/{procuration_activity}/all', function(Request $request, ProcurationActivity $procurationActivity){
+    /* Route::get('radiomarathon/{procuration_activity}/all', function(Request $request, ProcurationActivity $procurationActivity){
         $procurationActivityId = $procurationActivity->id;
 
         $results = Donation::query()
@@ -433,6 +439,28 @@ Route::middleware('auth:sanctum')->group(function () {
             ->get();
 
             return response()->json(['data'=>$results]);
+    }); */
+
+    Route::get('radiomarathon/{procuration_activity}/all', [RadiomarathonController::class, 'allDonations']);
+
+    // Consultar métricas y último donativo para el Stream
+    Route::get('radiomarathon/{procuration_activity}/stream', function(ProcurationActivity $procurationActivity) {
+        $boteo    = BoteoPublishedAmount::whereProcurationActivityId($procurationActivity->id)->sum('amount');
+
+        // Filtrar para que SOLO sume las promesas PUBLICADAS
+        $promises = PaymentPromise::whereProcurationActivityId($procurationActivity->id)
+            ->whereNotNull('published_at')
+            ->sum('amount');
+
+        $others   = Donation::whereProcurationActivityId($procurationActivity->id)->whereNotIn('source', ['prospecto', 'boteo'])->sum('amount');
+
+        $latest = Cache::get("radiomarathon_{$procurationActivity->id}_latest_stream");
+
+        return response()->json([
+            'data'   => (float) ($boteo + $promises + $others),
+            'target' => (float) ($procurationActivity->goal_amount ?? 0),
+            'latest' => $latest
+        ]);
     });
 });
 

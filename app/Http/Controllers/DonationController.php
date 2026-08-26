@@ -49,7 +49,10 @@ class DonationController extends Controller
     {
         $donation = $this->donationService->createWithFolio($request->validated());
 
-        return response()->json(['message' => 'Donativo aplicado con éxito', 'data' => $donation], 201);
+        return response()->json([
+            'message' => 'Donativo aplicado con éxito',
+            'data'    => $donation
+        ], 201);
     }
 
     public function storeAndPrint(Request $request)
@@ -69,18 +72,15 @@ class DonationController extends Controller
         return $pdf->download('recibo_' . $donation->folio_number . '.pdf');
     }
 
-    public function storeAndPrintRadiomarathon(Request $request)
+    public function storeAndPrintRadiomarathon(StoreDonationRequest $request)
     {
-        $data = $request->except(['full_name', 'raffle_ticket_id']);
-
-        if ($request->input('source') === 'others') {
-            unset($data['donor_id']);
-        }
-
+        $data = $request->validated();
         $data['activity_type'] = 'radiomarathon';
 
+        // El servicio limpia los campos innecesarios
         $donation = $this->donationService->createWithFolio($data);
-        $donation->load(['donor', 'sponsor', 'radiomarathonKey']);
+
+        $donation->load(['donor', 'sponsor', 'fiscalRecord', 'procurationActivity', 'radiomarathonKey']);
 
         $pdf = Pdf::loadView('pdf.radiomarathon_receipt', compact('donation'))
                 ->setPaper([0, 0, 226.77, 368.5], 'portrait');

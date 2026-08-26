@@ -16,10 +16,13 @@ class StoreDonationRequest extends FormRequest
         return [
             // Datos del Donante fijos
             'donor_id'                => 'sometimes|exists:donors,id',
+            'donor_name'   => 'nullable|string|max:255',
+            'full_name'    => 'nullable|string|max:255',
+            'company_name' => 'nullable|string|max:255',
             'radiomarathon_key_id'    => 'sometimes|exists:radiomarathon_keys,id',
             'procuration_activity_id' => 'required|exists:procuration_activities,id',
             'activity_type'           => 'required|string',
-            //'donation_type'           => 'nullable|string',
+            'donation_type'           => 'nullable|string',
             'source'                  => 'sometimes|string|in:boteo,prospecto,rrss,bazar,llamadas,templete,others',
 
             // Info Financiera fija
@@ -28,7 +31,7 @@ class StoreDonationRequest extends FormRequest
             'payment_method'        => 'required|in:Efectivo,Transferencia,Depósito,Cheque,Tarjeta Débito,Tarjeta Crédito,Oxxo',
             'reference'             => 'nullable|string|max:255',
             'amount'                => 'required|numeric|min:0.01',
-            'currency'              => 'required|in:MXN,DLLS',
+            'currency'              => 'required|string|max:255',
             'exchange_rate'         => 'required_if:currency,DLLS|nullable|numeric|min:0.0001',
             'equivalent_amount_mxn' => 'required_if:currency,DLLS|nullable|numeric',
 

@@ -25,7 +25,7 @@ class Donation extends Model
 
     // Casts para asegurar que los tipos lleguen limpios a JavaScript
     protected $casts = [
-        //'payment_date'          => 'date:m/d/Y',
+        'payment_date'          => 'date:m/d/Y',
         'cancelled_at'          => 'datetime',
         'amount'                => 'decimal:2',
         'exchange_rate'         => 'decimal:4',

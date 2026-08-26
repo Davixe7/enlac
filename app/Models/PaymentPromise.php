@@ -10,6 +10,7 @@ class PaymentPromise extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'published_at'       => 'date:d/m/Y H:i',
         'date'               => 'date:d/m/Y',
         'anonymous'          => 'boolean',
         'deductible_receipt' => 'boolean',

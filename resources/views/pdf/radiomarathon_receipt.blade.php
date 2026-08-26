@@ -51,7 +51,7 @@
             <div class="field"><span class="bold">No. Bote:</span> {{ $donation->boteo_can_number ?? 'N/A' }}</div>
             <div class="field">
                 <span class="bold">Donante:</span>
-                {{ $donation->donor_name ?? ($donation->full_name ?? ($donation->donor->full_name ?? ($donation->sponsor->name ?? 'N/A'))) }}
+                {{ $donation->donor_name ?? ($donation->full_name ?? ($donation->donor->full_name ?? ($donation->sponsor->name ?? 'Público General'))) }}
             </div>
             <div class="field"><span class="bold">Responsable del Bote:</span> {{ $donation->boteo_responsible_name ?? 'N/A' }}</div>
             <div class="field"><span class="bold">Fuente:</span> Boteo</div>
@@ -87,7 +87,7 @@
 
             <div class="field">
                 <span class="bold">Donante:</span>
-                {{ $donation->donor_name ?? ($donation->full_name ?? ($donation->donor->full_name ?? ($donation->sponsor->name ?? 'N/A'))) }}
+                {{ $donation->donor_name ?? ($donation->full_name ?? ($donation->donor->full_name ?? ($donation->sponsor->name ?? 'Público General'))) }}
             </div>
 
             <div class="field">

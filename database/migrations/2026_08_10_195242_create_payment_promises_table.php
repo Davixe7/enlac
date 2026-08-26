@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('radiomarathon_key_id')->constrained('radiomarathon_keys');
             $table->boolean('anonymous')->default(false);
             $table->boolean('deductible_receipt')->default(false);
+            $table->datetime('published_at')->nullable();
             $table->timestamps();
         });
     }
