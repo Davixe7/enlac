@@ -14,11 +14,12 @@ class StoreDonationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Datos del Donante fijos
+            // Datos del Donante fijos'
+            'raffle_ticket_id'        => 'nullable',
             'donor_id'                => 'sometimes|exists:donors,id',
-            'donor_name'   => 'nullable|string|max:255',
-            'full_name'    => 'nullable|string|max:255',
-            'company_name' => 'nullable|string|max:255',
+            'donor_name'              => 'nullable|string|max:255',
+            'full_name'               => 'nullable|string|max:255',
+            'company_name'            => 'nullable|string|max:255',
             'radiomarathon_key_id'    => 'sometimes|exists:radiomarathon_keys,id',
             'procuration_activity_id' => 'required|exists:procuration_activities,id',
             'activity_type'           => 'required|string',

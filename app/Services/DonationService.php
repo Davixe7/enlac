@@ -63,7 +63,6 @@ class DonationService
         unset(
             $data['full_name'],
             $data['company_name'],
-            $data['raffle_ticket_id']
         );
 
         return $data;
