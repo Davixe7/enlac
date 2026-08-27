@@ -82,4 +82,8 @@ class Donor extends Model
     {
         return $this->hasMany(DonorStatusLog::class)->orderBy('changed_at', 'desc');
     }
+
+    public function payment_promises(){
+        return $this->hasMany(PaymentPromise::class);
+    }
 }

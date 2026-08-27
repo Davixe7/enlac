@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DonationExport;
 use App\Models\Donation;
 use App\Http\Requests\StoreDonationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\ProcurationActivity;
+use Illuminate\Support\Str;
 
 class DonationController extends Controller
 {
@@ -44,6 +49,7 @@ class DonationController extends Controller
     public function store(StoreDonationRequest $request): JsonResponse
     {
         $donation = $this->createDonationWithFolio($request->validated());
+        $donation->payment_date = $donation->payment_date->format('d/m/Y');
         return response()->json(['message' => 'Donativo aplicado con éxito', 'data' => $donation], 201);
     }
 
@@ -86,5 +92,64 @@ class DonationController extends Controller
             'message' => 'Donativo cancelado correctamente.',
             'data' => $donation
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $category = strtolower($request->query('category', ''));
+        $activityId = $request->query('procuration_activity_id');
+
+        if (!$activityId) {
+            return response()->json(['error' => 'Es necesario especificar el id del evento (procuration_activity_id).'], 400);
+        }
+
+        // 1. Buscamos la actividad para obtener su nombre
+        $activity = ProcurationActivity::find($activityId);
+
+        // Si no se encuentra, usamos el ID como respaldo
+        $activitySlug = $activity ? Str::slug($activity->name, '_') : "evento_{$activityId}";
+
+        $query = Donation::query()->where('procuration_activity_id', $activityId);
+
+        switch ($category) {
+            case 'prospecto':
+                // Reporte 1: Pagos realizados asignados a Prospectos
+                $query->whereRaw('LOWER(source) = ?', ['prospecto']);
+                $fileName = "reporte_prospectos_{$activitySlug}_" . now()->format('d-m-Y_His') . '.xlsx';
+                $exportType = 'prospecto';
+                break;
+
+            case 'boteo':
+                // Reporte 2: Registros de Boteo
+                $query->whereRaw('LOWER(source) = ?', ['boteo']);
+                $fileName = "reporte_boteo_{$activitySlug}_" . now()->format('d-m-Y_His') . '.xlsx';
+                $exportType = 'boteo';
+                break;
+
+            case 'medios_eventos':
+            case 'otros':
+            case 'others':
+                // Reporte 3: Llamadas, Redes Sociales, Templete, Bazar, Otros
+                $sources = ['llamada', 'redes sociales', 'rrss', 'templete', 'bazar', 'otros', 'others'];
+                $query->whereIn(DB::raw('LOWER(source)'), $sources);
+                $fileName = "reporte_donativos_varios_{$activitySlug}_" . now()->format('d-m-Y_His') . '.xlsx';
+                $exportType = 'others';
+                break;
+
+            case 'cobranza':
+                // Reporte 4: Seguimiento a Cobranza
+                $fileName = "reporte_cobranza_{$activitySlug}_" . now()->format('d-m-Y_His') . '.xlsx';
+                $exportType = 'cobranza';
+                break;
+
+            default:
+                return response()->json(['error' => 'Categoría de exportación no válida.'], 400);
+        }
+
+        $response = Excel::download(new DonationExport($query, $exportType), $fileName);
+
+        $response->headers->set('Access-Control-Expose-Headers', 'Content-Disposition');
+
+        return $response;
     }
 }

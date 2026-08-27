@@ -15,19 +15,21 @@ class StoreDonationRequest extends FormRequest
     {
         return [
             // Datos del Donante fijos
-            'donor_id'                => 'required|exists:donors,id',
+            'donor_id'                => 'sometimes|exists:donors,id',
+            'radiomarathon_key_id'    => 'sometimes|exists:radiomarathon_keys,id',
             'procuration_activity_id' => 'required|exists:procuration_activities,id',
-            'raffle_ticket_id'        => 'sometimes|exists:raffle_tickets,id',
             'activity_type'           => 'required|string',
+            'donation_type'           => 'required|string',
+            'source'                  => 'sometimes|string|in:boteo,prospecto,rrss,bazar,llamadas,templete,others',
 
             // Info Financiera fija
-            'concept' => 'nullable|string',
-            'payment_date' => 'required|date_format:Y-m-d',
-            'payment_method' => 'required|in:Efectivo,Transferencia,Depósito,Cheque,Tarjeta Débito,Tarjeta Crédito,Oxxo',
-            'reference' => 'nullable|string|max:255',
-            'amount' => 'required|numeric|min:0.01',
-            'currency' => 'required|in:MXN,DLLS',
-            'exchange_rate' => 'required_if:currency,DLLS|nullable|numeric|min:0.0001',
+            'concept'               => 'nullable|string',
+            'payment_date'          => 'required|date_format:Y-m-d',
+            'payment_method'        => 'required|in:Efectivo,Transferencia,Depósito,Cheque,Tarjeta Débito,Tarjeta Crédito,Oxxo',
+            'reference'             => 'nullable|string|max:255',
+            'amount'                => 'required|numeric|min:0.01',
+            'currency'              => 'required|in:MXN,DLLS',
+            'exchange_rate'         => 'required_if:currency,DLLS|nullable|numeric|min:0.0001',
             'equivalent_amount_mxn' => 'required_if:currency,DLLS|nullable|numeric',
 
             // Recibo Deducible
@@ -42,9 +44,11 @@ class StoreDonationRequest extends FormRequest
             'project_name' => 'required_if:activity_type,Alianza,activity_type,Fundaciones|nullable|string|max:255',
 
             // Boteo
-            'boteo_area' => 'required_if:activity_type,Boteo|nullable|string|max:255',
-            'boteo_can_number' => 'required_if:activity_type,Boteo|nullable|string|max:100',
-            'boteo_ten_percent' => 'required_if:activity_type,Boteo|nullable|numeric',
+            //'boteo_area'             => 'required_if:source,boteo|nullable|string|max:255',
+            //'boteo_ten_percent'      => 'required_if:source,boteo|nullable|numeric',
+            'boteo_can_number'       => 'required_if:source,boteo|nullable|string|max:100',
+            'boteo_responsible_name' => 'required_if:source,boteo|nullable|string',
+            'boteo_counter_name'     => 'required_if:source,boteo|nullable|string',
 
             // Programa de Verano o Natación
             'beneficiary_id' => 'required_if:activity_type,Programa de Verano,activity_type,Natación|nullable|exists:beneficiaries,id',

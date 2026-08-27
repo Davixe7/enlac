@@ -82,12 +82,18 @@ use App\Http\Controllers\DonorVisitController;
 use App\Http\Controllers\EventsCalendarController;
 use App\Http\Controllers\MedicalRecordsController;
 use App\Http\Controllers\ParentQuotaUpdateController;
+use App\Http\Controllers\PaymentPromiseController;
 use App\Http\Controllers\ProgramPriceController;
 use App\Http\Controllers\RaffleController;
 use App\Http\Controllers\RaffleSellerController;
 use App\Http\Controllers\RaffleTicketController;
+use App\Http\Controllers\RadiomarathonCallController;
 use App\Http\Controllers\SemaforoController;
 use App\Http\Controllers\SponsorshipController;
+use App\Http\Resources\DonorResource;
+use App\Models\Donation;
+use App\Models\Donor;
+use App\Models\ProcurationActivity;
 
 Route::get('semaforo', [SemaforoController::class, 'index']);
 
@@ -329,11 +335,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/procuration-activities', [ProcurationActivityController::class, 'index']);
     Route::post('/procuration-activities', [ProcurationActivityController::class, 'store']);
     Route::put('/procuration-activities/{id}', [ProcurationActivityController::class, 'update']);
+    Route::get('/procuration-activities/{procuration_activity}', [ProcurationActivityController::class, 'show']);
 
     Route::post('/donations', [DonationController::class, 'store']);
     Route::get('/donations', [DonationController::class, 'index']);
     Route::post('donations/print', [DonationController::class, 'storeAndPrint']);
     Route::get('/reports/donations/export', [DonationReportController::class, 'export']);
+    Route::get('donations/export', [DonationController::class, 'export']);
     Route::put('/donations/{donation}/cancel', [DonationController::class, 'cancel']);
 
     Route::apiResource('capacitations', CapacitationController::class);
@@ -350,7 +358,81 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/visits/export', [VisitReportController::class, 'export']);
 
     Route::apiResource('program_prices', ProgramPriceController::class)->only(['store', 'update', 'index']);
-    Route::apiResource('parent-quota-updates', ParentQuotaUpdateController::class)->only(['store', 'index']);;
+    Route::apiResource('parent-quota-updates', ParentQuotaUpdateController::class)->only(['store', 'index']);
+    Route::apiResource('payment-promises', PaymentPromiseController::class);
+
+    Route::get('radiomarathon/{procuration_activity}/donors', function(Request $request, ProcurationActivity $procurationActivity){
+        $data = Donor::whereJsonContains('prospect_for', 'Radiomaratón')
+        ->with(['payment_promises' => function($query) use ($procurationActivity) {
+            $query->where('procuration_activity_id', $procurationActivity->id);
+        }])
+        ->withSum([
+            'payment_promises' => fn ($query) => $query->where('procuration_activity_id', $procurationActivity->id)
+        ], 'amount')
+        ->withSum([
+            'donations' => function ($query) use ($procurationActivity) {
+                $query
+                ->where('procuration_activity_id', $procurationActivity->id)
+                ->where('source', 'prospecto');
+            }
+        ], 'amount')
+        ->get();
+
+        return DonorResource::collection($data);
+    });
+
+    Route::get('radiomarathon/{procuration_activity}/boteos', function(Request $request, ProcurationActivity $procurationActivity){
+        $data = Donation::where('procuration_activity_id', $procurationActivity->id)
+        ->where('source', 'boteo')
+        ->with('donor')
+        ->get();
+
+        return response()->json(compact('data'));
+    });
+
+    Route::get('radiomarathon/{procuration_activity}/others', function(Request $request, ProcurationActivity $procurationActivity){
+        $data = Donation::where('procuration_activity_id', $procurationActivity->id)
+        ->whereNotIn('source', ['prospecto', 'boteo'])
+        ->with('donor')
+        ->get();
+
+        return response()->json(compact('data'));
+    });
+
+    Route::apiResource('radiomarathon-calls', RadiomarathonCallController::class);
+    Route::get('radiomarathon/{procuration_activity}/all', function(Request $request, ProcurationActivity $procurationActivity){
+        $procurationActivityId = $procurationActivity->id;
+
+        $results = Donation::query()
+            ->leftJoin('payment_promises', function ($join) use ($procurationActivityId) {
+                $join->on('donations.donor_id', '=', 'payment_promises.donor_id')
+                    ->where('payment_promises.procuration_activity_id', '=', $procurationActivityId);
+            })
+            ->leftJoin('donors', 'donors.id', '=', 'donations.donor_id')
+            ->where('donations.procuration_activity_id', $procurationActivityId)
+            ->select(
+                'donors.company_name',
+                'donations.source',
+                'donations.donor_id',
+                'payment_promises.amount as promised_amount',
+                DB::raw("COALESCE(CONCAT_WS(' ', donors.first_name, donors.last_name, donors.second_last_name), donations.donor_name) as donor_name"),
+                DB::raw('SUM(donations.amount) as total_donated'),
+                DB::raw("CASE
+                    WHEN SUM(donations.amount) >= payment_promises.amount THEN 'total'
+                    ELSE 'parcial'
+                END as status")
+            )
+            ->groupBy(
+                'donations.source',
+                'donations.donor_id',
+                'donations.donor_name',
+                'payment_promises.amount',
+                'company_name'
+            )
+            ->get();
+
+            return response()->json(['data'=>$results]);
+    });
 });
 
 Route::get('public/raffles/{raffle}', function (\App\Models\Raffle $raffle) {

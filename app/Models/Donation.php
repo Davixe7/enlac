@@ -25,13 +25,13 @@ class Donation extends Model
 
     // Casts para asegurar que los tipos lleguen limpios a JavaScript
     protected $casts = [
-        'payment_date' => 'date',
-        'cancelled_at' => 'datetime',
-        'amount' => 'decimal:2',
-        'exchange_rate' => 'decimal:4',
+        'payment_date'          => 'date:m/d/Y',
+        'cancelled_at'          => 'datetime',
+        'amount'                => 'decimal:2',
+        'exchange_rate'         => 'decimal:4',
         'equivalent_amount_mxn' => 'decimal:2',
-        'has_tax_receipt' => 'boolean',
-        'boteo_ten_percent' => 'decimal:2',
+        'has_tax_receipt'       => 'boolean',
+        'boteo_ten_percent'     => 'decimal:2',
     ];
 
     /**

@@ -29,7 +29,7 @@ return new class extends Migration
             $table->decimal('exchange_rate', 10, 4)->nullable();
             $table->decimal('equivalent_amount_mxn', 12, 2)->nullable();
 
-            // Recibo Deducible
+            // Recibo Deduciblp
             $table->boolean('has_tax_receipt')->default(false);
             $table->string('tax_receipt_number')->nullable();
 

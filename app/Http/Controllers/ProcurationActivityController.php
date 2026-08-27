@@ -39,4 +39,8 @@ class ProcurationActivityController extends Controller
 
         return response()->json($activity, 200);
     }
+
+    public function show(ProcurationActivity $procurationActivity){
+        return response()->json(['data'=>$procurationActivity]);
+    }
 }
