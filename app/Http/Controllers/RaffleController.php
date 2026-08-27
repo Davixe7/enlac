@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\RaffleTicketsExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Cache;
 
 class RaffleController extends Controller
 {
@@ -47,7 +48,7 @@ class RaffleController extends Controller
      */
     public function show(Raffle $raffle)
     {
-        $data = $raffle;
+        $data = $raffle->load(['activity', 'tickets.buyer', 'tickets.seller']);
         return response()->json(compact('data'));
     }
 
@@ -148,5 +149,82 @@ class RaffleController extends Controller
     {
         $fileName = 'reporte-rifa-' . $raffle->id . '-' . now()->format('d-m-Y') . '.xlsx';
         return Excel::download(new RaffleTicketsExport($raffle), $fileName);
+    }
+
+    /**
+     * Descarta o declara ganador un boleto individual durante el sorteo en vivo
+     */
+    public function toggleTicketDiscard(Request $request, Raffle $raffle)
+    {
+        $request->validate([
+            'ticket_id' => 'required|exists:raffle_tickets,id',
+            'status'    => 'required|in:discarded,sold,won'
+        ]);
+
+        $ticket = $raffle->tickets()->where('id', $request->ticket_id)->firstOrFail();
+
+        DB::transaction(function () use ($raffle, $ticket, $request) {
+            $ticket->update(['status' => $request->status]);
+
+            // Si se marca como ganador, registrarlo en la cabecera de la rifa
+            if ($request->status === 'won') {
+                $ticket->load(['buyer', 'seller']);
+                $raffle->update([
+                    'winning_ticket'     => $ticket->number,
+                    'winner_name'        => $ticket->buyer ? $ticket->buyer->first_name : 'Sin Comprador',
+                    'seller_winner_name' => $ticket->seller ? $ticket->seller->first_name : 'Sin Vendedor',
+                ]);
+            }
+        });
+
+        // Refrescar el Cache del Stream
+        $this->broadcastStreamState($raffle);
+
+        return response()->json([
+            'message' => 'Estatus de boleto actualizado',
+            'ticket'  => $ticket
+        ]);
+    }
+
+    /**
+     * Devuelve el estado actual de la rifa para el Stream (Lee de Cache o DB)
+     */
+    public function getStreamState(Raffle $raffle)
+    {
+        $cacheKey = "raffle_stream_state_{$raffle->id}";
+
+        $data = Cache::remember($cacheKey, 3600, function () use ($raffle) {
+            $raffle->load(['activity', 'tickets.buyer']);
+
+            $soldTickets = $raffle->tickets
+                ->whereIn('status', ['sold', 'discarded', 'won'])
+                ->values();
+
+            return [
+                'raffle_id'      => $raffle->id,
+                'winning_ticket' => $raffle->winning_ticket,
+                'winner_name'    => $raffle->winner_name,
+                'activity_name'  => $raffle->procurationActivity?->name ?? 'Sin Actividad',
+                'tickets'        => $soldTickets->map(fn($t) => [
+                    'id'         => $t->id,
+                    'number'     => $t->number,
+                    'status'     => $t->status,
+                    'buyer_name' => $t->buyer ? $t->buyer->first_name : 'N/A',
+                ]),
+                'updated_at'     => now()->toIso8601String()
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    /**
+     * Función auxiliar para actualizar el Cache cuando haya un cambio
+     */
+    private function broadcastStreamState(Raffle $raffle)
+    {
+        $cacheKey = "raffle_stream_state_{$raffle->id}";
+        Cache::forget($cacheKey);
+        $this->getStreamState($raffle);
     }
 }

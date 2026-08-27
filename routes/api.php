@@ -178,6 +178,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('raffles/{raffle}/startsAt', [RaffleController::class, 'startsAt']);
     Route::post('raffles/{raffle}/set-winner', [RaffleController::class, 'setWinner']);
     Route::get('raffles/{raffle}/export', [RaffleController::class, 'export']);
+    Route::post('raffles/{raffle}/live-discard', [RaffleController::class, 'toggleTicketDiscard']);
 
     Route::get('groups/options', [GroupController::class, 'options']);
 
@@ -361,3 +362,5 @@ Route::get('public/raffles/{raffle}', function (\App\Models\Raffle $raffle) {
     ]);
     return response()->json(compact('data'));
 });
+
+Route::get('public/raffles/{raffle}/stream-state', [RaffleController::class, 'getStreamState']);
