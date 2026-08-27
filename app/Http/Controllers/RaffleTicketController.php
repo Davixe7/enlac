@@ -35,7 +35,7 @@ class RaffleTicketController extends Controller
      */
     public function show(RaffleTicket $raffleTicket)
     {
-        $data = $raffleTicket->load(['raffle.activity', 'buyer', 'seller']);
+        $data = $raffleTicket->load(['raffle.activity', 'buyer', 'seller', 'raffle']);
         return response()->json(compact('data'));
     }
 

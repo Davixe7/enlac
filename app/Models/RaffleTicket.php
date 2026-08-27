@@ -31,4 +31,8 @@ class RaffleTicket extends Model
     public function donations(){
         return $this->hasMany(Donation::class);
     }
+
+    public function activity(){
+        return $this->belongsTo(ProcurationActivity::class);
+    }
 }

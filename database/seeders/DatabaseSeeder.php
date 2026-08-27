@@ -26,16 +26,16 @@ class DatabaseSeeder extends Seeder
         //$this->call(GroupSeeder::class);
         //$this->call(ActivitySeeder::class);
         //$this->call(PermissionSeeder::class);
-        $this->call(RadiomarathonKeySeeder::class);
+        //$this->call(RadiomarathonKeySeeder::class);
 
         //$evaluatorRole = Role::whereName('evaluator')->first();
         //$adminRole     = Role::whereName('admin')->first();
         //$user->roles()->attach( [$evaluatorRole, $adminRole] );
 
-        Program::whereDoesntHave('programStatusLogs')
-        ->get()
-        ->each(function($p){
-            $p->programStatusLogs()->create(['is_active'=>1, 'user_id' => 1]);
-        });
+        //Program::whereDoesntHave('programStatusLogs')
+        //->get()
+        //->each(function($p){
+        //    $p->programStatusLogs()->create(['is_active'=>1, 'user_id' => 1]);
+        //});
     }
 }
