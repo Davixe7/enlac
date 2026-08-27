@@ -11,6 +11,18 @@ use Illuminate\Support\Facades\DB;
 
 class DonationController extends Controller
 {
+
+    public function index(Request $request) {
+        $query = Donation::query();
+
+        if( $request->has('raffle_ticket_id') ){
+            $query->where('raffle_ticket_id', $request->raffle_ticket_id);
+        }
+
+        $data = $query->get();
+        return response()->json(compact('data'));
+    }
+
     private function createDonationWithFolio($data)
     {
         return DB::transaction(function () use ($data) {
@@ -47,7 +59,7 @@ class DonationController extends Controller
         $donation->load(['donor', 'fiscalRecord', 'procurationActivity', 'sponsor']);
 
         $pdf = Pdf::loadView('pdf.donation_receipt', compact('donation'))
-                ->setPaper([0, 0, 226.77, 368.5], 'portrait');
+            ->setPaper([0, 0, 226.77, 368.5], 'portrait');
 
         return $pdf->download('recibo_' . $donation->folio_number . '.pdf');
     }

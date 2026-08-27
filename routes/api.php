@@ -331,6 +331,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/procuration-activities/{id}', [ProcurationActivityController::class, 'update']);
 
     Route::post('/donations', [DonationController::class, 'store']);
+    Route::get('/donations', [DonationController::class, 'index']);
     Route::post('donations/print', [DonationController::class, 'storeAndPrint']);
     Route::get('/reports/donations/export', [DonationReportController::class, 'export']);
     Route::put('/donations/{donation}/cancel', [DonationController::class, 'cancel']);

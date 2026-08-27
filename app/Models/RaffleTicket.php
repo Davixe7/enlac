@@ -29,6 +29,6 @@ class RaffleTicket extends Model
     }
 
     public function donations(){
-        return $this->hasMany(Donation::class, 'raffle_ticket_id', 'id');
+        return $this->hasMany(Donation::class);
     }
 }
