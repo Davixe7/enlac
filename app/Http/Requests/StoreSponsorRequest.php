@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSponsorRequest extends FormRequest
 {
@@ -21,6 +22,8 @@ class StoreSponsorRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = $this->isMethod('put') || $this->isMethod('patch') || $this->route('sponsor');
+
         return [
             'name'             => 'required|string|max:191',
             'last_name'        => 'required|string|max:191',
@@ -32,6 +35,14 @@ class StoreSponsorRequest extends FormRequest
             'contact_by'       => 'required',
             'is_anonymous'     => 'required|boolean',
             'type'             => 'required',
+
+            'candidate_id' => [
+                Rule::requiredIf(function () use ($isUpdate) {
+                    return $this->type === 'link' && !$isUpdate;
+                }),
+                'nullable',
+                'exists:candidates,id',
+            ],
 
             'addresses.*.street'       => 'nullable',
             'addresses.*.inner_number' => 'nullable|string|max:50',
