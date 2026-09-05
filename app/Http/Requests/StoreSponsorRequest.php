@@ -34,7 +34,7 @@ class StoreSponsorRequest extends FormRequest
             'type'             => 'required',
 
             'addresses.*.street'       => 'nullable',
-            'addresses.*.inner_number' => 'nullable',
+            'addresses.*.inner_number' => 'nullable|string|max:50',
             'addresses.*.outer_number' => 'nullable',
             'addresses.*.neighborhood' => 'nullable',
             'addresses.*.city'         => 'nullable',
