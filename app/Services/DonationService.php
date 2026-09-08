@@ -7,6 +7,8 @@ use App\Models\Donation;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use App\Models\ProcurationActivity;
+use App\Enums\ProcurationActivityType;
 
 class DonationService
 {
@@ -47,6 +49,22 @@ class DonationService
     {
         if (isset($data['source']) && $data['source'] === 'others') {
             unset($data['donor_id']);
+        }
+
+        $isPadrinosGenerales = isset($data['activity_type'])
+        && ($data['activity_type'] === 'Padrinos Generales' || $data['activity_type'] === ProcurationActivityType::PADRINOS_GENERALES->value);
+
+        // Si es Padrinos Generales o el campo viene vacío, asigna la actividad por defecto
+        if ($isPadrinosGenerales || empty($data['procuration_activity_id'])) {
+            $defaultActivity = ProcurationActivity::firstOrCreate(
+                ['name' => 'Padrinos Generales'],
+                [
+                    'type' => 'Padrinos Generales',
+                    'is_active' => true,
+                ]
+            );
+
+            $data['procuration_activity_id'] = $defaultActivity->id;
         }
 
         $fullName = $data['full_name'] ?? null;

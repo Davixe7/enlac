@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProcurationActivityType;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProcurationActivityRequest extends FormRequest
@@ -21,7 +23,7 @@ class StoreProcurationActivityRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'type' => 'required|string',
+            'type' => ['required', new Enum(ProcurationActivityType::class)],
             'is_active' => 'required|boolean'
         ];
     }

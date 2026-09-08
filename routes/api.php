@@ -338,6 +338,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('fiscal-records', DonorFiscalRecordController::class);
     Route::apiResource('radiomarathon-keys', RadiomarathonKeyController::class);
 
+    Route::get('/procuration-activities/types', [ProcurationActivityController::class, 'types']);
     Route::get('/procuration-activities', [ProcurationActivityController::class, 'index']);
     Route::post('/procuration-activities', [ProcurationActivityController::class, 'store']);
     Route::put('/procuration-activities/{id}', [ProcurationActivityController::class, 'update']);

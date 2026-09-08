@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProcurationActivityType;
 use App\Models\ProcurationActivity;
 use App\Http\Requests\StoreProcurationActivityRequest;
 use App\Http\Requests\UpdateProcurationActivityRequest;
@@ -9,6 +10,12 @@ use Illuminate\Http\JsonResponse;
 
 class ProcurationActivityController extends Controller
 {
+
+    public function types(): JsonResponse
+    {
+        return response()->json(ProcurationActivityType::options());
+    }
+
     /**
      * Listar las actividades ordenadas alfabéticamente
      */

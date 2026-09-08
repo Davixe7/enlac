@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProcurationActivityType;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProcurationActivityRequest extends FormRequest
@@ -21,7 +23,7 @@ class UpdateProcurationActivityRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'type' => 'sometimes|required|string',
+            'type' => ['sometimes', 'required', new Enum(ProcurationActivityType::class)],
             'is_active' => 'sometimes|required|boolean',
             'created_date' => 'nullable|date_format:Y-m-d',
             'event_date' => 'nullable|date_format:Y-m-d',

@@ -42,12 +42,12 @@ class Donation extends Model
         return $this->belongsTo(Donor::class);
     }
 
-    /**
-     * Relación con el Catálogo de Actividades de Procuración que creamos antes
-     */
     public function procurationActivity(): BelongsTo
     {
-        return $this->belongsTo(ProcurationActivity::class);
+        return $this->belongsTo(ProcurationActivity::class)->withDefault([
+            'name' => 'Padrinos Generales',
+            'type' => 'Padrinos Generales',
+        ]);
     }
 
     public function fiscalRecord()
