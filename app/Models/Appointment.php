@@ -39,12 +39,13 @@ class Appointment extends Model
         return $query->whereCandidateId($candidate_id);
     }
 
-    public function scopeByType($query, String $type){
-        if( !$type ){
+    public function scopeByType($query, ?string $type)
+    {
+        if (is_null($type) || $type === '') {
             return $query;
         }
 
-        return $query->whereType($type);
+        return $query->where('type', $type);
     }
 
     public function medicalRecords(): HasMany
