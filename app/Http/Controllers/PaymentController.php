@@ -9,6 +9,7 @@ use App\Models\PaymentConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Rap2hpoutre\FastExcel\FastExcel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PaymentController extends Controller
 {
@@ -46,7 +47,7 @@ class PaymentController extends Controller
         ]);
 
         try {
-            DB::transaction(function() use ($request, $data) {
+            return DB::transaction(function() use ($request, $data) {
                 $data['created_by_id'] = auth()->id();
                 $payment               = Payment::create($data);
                 $paymentConfig         = PaymentConfig::find($request->payment_config_id);
@@ -123,5 +124,69 @@ class PaymentController extends Controller
 
         return (new FastExcel($payments))
         ->download($filename);
+    }
+
+    /**
+     * Genera el recibo en PDF para un pago específico.
+     */
+    public function printReceipt(Payment $payment)
+    {
+        $payment->load([
+            'candidate.legalGuardian',
+            'candidate.enlacResponsible',
+            'sponsor',
+            'paymentConfig.sponsor',
+            'user',
+            'paymentDetails'
+        ]);
+
+        $monthNames = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+
+        $monthsFormatted = $payment->paymentDetails->map(function ($detail) use ($monthNames) {
+            $monthName = $monthNames[$detail->month] ?? $detail->month;
+            return "{$monthName} {$detail->year}";
+        })->implode(', ');
+
+        if ($payment->payment_type === 'sponsor') {
+            // Obtenemos el padrino registrado en el pago o en su configuración
+            $sponsor = $payment->sponsor ?: $payment->paymentConfig?->sponsor;
+            $payerName = ($sponsor && $sponsor->full_name) ? $sponsor->full_name : 'Padrino Institucional';
+        } else {
+            // Para cuota de padres: buscamos el tutor legal o responsable ENLAC en contactos
+            $guardian = $payment->candidate?->legalGuardian;
+
+            if ($guardian && $guardian->full_name && $guardian->full_name !== 'SIN DEFINIR') {
+                $payerName = $guardian->full_name;
+            } else {
+                $responsible = $payment->candidate?->enlacResponsible;
+                if ($responsible && $responsible->full_name && $responsible->full_name !== 'N/A') {
+                    $payerName = $responsible->full_name;
+                } else {
+                    $payerName = 'Padre / Tutor';
+                }
+            }
+        }
+
+        $data = [
+            'folio'          => $payment->folio,
+            'date'           => $payment->date ? date('d/m/Y', strtotime($payment->date)) : $payment->created_at->format('d/m/Y'),
+            'concept'        => $payment->payment_type === 'parent' ? 'Cuota de Padres' : 'Aportación de Padrinos',
+            'payer_name'     => $payerName,
+            'beneficiary'    => $payment->candidate ? $payment->candidate->full_name : 'N/A',
+            'period'         => $monthsFormatted ?: 'N/A',
+            'payment_method' => $payment->payment_method,
+            'ref'            => $payment->ref,
+            'amount'         => $payment->amount,
+            'user_name'      => $payment->user ? $payment->user->full_name : 'Sistema',
+        ];
+
+        $pdf = Pdf::loadView('pdf.payment_receipt', $data)
+            ->setPaper([0, 0, 226.77, 368.50]);
+
+        return $pdf->stream("recibo_pago_{$payment->id}.pdf");
     }
 }

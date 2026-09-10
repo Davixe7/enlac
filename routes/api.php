@@ -202,6 +202,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('attendances/candidates', [AttendanceController::class, 'candidates'])->name('attendances.candidates');
     Route::get('payments/{candidate}/export', [PaymentController::class, 'export']);
+    Route::get('payments/{payment}/receipt', [PaymentController::class, 'printReceipt']);
 
     Route::put('candidatestatuses/{candidate}', [CandidateStatusUpdateController::class, 'update']);
 

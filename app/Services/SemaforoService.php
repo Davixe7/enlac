@@ -156,7 +156,7 @@ class SemaforoService
             'color'              => $color,
             'payment_config_id'  => $currentConfig ? $currentConfig->id : null,
             'sponsorship_id'     => $currentConfig ? $currentConfig->sponsorship_id : null,
-            'type'               => $currentConfig ? $currentConfig->sponsorship->type : null
+            'type' => $paymentConfig->sponsorship?->type ?? 'parent',
         ];
     }
 }
