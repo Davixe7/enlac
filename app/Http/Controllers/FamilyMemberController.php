@@ -29,7 +29,7 @@ class FamilyMemberController extends Controller
         $validated = $request->validate([
             'name'                 => 'required|string|max:255',
             'candidate_id'         => 'required|exists:candidates,id',
-            'age'                  => 'nullable|string|max:255',
+            'age'                  => 'nullable',
             'relationship'         => 'required|string|max:100',
             'marital_status'       => 'nullable|string|max:50',
             'scolarship'           => 'nullable|string|max:100',
@@ -37,8 +37,8 @@ class FamilyMemberController extends Controller
             'monthly_income'       => 'required|numeric|min:0',
             'monthly_contribution' => 'required|numeric|min:0|max:' . $request->monthly_income,
         ], [
-            'name.required' => 'El nombre completo es obligatorio.',
-            'monthly_contribution.max' => 'La aportación no puede ser mayor al ingreso mensual.',
+            'name.required'                 => 'El Nombre Completo es obligatorio.',
+            'relationship.required'         => 'El Parentesco es obligatorio.',
         ]);
 
         // Si la validación pasa, creas el registro
@@ -62,16 +62,16 @@ class FamilyMemberController extends Controller
     {
         $validated = $request->validate([
             'name'                 => 'required|string|max:255',
-            'age'                  => 'nullable|integer|min:0|max:120',
-            'relationship'         => 'required|string|max:100',
+            'age'                  => 'nullable',
+            'relationship'         => 'nullable|string|max:100',
             'marital_status'       => 'nullable|string|max:50',
             'scolarship'           => 'nullable|string|max:100',
             'ocupation'            => 'nullable|string|max:150',
-            'monthly_income'       => 'required|numeric|min:0',
-            'monthly_contribution' => 'required|numeric|min:0|max:' . $request->monthly_income,
+            'monthly_income'       => 'nullable|numeric|min:0',
+            'monthly_contribution' => 'nullable|numeric|min:0|max:' . $request->monthly_income,
         ], [
-            'name.required' => 'El nombre completo es obligatorio.',
-            'monthly_contribution.max' => 'La aportación no puede ser mayor al ingreso mensual.',
+            'name.required'                 => 'El Nombre es obligatorio.',
+            'relationship.required'         => 'El Parentesco es obligatorio.',
         ]);
 
         $familyMember->update($validated);
