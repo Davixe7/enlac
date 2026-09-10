@@ -31,6 +31,7 @@ class BeneficiaryResource extends JsonResource
                 return $this->statusLogs->sortByDesc('created_at')->first()?->comments;
                 }),
             'entry_date'                              => $this->entry_date ? Carbon::parse($this->entry_date)->format('d/m/Y') : null,
+            'status_logs' => $this->whenLoaded('statusLogs'),
             'requires_transport'                      => $this->requires_transport,
             'program'                                 => $this->whenLoaded('program'),
             'program_name'                            => $this->whenLoaded('program', $this->program->name),

@@ -17,7 +17,8 @@ class CandidateStatusUpdateController extends Controller
         $data = $request->validate([
             'status'     => ['required', 'string', Rule::in(CandidateStatus::cases())],
             'entry_date' => 'required_if:status,programado',
-            'program_id' => 'required_if:status,programado'
+            'program_id' => 'required_if:status,programado',
+            'comment'    => 'nullable|string',
         ]);
 
         $statusEnum = CandidateStatus::from($data['status']);

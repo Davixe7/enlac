@@ -240,8 +240,9 @@ class Candidate extends Model implements HasMedia
         });
     }
 
-    public function statusLogs(){
-        return $this->hasMany(CandidateStatusLog::class);
+    public function statusLogs()
+    {
+        return $this->hasMany(CandidateStatusLog::class)->with('author')->latest();
     }
 
     public function legalGuardian(){
