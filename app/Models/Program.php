@@ -56,4 +56,20 @@ class Program extends Model
         return $this->hasOne(ProgramPrice::class)
         ->where('valid_since', '>', now());
     }
+
+    public function currentPriceRecord()
+    {
+        return $this->hasOne(ProgramPrice::class)
+            ->where('valid_since', '<=', now())
+            ->latestOfMany('valid_since');
+    }
+
+    public function getValidSinceAttribute()
+    {
+        if ($this->pendingPriceUpdate) {
+            return $this->pendingPriceUpdate->valid_since;
+        }
+
+        return $this->prices()->current()->first()?->valid_since;
+    }
 }

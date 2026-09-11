@@ -22,8 +22,10 @@ class ProgramController extends Controller
 
     public function adminIndex()
     {
-        $programs = Program::orderBy('order')
-        ->get();
+        $programs = Program::with(['pendingPriceUpdate', 'currentPriceRecord'])
+                            ->orderBy('order')
+                            ->get();
+
         return ProgramResource::collection($programs);
     }
 
