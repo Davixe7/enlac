@@ -31,7 +31,7 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['payment_config_id'=>'required|exists:payment_configs,id']);
+        $request->validate(['payment_config_id' => 'required|exists:payment_configs,id']);
 
         $data = $request->validate([
             'payment_config_id' => ['required', 'exists:payment_configs,id'],
@@ -49,8 +49,21 @@ class PaymentController extends Controller
         try {
             return DB::transaction(function() use ($request, $data) {
                 $data['created_by_id'] = auth()->id();
-                $payment               = Payment::create($data);
-                $paymentConfig         = PaymentConfig::find($request->payment_config_id);
+
+                // 1. Obtener la configuración primero
+                $paymentConfig = PaymentConfig::with('sponsorship')->find($request->payment_config_id);
+
+                // 2. Si la configuración tiene sponsor_id o pertenece a un padrinazgo, forzar el tipo y el sponsor_id
+                if ($paymentConfig && $paymentConfig->sponsor_id) {
+                    $data['sponsor_id']   = $paymentConfig->sponsor_id;
+                    $data['payment_type'] = 'sponsor';
+                } elseif ($paymentConfig && $paymentConfig->sponsorship && $paymentConfig->sponsorship->type === 'sponsor') {
+                    $data['sponsor_id']   = $paymentConfig->sponsorship->sponsor_id;
+                    $data['payment_type'] = 'sponsor';
+                }
+
+                // 3. Crear el pago con los datos correctos
+                $payment = Payment::create($data);
 
                 foreach($request->targetMonths as $targetMonth){
                     $amount = $request->is_partial ? $request->amount : $targetMonth['goal_amount'];
@@ -66,10 +79,8 @@ class PaymentController extends Controller
                 return response()->json(['data' => $payment]);
             });
         } catch (\Throwable $th) {
-            //'No se pudo crear el pago o alguno de sus detalles'
             return response()->json(['error' => $th->getMessage()], 500);
         }
-
     }
 
     /**
@@ -151,12 +162,12 @@ class PaymentController extends Controller
             return "{$monthName} {$detail->year}";
         })->implode(', ');
 
-        if ($payment->payment_type === 'sponsor') {
-            // Obtenemos el padrino registrado en el pago o en su configuración
+        if ($payment->payment_type === 'sponsor' || $payment->sponsor_id || $payment->paymentConfig?->sponsor_id) {
             $sponsor = $payment->sponsor ?: $payment->paymentConfig?->sponsor;
-            $payerName = ($sponsor && $sponsor->full_name) ? $sponsor->full_name : 'Padrino Institucional';
+            $payerName = ($sponsor && $sponsor->full_name && $sponsor->full_name !== 'Cuota de Padres')
+                ? $sponsor->full_name
+                : 'Padrino Institucional';
         } else {
-            // Para cuota de padres: buscamos el tutor legal o responsable ENLAC en contactos
             $guardian = $payment->candidate?->legalGuardian;
 
             if ($guardian && $guardian->full_name && $guardian->full_name !== 'SIN DEFINIR') {
