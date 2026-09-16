@@ -39,7 +39,7 @@ class StoreDonationRequest extends FormRequest
 
             // Recibo Deducible
             'has_tax_receipt' => 'required|boolean',
-            'tax_receipt_number' => 'required_if:has_tax_receipt,true|nullable|string|max:100',
+            'tax_receipt_number' => 'nullable',
 
             // VALIDACIONES CONDICIONALES DINÁMICAS (Según el Tipo de Actividad)
             // Alcancías

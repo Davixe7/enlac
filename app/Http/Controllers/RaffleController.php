@@ -19,15 +19,21 @@ class RaffleController extends Controller
      */
     public function index(Request $request)
     {
-        if( $request->filled('procuration_activity_id') ){
-            $data = Raffle::whereProcurationActivityId( $request->procuration_activity_id )
-            ->with(['tickets.buyer', 'tickets.seller', 'tickets' => function($query){
-                $query->withSum('donations', 'amount');
-            }])->firstOrFail();
+        if ($request->filled('procuration_activity_id')) {
+            $data = Raffle::whereProcurationActivityId($request->procuration_activity_id)
+                ->with([
+                    'tickets.buyer',
+                    'tickets.seller',
+                    'tickets.donations',
+                    'tickets' => function($query) {
+                        $query->withSum('donations', 'amount');
+                    }
+                ])->firstOrFail();
+
             return response()->json(compact('data'));
         }
 
-        $data = Raffle::with(['tickets.buyer', 'tickets.seller']);
+        $data = Raffle::with(['tickets.buyer', 'tickets.seller', 'tickets.donations']);
         return response()->json(compact('data'));
     }
 
