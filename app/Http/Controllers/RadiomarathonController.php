@@ -42,7 +42,8 @@ class RadiomarathonController extends Controller
                 DB::raw('COALESCE(SUM(don.amount), 0) as total_donated'),
                 DB::raw('NULL as folio_number'),
                 DB::raw('MAX(don.payment_date) as payment_date'),
-                DB::raw('NULL as payment_method')
+                DB::raw('NULL as payment_method'),
+                DB::raw('NULL as amount_usd')
             )
             ->groupBy('d.id', 'pp.amount', 'd.first_name', 'd.last_name', 'd.second_last_name', 'd.company_name');
     }
@@ -114,6 +115,7 @@ class RadiomarathonController extends Controller
             'company_name' => $companyName ?? 'N/A',
             'promised_amount' => $row->promised_amount ? number_format($promised, 2, '.', '') : null,
             'total_donated' => number_format($donated, 2, '.', ''),
+            'amount_usd' => $row->amount_usd ? number_format((float) $row->amount_usd, 2, '.', '') : null,
             'status' => $status,
             'folio_number' => $row->folio_number ?? 'N/A',
             'payment_date' => $formattedDate,
