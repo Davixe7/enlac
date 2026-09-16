@@ -24,7 +24,8 @@ class StoreProcurationActivityRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'type' => ['required', new Enum(ProcurationActivityType::class)],
-            'is_active' => 'required|boolean'
+            'is_active' => 'required|boolean',
+            'exchange_rate' => 'nullable|numeric|min:0',
         ];
     }
 }

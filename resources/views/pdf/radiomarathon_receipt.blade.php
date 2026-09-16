@@ -116,7 +116,7 @@
             @if(($donation->currency ?? 'MXN') === 'MXN')
                 <div class="field"><span class="bold">Tipo de cambio:</span> N/A</div>
             @else
-                <div class="field"><span class="bold">Tipo de cambio:</span> {{ $donation->exchange_rate }}</div>
+                <div class="field"><span class="bold">Tipo de cambio:</span> {{ (float) $donation->exchange_rate }}</div>
                 <div class="field"><span class="bold">Equivalencia en Pesos:</span> $ {{ number_format($donation->equivalent_amount_mxn, 2) }}</div>
             @endif
 

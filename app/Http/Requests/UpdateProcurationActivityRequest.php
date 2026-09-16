@@ -29,6 +29,7 @@ class UpdateProcurationActivityRequest extends FormRequest
             'event_date' => 'nullable|date_format:Y-m-d',
             'place' => 'nullable|string|max:255',
             'goal_amount' => 'nullable|numeric',
+            'exchange_rate' => 'nullable|numeric|min:0',
             'tickets_count' => 'nullable|integer',
             'ticket_price' => 'nullable|numeric',
             'winning_ticket' => 'nullable|string|max:255',
