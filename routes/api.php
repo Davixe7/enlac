@@ -404,6 +404,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $data = Donation::where('procuration_activity_id', $procurationActivity->id)
         ->whereNotIn('source', ['prospecto', 'boteo'])
         ->with('donor')
+        ->latest()
         ->get();
 
         return response()->json(compact('data'));
