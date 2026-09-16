@@ -62,7 +62,8 @@ class RadiomarathonController extends Controller
                 'don.amount as total_donated',
                 'don.folio_number',
                 'don.payment_date',
-                'don.payment_method'
+                'don.payment_method',
+                'don.amount_usd',
             );
     }
 
@@ -84,7 +85,6 @@ class RadiomarathonController extends Controller
             }
         }
 
-        // Lógica de Estatus Coherente
         if ($row->source === 'prospecto') {
             if ($donated <= 0) {
                 $status = 'pendiente';
@@ -94,7 +94,6 @@ class RadiomarathonController extends Controller
                 $status = 'parcial';
             }
         } else {
-            // Donativos directos/generales no tienen promesa
             $status = 'recibido';
         }
 
@@ -118,7 +117,7 @@ class RadiomarathonController extends Controller
             'status' => $status,
             'folio_number' => $row->folio_number ?? 'N/A',
             'payment_date' => $formattedDate,
-            'raw_payment_date' => $row->payment_date, // Para filtrado exacto ISO
+            'raw_payment_date' => $row->payment_date,
             'payment_method' => $row->payment_method ?? 'N/A',
             'amount' => number_format($donated, 2, '.', '')
         ];

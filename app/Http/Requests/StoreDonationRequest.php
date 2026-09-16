@@ -32,6 +32,7 @@ class StoreDonationRequest extends FormRequest
             'payment_method'        => 'required|in:Efectivo,Transferencia,Depósito,Cheque,Tarjeta Débito,Tarjeta Crédito,Oxxo',
             'reference'             => 'nullable|string|max:255',
             'amount'                => 'required|numeric|min:0.01',
+            'amount_usd'            => 'nullable|numeric',
             'currency'              => 'required|string|max:255',
             'exchange_rate'         => 'required_if:currency,DLLS|nullable|numeric|min:0.0001',
             'equivalent_amount_mxn' => 'required_if:currency,DLLS|nullable|numeric',
