@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDonationRequest;
 use App\Models\Donation;
+use App\Models\RaffleTicket;
 use App\Services\DonationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
@@ -66,6 +67,13 @@ class DonationController extends Controller
         $donation = $this->donationService->createWithFolio($data);
         $donation->load(['donor', 'fiscalRecord', 'procurationActivity', 'sponsor']);
 
+        if (!$donation->donor && !empty($donation->raffle_ticket_id)) {
+            $ticket = RaffleTicket::with('buyer')->find($donation->raffle_ticket_id);
+            if ($ticket && $ticket->buyer) {
+                $donation->setRelation('donor', $ticket->buyer);
+            }
+        }
+
         $pdf = Pdf::loadView('pdf.donation_receipt', compact('donation'))
             ->setPaper([0, 0, 226.77, 368.5], 'portrait');
 
@@ -77,7 +85,6 @@ class DonationController extends Controller
         $data = $request->validated();
         $data['activity_type'] = 'radiomarathon';
 
-        // El servicio limpia los campos innecesarios
         $donation = $this->donationService->createWithFolio($data);
 
         $donation->load(['donor', 'sponsor', 'fiscalRecord', 'procurationActivity', 'radiomarathonKey']);

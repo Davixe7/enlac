@@ -51,10 +51,27 @@ class DonationService
             unset($data['donor_id']);
         }
 
+        // Si viene de un boleto de rifa, vinculamos automáticamente la actividad y el donante
+        if (!empty($data['raffle_ticket_id'])) {
+            $ticket = \App\Models\RaffleTicket::with(['raffle', 'buyer'])->find($data['raffle_ticket_id']);
+
+            if ($ticket) {
+                // Asignar actividad de la rifa si no venía definida
+                if ($ticket->raffle && $ticket->raffle->procuration_activity_id) {
+                    $data['procuration_activity_id'] = $ticket->raffle->procuration_activity_id;
+                }
+
+                // Asignar el donante (buyer) del boleto a la donación
+                if (empty($data['donor_id']) && $ticket->donor_id) {
+                    $data['donor_id'] = $ticket->donor_id;
+                }
+            }
+        }
+
         $isPadrinosGenerales = isset($data['activity_type'])
         && ($data['activity_type'] === 'Padrinos Generales' || $data['activity_type'] === ProcurationActivityType::PADRINOS_GENERALES->value);
 
-        // Si es Padrinos Generales o el campo viene vacío, asigna la actividad por defecto
+        // Si sigue sin procuration_activity_id, se le asigna la actividad por defecto
         if ($isPadrinosGenerales || empty($data['procuration_activity_id'])) {
             $defaultActivity = ProcurationActivity::firstOrCreate(
                 ['name' => 'Padrinos Generales'],
