@@ -99,7 +99,7 @@ class BeneficiaryController extends Controller
 
     public function show(Candidate $candidate)
     {
-        return new BeneficiaryResource($candidate->load(['program','personal_groups', 'locationDetail']));
+        return new BeneficiaryResource($candidate->load(['program','personal_groups', 'locationDetail', 'statusLogs']));
     }
 
     public function showById(int $candidate_id, Request $request)
