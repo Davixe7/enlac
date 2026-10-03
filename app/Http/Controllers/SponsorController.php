@@ -28,9 +28,22 @@ class SponsorController extends Controller
     public function store(StoreSponsorRequest $request)
     {
         $data = $request->validated();
-        unset($data['addresses']);
+
+        $candidateId = $data['candidate_id'] ?? null;
+        unset($data['candidate_id'], $data['addresses']);
 
         $sponsor = Sponsor::create($data);
+
+        if ($sponsor->type === 'link' && !empty($candidateId)) {
+            $sponsor->sponsorships()->create([
+                'candidate_id' => $candidateId,
+                'type'         => 'sponsor',  // Valor valido del ENUM ('parent' o 'sponsor')
+                'amount'       => $request->amount ?? 0,
+                'frequency'    => $request->frequency ?? 1,
+                'month_payday' => $request->month_payday ?? 1,
+                'address_type' => 'home',     // 'home' u 'office' según el ENUM de sponsorships
+            ]);
+        }
 
         if( $request->hasFile('profilePicture') ){
             $sponsor->addMediaFromRequest('profilePicture')->toMediaCollection('profile_picture');

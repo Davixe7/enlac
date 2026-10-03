@@ -49,7 +49,10 @@ class SponsorshipController extends Controller
             unset($receiptData['fiscalStatusFile']);
             $fiscalStatusFile = $request->file('receipt.fiscalStatusFile');
             $receipt          = $sponsorship->deductible_receipt()->create($receiptData);
-            $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
+
+            if ($fiscalStatusFile) {
+                $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
+            }
         }
 
         return new SponsorshipResource($sponsorship);
@@ -71,12 +74,18 @@ class SponsorshipController extends Controller
         $data = $request->validated();
         unset($data['receipt']);
 
+        $sponsorship->update($data);
+
         $receiptData = $request->validated()['receipt'] ?? null;
         if( $receiptData ){
             unset($receiptData['fiscalStatusFile']);
             $fiscalStatusFile = $request->file('receipt.fiscalStatusFile');
             $receipt = DeductibleReceipt::updateOrCreate(['sponsorship_id' => $sponsorship->id], $receiptData);
-            $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
+
+            if ($fiscalStatusFile) {
+                $receipt->clearMediaCollection('fiscalStatus'); // Opcional: limpia la constancia previa si subieron una nueva
+                $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
+            }
         }
 
         return new SponsorshipResource($sponsorship);
