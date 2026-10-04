@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Candidate;
@@ -31,7 +32,9 @@ class SemaforoService
             })->get();
 
         // 3. Obtener los Snapshots activos que intersecten el año escolar
-        $allConfigs = PaymentConfig::where('candidate_id', $candidateId)
+        // Se agrega whereHas('sponsorship') para excluir los sponsorships con soft delete
+        $allConfigs = PaymentConfig::whereHas('sponsorship')
+            ->where('candidate_id', $candidateId)
             ->where('effective_since', '<=', $endCalendarDate)
             ->where(function ($q) use ($startCalendarDate) {
                 $q->whereNull('effective_until')->orWhere('effective_until', '>=', $startCalendarDate);
@@ -54,20 +57,20 @@ class SemaforoService
                 $realYear  = $iMonthCalendarDate->year;
 
                 // Encontrar el snapshot aplicable para este mes calendario específico
-                $currentConfig = $configs->first(function ($snap) use ($sponsorshipId, $iMonthCalendarDate, $iSchoolMonth) {
+                $currentConfig = $configs->first(function ($snap) use ($sponsorshipId, $iMonthCalendarDate) {
                     return $sponsorshipId == $snap->sponsorship_id && $iMonthCalendarDate->between($snap->effective_since, $snap->effective_until ?? now()->addYears(100));
                 });
 
                 if (!$currentConfig) {
-                    $monthsData[$iSchoolMonth] = $this->buildMonthPayload($currentConfig,0, 0, 'white', $realMonth, $realYear);
+                    $monthsData[$iSchoolMonth] = $this->buildMonthPayload($currentConfig, 0, 0, 'white', $realMonth, $realYear);
                     continue;
                 }
 
                 // Sumar aportes específicos para este mes/año asociados a los pagos de este snapshot
                 $paidAmount = $paymentDetails->where('payment_config_id', $currentConfig->id)
-                ->where('year', $realYear)
-                ->where('month', $realMonth)
-                ->sum('amount');
+                    ->where('year', $realYear)
+                    ->where('month', $realMonth)
+                    ->sum('amount');
 
                 $goalAmount = $currentConfig->monthlyAmount;
                 $color = $this->calculateSemesterColor($currentConfig, $iSchoolMonth, $schoolYear, $paidAmount, $goalAmount);
@@ -76,8 +79,9 @@ class SemaforoService
 
             // La matriz ahora devuelve la data indexada por la entidad estructural correcta
             $sponsor = $configs->first()->sponsor;
-            $matrix[$sponsor['full_name']] = $monthsData;
-
+            if ($sponsor) {
+                $matrix[$sponsor['full_name']] = $monthsData;
+            }
         }
 
         return $matrix;
@@ -156,7 +160,7 @@ class SemaforoService
             'color'              => $color,
             'payment_config_id'  => $currentConfig ? $currentConfig->id : null,
             'sponsorship_id'     => $currentConfig ? $currentConfig->sponsorship_id : null,
-            'type' => $paymentConfig->sponsorship?->type ?? 'parent',
+            'type'               => $currentConfig?->sponsorship?->type ?? 'parent',
         ];
     }
 }

@@ -42,8 +42,6 @@ class SponsorshipController extends Controller
 
         $sponsorship = Sponsorship::create($data);
 
-        // Crea el primer snapshot cuando se genera un PaymentConfig
-
         $receiptData = $request->validated()['receipt'] ?? null;
         if( $receiptData ){
             unset($receiptData['fiscalStatusFile']);
@@ -83,7 +81,7 @@ class SponsorshipController extends Controller
             $receipt = DeductibleReceipt::updateOrCreate(['sponsorship_id' => $sponsorship->id], $receiptData);
 
             if ($fiscalStatusFile) {
-                $receipt->clearMediaCollection('fiscalStatus'); // Opcional: limpia la constancia previa si subieron una nueva
+                $receipt->clearMediaCollection('fiscalStatus');
                 $receipt->addMedia($fiscalStatusFile)->toMediaCollection('fiscalStatus');
             }
         }
