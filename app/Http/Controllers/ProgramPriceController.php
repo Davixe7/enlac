@@ -6,19 +6,16 @@ use App\Models\Program;
 use App\Models\ProgramPrice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ProgramPriceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        if( $request->pending ){
+        if ($request->pending) {
             $data = ProgramPrice::whereProgramId($request->program_id)
-            ->where('valid_since', '>', now())
-            ->first();
+                ->where('applied', 0)
+                ->where('valid_since', '>', now()->format('Y-m-d'))
+                ->first();
             return response()->json(compact('data'));
         }
 
@@ -26,46 +23,71 @@ class ProgramPriceController extends Controller
         return response()->json(compact('data'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'program_id'  => 'required',
+            'program_id'  => 'required|exists:programs,id',
             'price'       => 'required|numeric',
             'valid_since' => 'required|date'
         ]);
 
-        $validSince = Carbon::parse($request->input('valid_since'));
-        $validUntil = $validSince->copy()->subDay();
-        $data       = array_merge($validated,[
-            'valid_since' => $validSince->format('Y-m-d'),
-            'applied'     => 0
-        ]);
+        // Extraemos únicamente la fecha Y-m-d limpia (sin componente de hora)
+        $validSinceDate = Carbon::parse($request->input('valid_since'))->format('Y-m-d');
+        $todayDate      = now()->format('Y-m-d');
 
-        if( $validSince->isToday() ){
-            $data['applied'] = 1;
+        // Si la fecha enviada es menor o igual al día de hoy, SE APLICA HOY
+        $isCurrentOrPast = ($validSinceDate <= $todayDate);
+        $validUntil      = Carbon::parse($validSinceDate)->subDay()->format('Y-m-d');
 
-            ProgramPrice::whereProgramId($request->program_id)
-            ->current()
-            ->update(['valid_until' => $validUntil->format('Y-m-d')]);
+        if ($isCurrentOrPast) {
+            // 1. Cerramos la vigencia del registro activo anterior
+            ProgramPrice::where('program_id', $request->program_id)
+                ->where('applied', 1)
+                ->whereNull('valid_until')
+                ->update(['valid_until' => $validUntil]);
 
-            Program::where('id', $request->program_id)
-            ->update(['price'=>$request->price]);
+            // 2. Eliminamos o limpiamos cualquier registro futuro pendiente
+            ProgramPrice::where('program_id', $request->program_id)
+                ->where('applied', 0)
+                ->delete();
+
+            // 3. Insertamos el nuevo precio activo (applied = 1)
+            $priceRecord = ProgramPrice::create([
+                'program_id'  => $request->program_id,
+                'price'       => $request->price,
+                'valid_since' => $validSinceDate,
+                'valid_until' => null,
+                'applied'     => 1
+            ]);
+
+            // 4. Actualizamos de forma inmediata la columna price en la tabla programs
+            $program = Program::find($request->program_id);
+            $program->update(['price' => $request->price]);
+
+        } else {
+            // Es una fecha estrictamente futura
+            $priceRecord = ProgramPrice::updateOrCreate(
+                [
+                    'program_id' => $request->program_id,
+                    'applied'    => 0
+                ],
+                [
+                    'price'       => $request->price,
+                    'valid_since' => $validSinceDate,
+                    'valid_until' => null,
+                    'applied'     => 0
+                ]
+            );
+
+            $program = Program::find($request->program_id);
         }
 
-        $newPrice = ProgramPrice::updateOrCreate([
-            'program_id' => $request->program_id,
-            'applied'    => 0
-        ], $data);
-
-        return response()->json(['data'=>$newPrice], 201);
+        return response()->json([
+            'data'    => $priceRecord,
+            'program' => $program->fresh()
+        ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, ProgramPrice $programPrice)
     {
         $validated = $request->validate([
@@ -73,30 +95,44 @@ class ProgramPriceController extends Controller
             'valid_since' => 'sometimes|date'
         ]);
 
-        $validSince = Carbon::parse($request->input('valid_since'));
-        $validUntil = $validSince->copy()->subDay();
-        $applied    = false;
+        $validSinceDate = Carbon::parse($request->input('valid_since', $programPrice->valid_since))->format('Y-m-d');
+        $todayDate      = now()->format('Y-m-d');
 
-        if( $validSince->isToday() ){
-            ProgramPrice::whereProgramId($programPrice->program_id)
-            ->current()
-            ->update(['valid_until' => $validUntil]);
+        $isCurrentOrPast = ($validSinceDate <= $todayDate);
+        $validUntil      = Carbon::parse($validSinceDate)->subDay()->format('Y-m-d');
 
-            Program::where('id', $request->program_id)->update(['price'=>$request->price]);
+        if ($isCurrentOrPast) {
+            ProgramPrice::where('program_id', $programPrice->program_id)
+                ->where('id', '!=', $programPrice->id)
+                ->where('applied', 1)
+                ->whereNull('valid_until')
+                ->update(['valid_until' => $validUntil]);
 
-            $applied    = true;
+            Program::where('id', $programPrice->program_id)
+                ->update(['price' => $request->input('price', $programPrice->price)]);
+
+            $programPrice->update([
+                'price'       => $request->input('price', $programPrice->price),
+                'valid_since' => $validSinceDate,
+                'valid_until' => null,
+                'applied'     => 1
+            ]);
+        } else {
+            $programPrice->update([
+                'price'       => $request->input('price', $programPrice->price),
+                'valid_since' => $validSinceDate,
+                'applied'     => 0
+            ]);
         }
 
-        $programPrice->update(array_merge($validated, [
-            'applied' => $applied
-        ]));
+        $program = Program::find($programPrice->program_id);
 
-        return response()->json(['data'=>$programPrice], 200);
+        return response()->json([
+            'data'    => $programPrice,
+            'program' => $program->fresh()
+        ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(ProgramPrice $programPrice)
     {
         //
