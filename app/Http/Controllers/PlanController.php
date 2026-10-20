@@ -118,8 +118,11 @@ class PlanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Plan $personalProgram)
+    public function destroy(Plan $plan)
     {
-        //
+        $plan->activities()->detach();
+        $plan->delete();
+
+        return response()->json(['message' => 'Programa eliminado exitosamente.'], 200);
     }
 }
