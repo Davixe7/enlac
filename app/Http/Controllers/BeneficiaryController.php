@@ -142,11 +142,22 @@ class BeneficiaryController extends Controller
             'profile_picture_url' => $profileImageUrl,
             'chronological_age'    => number_format( Carbon::parse($data1[0]->birth_date)->diffInMonths(), 2 )
         ];
-        return response()->json(compact('data'), 200);
+        return !empty($data) ? response()->json(compact('data'), 200) : response()->json(['message' => 'No data found'], 404);
     }
 
     public function medicalRecords(int $idAppoiment, Request $request)
     {
+        //obtener id del candidato asociado a la cita
+        $candidateId = DB::table('appointments')
+            ->where('id', $idAppoiment)
+            ->value('candidate_id');
+        //buscar gender del candidato asociado a la cita
+        $gender = DB::table('medical_records')
+            ->where('status', 1)
+            ->where('candidate_id', $candidateId)
+            ->where('gender', '!=', null)
+            ->value('gender');
+        // Fetch medical records for the given appointment ID
         $medical_record = DB::table('medical_records')
             ->Where('appointment_id',"=", $idAppoiment)
             ->where('status', 1)
@@ -285,7 +296,7 @@ class BeneficiaryController extends Controller
                 'appointment_id' => $idAppoiment,
                 'type_id' => "",
                 'appointment_type' => "",
-                'gender' => ""
+                'gender' => $gender
             ];
         }else{
             $data = [
@@ -354,11 +365,12 @@ class BeneficiaryController extends Controller
                 'appointment_id' => $medical_record[0]->appointment_id,
                 'type_id' => $medical_record[0]->type_id,
                 'appointment_type' => $medical_record[0]->appointment_type,
-                'gender' => $medical_record[0]->gender
+                'gender' => $medical_record[0]->gender == null ? $gender : $medical_record[0]->gender
             ];
         }
 
         return response()->json(['data'=>$data], 200);
+        // return $gender;
     }
 
     public function internMedicaments(int $event_id, Request $request)
